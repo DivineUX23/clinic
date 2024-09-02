@@ -1,0 +1,41 @@
+/* Replace blue with pink */
+:root {
+    --primary: #ff69b4;
+    --secondary: #ffb6c1;
+    --accent: #ff1493;
+    --primary-fg: #fff;
+  
+    --body-fg: #333;
+    --body-bg: #fff;
+    --body-quiet-color: #666;
+    --body-loud-color: #000;
+  
+    --header-color: #ffc0cb;
+    --header-branding-color: var(--accent);
+    --header-bg: var(--secondary);
+    --header-link-color: var(--primary-fg);
+  
+    --breadcrumbs-fg: #ff69b4;
+    --breadcrumbs-link-fg: var(--body-bg);
+    --breadcrumbs-bg: var(--primary);
+  
+    --link-fg: #ff1493;
+    --link-hover-color: #ff69b4;
+    --link-selected-fg: #ff69b4;
+  
+    --hairline-color: #ffc0cb;
+    --border-color: #ffc0cb;
+  
+    --error-fg: #ff0000;
+  
+    --message-success-bg: #ffb6c1;
+    --message-warning-bg: #ffe4b5;
+    --message-error-bg: #ffe4e1;
+  
+    --darkened-bg: #ffc0cb;
+    --selected-bg: #ffe4e1;
+    --selected-row: #ffe4e1;
+  
+    --close-button-bg: #ff69b4;
+    --close-button-hover-bg: #ff1493;
+  }
