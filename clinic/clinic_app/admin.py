@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem, Cart, CartItem, Newsletter
+from .models import Category, Product, Order, OrderItem, CartItem, Cart
 """
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -30,14 +30,14 @@ class CartItemInline(admin.TabularInline):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ['user', 'created_at', 'updated_at']
+    list_display = ['session_key', 'created_at', 'updated_at']
     inlines = [CartItemInline]
-
+"""
 @admin.register(Newsletter)
 class NewsletterAdmin(admin.ModelAdmin):
     list_display = ['email', 'subscribed_at']
     search_fields = ['email']
-
+"""
 # If you want to customize the admin site header and title
 admin.site.site_header = 'Jolly Life Health E-commerce Admin'
 admin.site.site_title = 'Jolly Life Health E-commerce Admin Portal'
