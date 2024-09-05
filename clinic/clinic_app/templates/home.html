@@ -346,30 +346,43 @@ End CSS
 
 <!-- Add this script at the end of your template -->
 <script>
-    function addTobeBought(productId) {
-        const form = document.getElementById(`form-${productId}`);
-        const formData = new FormData(form);
+  function addTobeBought(productId) {
+    console.log('Function called with productId:', productId);
     
-        fetch("{% url 'add_to_cart' %}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-CSRFToken": formData.get("csrfmiddlewaretoken")
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("Product added to cart successfully!");
-                console.log('Error:', formData)
-                // Update cart quantity or any other UI changes here
-            } else {
-                alert("Failed to add product to cart.");
-            }
-        })
-        .catch(error => console.error('Error:', error));
+    const form = document.getElementById(`form-${productId}`);
+    console.log('Form found:', form);
+    
+    const formData = new FormData(form);
+    console.log('FormData created:');
+    
+    // Debugging the contents of FormData
+    for (let pair of formData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
     }
-    
+
+    fetch("{% url 'add_to_cart' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+        }
+    })
+    .then(response => {
+        console.log('Response received:', response);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Data received:', data);
+        if (data.success) {
+            alert("Product added to cart successfully!");
+            // Update cart quantity or any other UI changes here
+        } else {
+            alert("Failed to add product to cart.");
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
 </script>
 {% endblock %}
   <!-- ================================

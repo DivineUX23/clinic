@@ -23,12 +23,22 @@ from . import views
 urlpatterns = [
     #path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('cart', views.cart, name='cart'),
+    #path('cart', views.cart, name='cart'),
     path('add-to-cart/', views.add_to_cart, name='add_to_cart'),
+    
+    path('cart/', views.cart_view, name='cart'),
+    path('cart/update/', views.update_cart, name='update_cart'),
+    path('cart/update-note/', views.update_order_note, name='update_order_note'),
+
+
+    path('initialize-payment/', views.initialize_payment, name='initialize_payment'),
+    path('payment-callback/', views.payment_callback, name='payment_callback'),
+    #path('payment-success/', views.payment_success, name='payment_success'),
+    #path('payment-failed/', views.payment_failed, name='payment_failed'),
+
 ]
 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-

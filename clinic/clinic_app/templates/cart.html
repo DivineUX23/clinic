@@ -21,177 +21,165 @@ End CSS
   Start Content
   ================================= -->
 
-{% block content %}
-
-
-<!-- Body-->
-
-<!-- Page Content-->
-<div class="container mt-3 rtl px-0 px-md-3" style="text-align: left;" id="cart-summary">
-<h3 class="mt-4 mb-3 text-center text-lg-left mobile-fs-20">Shopping cart</h3>
-
-
-<div class="row g-3 mx-max-md-0">
-<!-- List of items-->
-<section class="col-lg-8 px-max-md-0">
-                <!-- for web -->
-<div class="table-responsive d-none d-lg-block">
-<table class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table __cart-table">
-<thead class="thead-light">
-    <tr class="">
-        <th class="font-weight-bold __w-45">
-            <div class="pl-3">
-                Product
-            </div>
-        </th>
-        <th class="font-weight-bold pl-0 __w-15p text-capitalize">Unit price</th>
-        <th class="font-weight-bold __w-15p">
-            <span class="pl-3">Qty</span>
-        </th>
-        <th class="font-weight-bold __w-15p text-end">
-            <div class="pr-3">
-                Total
-            </div>
-        </th>
-    </tr>
-</thead>
-</table>
-        </div>
-<!-- end web -->
-<!-- Mobile -->
-            <!-- End Mobile -->
-
-
-                                
-                                        
-
-<div class="card mb-4">
-<div class="card-body py-5">
-    <div class="py-md-4">
-        <div class="text-center text-capitalize">
-            <img class="mb-3 mw-100" src="https://medplusnig.com/public/assets/front-end/img/icons/empty-cart.svg" alt="">
-            <p class="text-capitalize">Your Cart is Empty!</p>
-        </div>
-    </div>
-</div>
-</div>
-        
-
-<div class="px-3 px-md-0 mt-3 mt-md-0">
-<form  method="get">
-    <div class="mb-lg-3">
-        <div class="row">
-            <div class="col-12">
-                <label for="phoneLabel" class="form-label input-label">Order note <span
-                class="input-label-secondary">(Optional)</span></label>
-                <textarea class="form-control w-100 border-aliceblue" id="order_note" name="order_note"></textarea>
-            </div>
-        </div>
-    </div>
-</form>
-</div>
-</section>
-
-<!-- Sidebar-->
-<aside class="col-lg-4 pt-4 pt-lg-2 px-max-md-0">
-<div class="__cart-total __cart-total_sticky">
-<div class="cart_total p-0">
-                                                                                                                    
-
-<div class="d-flex justify-content-between">
-<span class="cart_title">Sub total</span>
-<span class="cart_value">
-    ₦0.00
-</span>
-</div>
-<div class="d-flex justify-content-between">
-<span class="cart_title">Tax</span>
-<span class="cart_value">
-    ₦0.00
-</span>
-</div>
-<div class="d-flex justify-content-between">
-<span class="cart_title">Shipping</span>
-<span class="cart_value">
-    ₦0.00
-</span>
-</div>
-<div class="d-flex justify-content-between">
-<span class="cart_title">Discount on product</span>
-<span class="cart_value">
-    - ₦0.00
-</span>
-</div>
-                    <hr class="my-2">
-<div class="d-flex justify-content-between">
-<span class="cart_title text-primary font-weight-bold">Total</span>
-<span class="cart_value">
-₦0.00
-</span>
-</div>
-</div>
-            <div class="mt-5">
-<div class="row justify-content-center g-4">
-                                                        <div class="col-sm-3 px-0 text-center mobile-padding">
-                <img class="order-summery-footer-image" src="https://medplusnig.com/storage/app/public/company-reliability/"
-                onerror="this.src='https://medplusnig.com/public/assets/front-end/img/delivery_info.png'" alt="">
-                <div class="deal-title">Fast Delivery all across the country</div>
-            </div>
-                                                                                <div class="col-sm-3 px-0 text-center mobile-padding">
-                <img class="order-summery-footer-image" src="https://medplusnig.com/storage/app/public/company-reliability/"
-                onerror="this.src='https://medplusnig.com/public/assets/front-end/img/safe_payment.png'" alt="">
-                <div class="deal-title">Safe Payment</div>
-            </div>
-                                                                                <div class="col-sm-3 px-0 text-center mobile-padding">
-                <img class="order-summery-footer-image" src="https://medplusnig.com/storage/app/public/company-reliability/"
-                onerror="this.src='https://medplusnig.com/public/assets/front-end/img/return_policy.png'" alt="">
-                <div class="deal-title">messages.24 hours Return Policy</div>
-            </div>
-                                                                                <div class="col-sm-3 px-0 text-center mobile-padding">
-                <img class="order-summery-footer-image" src="https://medplusnig.com/storage/app/public/company-reliability/"
-                onerror="this.src='https://medplusnig.com/public/assets/front-end/img/authentic_product.png'" alt="">
-                <div class="deal-title">100% Authentic Products</div>
-            </div>
-                                            </div>
-</div>
-
-<div class="mt-4">
-            <a href="https://medplusnig.com/customer/auth/login" class="btn btn--primary btn-block proceed_to_next_button disabled" >Proceed to Next</a>
-    </div>
-
-</div>
-</aside>
-
-<div class="bottom-sticky3 bg-white p-3 shadow-sm w-100 d-lg-none">
-<div class="d-flex justify-content-center align-items-center fs-14 mb-2">
-<div class="product-description-label fw-semibold text-capitalize">Total price : </div>
-&nbsp; <strong  class="text-base">₦0.00</strong>
-</div>
-<a href="https://medplusnig.com/customer/auth/login" class="btn btn--primary btn-block proceed_to_next_button text-capitalize disabled">Proceed to next</a>
-</div>
-
-
-</div>
-
-</div>
-
-<span id="update_nav_cart_url" data-url="https://medplusnig.com/cart/nav-cart-items"></span>
-<span id="remove_from_cart_url" data-url="https://medplusnig.com/cart/remove"></span>
-<span id="update_quantity_url" data-url="https://medplusnig.com/cart/updateQuantity-guest"></span>
-<span id="order_again_url" data-url="https://medplusnig.com/cart/order-again"></span>
-
-
-
-<!-- Toolbar for handheld devices-->
-
-<!-- Back To Top Button-->
-<a class="btn-scroll-top btn--primary" href="#top" data-scroll>
-<span class="btn-scroll-top-tooltip text-muted font-size-sm mr-2">Top</span><i
-class="btn-scroll-top-icon czi-arrow-up"> </i>
-</a>
-
-
-{% endblock %}
   <!-- ================================
   End Content
   ================================= -->
+
+
+
+{% block content %}
+<!-- Body-->
+<!-- Page Content-->
+<div class="container mt-3 rtl px-0 px-md-3" style="text-align: left;" id="cart-summary">
+    <h3 class="mt-4 mb-3 text-center text-lg-left mobile-fs-20">Shopping cart</h3>
+
+    <div class="row g-3 mx-max-md-0">
+        <!-- List of items-->
+        <section class="col-lg-8 px-max-md-0">
+            <!-- for web -->
+            <div class="table-responsive d-none d-lg-block">
+                <table class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table __cart-table">
+                    <thead class="thead-light">
+                        <tr class="">
+                            <th class="font-weight-bold __w-45">
+                                <div class="pl-3">
+                                    Product
+                                </div>
+                            </th>
+                            <th class="font-weight-bold pl-0 __w-15p text-capitalize">Unit price</th>
+                            <th class="font-weight-bold __w-15p">
+                                <span class="pl-3">Qty</span>
+                            </th>
+                            <th class="font-weight-bold __w-15p text-end">
+                                <div class="pr-3">
+                                    Total
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td class="__w-45">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="mr-2" style="width: 60px; height: 60px;">
+                                    <div>{{ item.product.name }}</div>
+                                </div>
+                            </td>
+                            <td class="__w-15p">₦{{ item.product.price }}</td>
+                            <td class="__w-15p">
+                                <form method="post" action="{% url 'update_cart' %}" class="d-flex align-items-center">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                    <button type="submit" name="action" value="decrease" class="btn btn-sm btn-outline-secondary">-</button>
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm mx-2" style="width: 60px;">
+                                    <button type="submit" name="action" value="increase" class="btn btn-sm btn-outline-secondary">+</button>
+                                </form>
+                            </td>
+                            <td class="__w-15p text-end">₦{{ item.total_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- end web -->
+
+            <!-- Mobile -->
+            <div class="d-lg-none">
+                {% for item in cart_items %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4">
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid">
+                            </div>
+                            <div class="col-8">
+                                <h5>{{ item.product.name }}</h5>
+                                <p>Price: ₦{{ item.product.price }}</p>
+                                <form method="post" action="{% url 'update_cart' %}" class="d-flex align-items-center">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                    <button type="submit" name="action" value="decrease" class="btn btn-sm btn-outline-secondary">-</button>
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm mx-2" style="width: 60px;">
+                                    <button type="submit" name="action" value="increase" class="btn btn-sm btn-outline-secondary">+</button>
+                                </form>
+                                <p class="mt-2">Total: ₦{{ item.total_price }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- End Mobile -->
+
+            {% if not cart_items %}
+            <div class="card mb-4">
+                <div class="card-body py-5">
+                    <div class="py-md-4">
+                        <div class="text-center text-capitalize">
+                            <img class="mb-3 mw-100" src="{% static 'assets/front-end/img/icons/empty-cart.svg' %}" alt="">
+                            <p class="text-capitalize">Your Cart is Empty!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="px-3 px-md-0 mt-3 mt-md-0">
+                <form method="post" action="{% url 'update_order_note' %}">
+                    {% csrf_token %}
+                    <div class="mb-lg-3">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="order_note" class="form-label input-label">Order note <span class="input-label-secondary">(Optional)</span></label>
+                                <textarea class="form-control w-100 border-aliceblue" id="order_note" name="order_note">{{ order_note }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Update Note</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Sidebar-->
+        <aside class="col-lg-4 pt-4 pt-lg-2 px-max-md-0">
+            <div class="__cart-total __cart-total_sticky">
+                <div class="cart_total p-0">
+                    <div class="d-flex justify-content-between">
+                        <span class="cart_title">Sub total</span>
+                        <span class="cart_value">₦{{ subtotal }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="cart_title">Tax</span>
+                        <span class="cart_value">₦{{ tax }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="cart_title">Shipping</span>
+                        <span class="cart_value">₦{{ shipping }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="cart_title">Discount on product</span>
+                        <span class="cart_value">- ₦{{ discount }}</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="cart_title text-primary font-weight-bold">Total</span>
+                        <span class="cart_value">₦{{ total }}</span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <!--<a href="" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}">Proceed to Next</a>
+                -->
+                    <form action="{% url 'initialize_payment' %}" method="POST">
+                        {% csrf_token %}
+                        <script src="https://js.paystack.co/v1/inline.js"></script>
+                        <button type="submit" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}" {% if not cart_items %}disabled{% endif %}>
+                            Pay with Paystack
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
