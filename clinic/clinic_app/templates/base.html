@@ -494,8 +494,7 @@
           console.log('Data received:', data);
           if (data.success) {
               alert("Product added to cart successfully!");
-              $('#cart-count').text(response.cart_quantity);
-              // Update cart quantity or any other UI changes here
+              document.getElementById('cart-count').textContent = data.cart_quantity;              // Update cart quantity or any other UI changes here
           } else {
               alert("Failed to add product to cart.");
           }
