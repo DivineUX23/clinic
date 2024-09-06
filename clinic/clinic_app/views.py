@@ -29,13 +29,21 @@ def home(request):
         'new_arrivals': new_arrivals,
         'most_popular': most_popular
     })
+
+
+
+def category(request):
+    return render(request, 'category.html', {})
+
+def product_detail(request, slug):
+    product = get_object_or_404(Product, slug=slug)
+    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:5]
+    context = {
+        'product': product,
+        'related_products': related_products,
+    }
+    return render(request, 'product.html', context)
 """
-def cart(request):
-    cart = get_cart(request)
-    return render(request, 'cart.html', {'cart': cart})
-
-
-
 def get_cart(request):
     session_key = request.session.session_key
     if not session_key:
@@ -154,6 +162,34 @@ def update_cart(request):
 def update_order_note(request):
     order_note = request.POST.get('order_note', '')
     request.session['order_note'] = order_note
+    return redirect('cart')
+
+
+
+@require_POST
+def remove_from_cart(request):
+    print(request.session.session_key)
+    print("-----------------------", request.session.get('cart'))  # Check if the cart exists in the session.
+    #cart = get_object_or_404(Cart, session_key=request.session.session_key)
+    #print(cart)
+
+    cart = Cart.objects.filter(session_key=request.session.session_key).first()
+        
+    product_id = request.POST.get('product_id')
+
+    # Find and remove the item from the cart
+    cart_item = CartItem.objects.filter(cart=cart, product_id=product_id).first()
+    if cart_item:
+        cart_item.delete()  # Remove the item from the database
+    
+    # Check if cart is empty and remove it if needed
+    if not cart.items.exists():
+        cart.delete()
+
+
+    # Save the cart if modifications were made to the cart itself
+    cart.save()
+    
     return redirect('cart')
 
 

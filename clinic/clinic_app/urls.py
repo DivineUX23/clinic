@@ -30,11 +30,20 @@ urlpatterns = [
     path('cart/update/', views.update_cart, name='update_cart'),
     path('cart/update-note/', views.update_order_note, name='update_order_note'),
 
+    path('remove_from_cart/', views.remove_from_cart, name='remove_from_cart'),
 
     path('initialize-payment/', views.initialize_payment, name='initialize_payment'),
     path('payment-callback/', views.payment_callback, name='payment_callback'),
     #path('payment-success/', views.payment_success, name='payment_success'),
     #path('payment-failed/', views.payment_failed, name='payment_failed'),
+
+    path('product/<slug:slug>/', views.product_detail, name='product_detail'),
+
+
+
+
+    path('category', views.category, name='category'),
+
 
 ]
 

@@ -214,7 +214,12 @@ End CSS
   
         <div class="flex items-center text-sm md:text-base 2xl:text-xl whitespace-nowrap">
           <div class="flex items-center gap-1 md:gap-2">
-            <button onclick="quickView('{{ product.id }}')" type="button" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+
+            
+            <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">
+              View
+            </a>
+
             <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-[#FF0077] transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
           </div>
         </div>
@@ -257,7 +262,10 @@ End CSS
   
         <div class="flex items-center text-sm md:text-base 2xl:text-xl whitespace-nowrap">
           <div class="flex items-center gap-1 md:gap-2">
-            <button onclick="quickView('{{ product.id }}')" type="button" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+            
+            <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">
+              View
+            </a>
             <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-[#FF0077] transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
           </div>
         </div>
@@ -344,46 +352,6 @@ End CSS
 </body>
 
 
-<!-- Add this script at the end of your template -->
-<script>
-  function addTobeBought(productId) {
-    console.log('Function called with productId:', productId);
-    
-    const form = document.getElementById(`form-${productId}`);
-    console.log('Form found:', form);
-    
-    const formData = new FormData(form);
-    console.log('FormData created:');
-    
-    // Debugging the contents of FormData
-    for (let pair of formData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-    }
-
-    fetch("{% url 'add_to_cart' %}", {
-        method: "POST",
-        body: formData,
-        headers: {
-            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
-        }
-    })
-    .then(response => {
-        console.log('Response received:', response);
-        return response.json();
-    })
-    .then(data => {
-        console.log('Data received:', data);
-        if (data.success) {
-            alert("Product added to cart successfully!");
-            // Update cart quantity or any other UI changes here
-        } else {
-            alert("Failed to add product to cart.");
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-</script>
 {% endblock %}
   <!-- ================================
   End Content
@@ -418,3 +386,96 @@ End CSS
 
 -->
 
+
+<div class="container mt-4">
+  <div class="row">
+      <!-- Product gallery-->
+      <div class="col-lg-5 col-md-6 col-12">
+          <div class="product-gallery">
+              {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% else %}
+                  <img src="{% static 'img/placeholder.png' %}" alt="Product placeholder" class="img-fluid">
+              {% endif %}
+          </div>
+      </div>
+
+      <!-- Product details-->
+      <div class="col-lg-7 col-md-6 col-12">
+          <h1 class="mb-2">{{ product.name }}</h1>
+          <p class="text-muted">Category: {{ product.get_category_display }}</p>
+          <div class="mb-3">
+              <span class="h3 font-weight-normal text-accent">₦{{ product.price }}</span>
+          </div>
+          <p class="mb-4">{{ product.description }}</p>
+
+          <form id="add-to-cart-form">
+              {% csrf_token %}
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <div class="form-group">
+                  <label for="quantity">Quantity:</label>
+                  <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control" style="width: 100px;">
+              </div>
+              <button type="submit" class="btn btn-primary">Add to Cart</button>
+          </form>
+          <div id="cart-message" class="mt-2"></div>
+
+          {% if product.stock > 0 %}
+              <p class="text-success mt-2">In stock</p>
+          {% else %}
+              <p class="text-danger mt-2">Out of stock</p>
+          {% endif %}
+      </div>
+  </div>
+
+  <!-- Related products -->
+  <div class="row mt-5">
+      <div class="col-12">
+          <h3>Related Products</h3>
+      </div>
+      {% for related_product in related_products %}
+          <div class="col-lg-3 col-md-4 col-6 mt-3">
+              <div class="card h-100">
+                  {% if related_product.image %}
+                      <img src="{{ related_product.image.url }}" class="card-img-top" alt="{{ related_product.name }}">
+                  {% else %}
+                      <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Product placeholder">
+                  {% endif %}
+                  <div class="card-body">
+                      <h5 class="card-title">{{ related_product.name }}</h5>
+                      <p class="card-text">₦{{ related_product.price }}</p>
+                      <a href="{% url 'product_detail' related_product.slug %}" class="btn btn-sm btn-outline-secondary">View Details</a>
+                  </div>
+              </div>
+          </div>
+      {% endfor %}
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+      $('#add-to-cart-form').on('submit', function(e) {
+          e.preventDefault();
+          $.ajax({
+              type: 'POST',
+              url: '{% url "add_to_cart" %}',
+              data: $(this).serialize(),
+              dataType: 'json',
+              success: function(response) {
+                  if (response.success) {
+                      $('#cart-message').html('<div class="alert alert-success">Item added to cart successfully!</div>');
+                      // Update cart count in navbar if you have one
+                      $('#cart-count').text(response.cart_quantity);
+                  } else {
+                      $('#cart-message').html('<div class="alert alert-danger">Failed to add item to cart.</div>');
+                  }
+              },
+              error: function() {
+                  $('#cart-message').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+              }
+          });
+      });
+  });
+</script>
+{% endblock %}

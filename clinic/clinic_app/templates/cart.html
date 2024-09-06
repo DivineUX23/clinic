@@ -66,6 +66,13 @@ End CSS
                                     <div>{{ item.product.name }}</div>
                                 </div>
                             </td>
+                            <td>
+                                <form method="post" action="{% url 'remove_from_cart' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger mt-2">Remove</button>
+                                </form>
+                            </td>
                             <td class="__w-15p">₦{{ item.product.price }}</td>
                             <td class="__w-15p">
                                 <form method="post" action="{% url 'update_cart' %}" class="d-flex align-items-center">
@@ -95,6 +102,13 @@ End CSS
                             </div>
                             <div class="col-8">
                                 <h5>{{ item.product.name }}</h5>
+                                
+                                    <form method="post" action="{% url 'remove_from_cart' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                        <button type="submit" class="btn btn-sm btn-danger mt-2">Remove</button>
+                                    </form>
+                                
                                 <p>Price: ₦{{ item.product.price }}</p>
                                 <form method="post" action="{% url 'update_cart' %}" class="d-flex align-items-center">
                                     {% csrf_token %}

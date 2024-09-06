@@ -1,0 +1,2078 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Jolly Life Health{% endblock %}
+{% block description %}{% endblock %}
+{% block keywords %}{% endblock %}
+
+ 
+<!-- ================================
+Start CSS
+================================= -->
+{% block extend_header %}{% endblock %}
+
+<!-- ================================
+End CSS
+================================= -->
+{% block extend_footer %}{% endblock %}
+
+ 
+ <!-- ================================
+  Start Content
+  ================================= -->
+
+  <!-- ================================
+  End Content
+  ================================= -->
+
+
+
+{% block content %}
+        <!-- Page title-->
+        <div class="__floating-btn">
+                            <div class="wa-widget-send-button">
+                <a href="https://wa.me/2348187122408" target="_blank">
+                    <img src="https://medplusnig.com/public/assets/front-end/img/whatsapp.svg"
+                        class="wa-messenger-svg-whatsapp wh-svg-icon" alt="Chat with us on WhatsApp">
+                </a>
+            </div>
+        
+    </div>
+            <span id="authentication-status" data-auth="false"></span>
+        
+        <div class="row">
+            <div class="col-12" style="margin-top:10rem;position: fixed;z-index: 9999;">
+                <div id="loading" style="display: none;">
+                    <center>
+                        <img width="200"
+                            src="https://medplusnig.com/storage/app/public/company/"
+                            onerror="this.src='https://medplusnig.com/public/assets/front-end/img/loader.gif'"
+                            class="bg-white p-8">
+                    </center>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Page Content-->
+        
+    <!-- Page Title-->
+    <div class="container py-3" dir="ltr">
+        <div class="search-page-header">
+            <div>
+                <h5 class="font-semibold mb-1"> Products </h5>
+                <div class="view-page-item-count">935 Items found</div>
+            </div>
+            <form id="search-form" class="d-none d-lg-block" action="https://medplusnig.com/products" method="GET">
+                <input hidden name="data_from" value="">
+                <div class="sorting-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+                        <path d="M11.6667 7.80078L14.1667 5.30078L16.6667 7.80078" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7.91675 4.46875H4.58341C4.3533 4.46875 4.16675 4.6553 4.16675 4.88542V8.21875C4.16675 8.44887 4.3533 8.63542 4.58341 8.63542H7.91675C8.14687 8.63542 8.33341 8.44887 8.33341 8.21875V4.88542C8.33341 4.6553 8.14687 4.46875 7.91675 4.46875Z" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7.91675 11.9688H4.58341C4.3533 11.9688 4.16675 12.1553 4.16675 12.3854V15.7188C4.16675 15.9489 4.3533 16.1354 4.58341 16.1354H7.91675C8.14687 16.1354 8.33341 15.9489 8.33341 15.7188V12.3854C8.33341 12.1553 8.14687 11.9688 7.91675 11.9688Z" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14.1667 5.30078V15.3008" stroke="#D9D9D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <label class="for-shoting" for="sorting">
+                        <span>Sort by</span>
+                    </label>
+                    <select onchange="filter(this.value)">
+                        <option value="latest">Latest</option>
+                        <option
+                            value="low-high">Low to High Price </option>
+                        <option
+                            value="high-low">High to Low Price</option>
+                        <option
+                            value="a-z">A to Z Order</option>
+                        <option
+                            value="z-a">Z to A Order</option>
+                    </select>
+                </div>
+            </form>
+            <div class="d-lg-none">
+                <div class="filter-show-btn btn btn--primary py-1 px-2 m-0">
+                    <i class="tio-filter"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Page Content-->
+    <div class="container pb-5 mb-2 mb-md-4 rtl __inline-35" dir="ltr">
+        
+        
+        <div id="customRequestCall" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title text-lg font-bold">Request for Fufillment</h6>
+                <button type="button" class="text-2xl" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="" id="pickup-form">
+                    <div class="card-body p-0">
+                        <div class="mt-3">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Requester Full Name
+                                            <span
+                                        class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="name"  id="name">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Email
+                                            <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="email"  id="email">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Phone number
+                                            <span
+                                        class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="phone_no"  id="phone">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Name of product
+                                        <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="product" id="product">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label>Quantity
+                                            <span
+                                        class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" name="quantity"  id="quantity">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label>Sample Prodcuct Image (If any)
+                                            <span
+                                        class="text-danger">(Optional)</span></label>
+                                        <input onchange="readURL(this);" type="file" class="form-control" name="productImage" accept=".webp, .jpg, jpeg, .png"  id="productImage" >
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Note</label>
+                                        <textarea type="number" class="form-control" name="note"  id="note"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div >
+                    <div class="form-group">
+                        <div class="mt-4">
+                            <a id="submitCustomBtn" onclick="submitCustomData()" class="btn btn--primary btn-block">Submit Request</a>
+                        <span id="processText"><h6 style="color: red">...Processing! Please wait</h6></span>
+                    </div>
+                </div>
+            </div>
+            <div >
+                <button type="button" class="btn btn--warning btn-block" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    </div>
+									
+									
+									
+        <div class="row">
+            <!-- Sidebar-->
+            <aside
+                class="col-lg-3 hidden-xs col-md-3 col-sm-4 SearchParameters __search-sidebar pr-2"
+                id="SearchParameters">
+                <!--Price Sidebar-->
+                <div class="cz-sidebar __inline-35" id="shop-sidebar">
+                    <div class="cz-sidebar-header bg-light">
+                        <button class="close ml-auto" type="button" data-dismiss="sidebar" aria-label="Close">
+                            <i class="tio-clear"></i>
+                        </button>
+                    </div>
+                    <div class="pb-0">
+                        <div class="text-center">
+                            <div class="__cate-side-title border-bottom">
+                                <span class="widget-title font-semibold">Filter </span>
+                            </div>
+                            <div class="__p-25-10 w-100 pt-4">
+                                <label class="w-100 opacity-75 text-nowrap for-shoting d-block mb-0" for="sorting" style="padding-right: 0">
+                                    <select class="form-control custom-select" id="searchByFilterValue">
+                                        <option selected disabled>Choose</option>
+                                        <option
+                                            value="https://medplusnig.com/products?data_from=best-selling&amp;page=1" >Best Selling Products</option>
+                                        <option
+                                            value="https://medplusnig.com/products?data_from=top-rated&amp;page=1" >Top rated</option>
+                                        <option
+                                            value="https://medplusnig.com/products?data_from=most-favorite&amp;page=1" >Most favorite</option>
+                                        <option
+                                            value="https://medplusnig.com/products?data_from=featured_deal&amp;page=1" >Featured deal</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="__p-25-10 w-100 pt-0 d-lg-none">
+                                <form id="search-form" action="https://medplusnig.com/products" method="GET">
+                                    <input hidden name="data_from" value="">
+                                    <select class="form-control" onchange="filter(this.value)">
+                                        <option value="latest">Latest</option>
+                                        <option
+                                            value="low-high">Low to High Price </option>
+                                        <option
+                                            value="high-low">High to Low Price</option>
+                                        <option
+                                            value="a-z">A to Z Order</option>
+                                        <option
+                                            value="z-a">Z to A Order</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-center">
+                            <div class="__cate-side-title pt-0">
+                                <span class="widget-title font-semibold">Price </span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center __cate-side-price">
+                                <div class="__w-35p">
+                                    <input class="bg-white cz-filter-search form-control form-control-sm appended-form-control"
+                                           type="number" value="0" min="0" max="1000000" id="min_price" placeholder="Min">
+
+                                </div>
+                                <div class="__w-10p">
+                                    <p class="m-0">To</p>
+                                </div>
+                                <div class="__w-35p">
+                                    <input value="100" min="100" max="1000000"
+                                           class="bg-white cz-filter-search form-control form-control-sm appended-form-control"
+                                           type="number" id="max_price"  placeholder="Max">
+
+                                </div>
+
+                                <div class="d-flex justify-content-center align-items-center __number-filter-btn">
+
+                                    <a class="" onclick="searchByPrice()">
+                                        <i class="__inline-37 czi-arrow-right"></i>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                                        <div>
+                        <div class="text-center">
+                            <div class="__cate-side-title">
+                                <span class="widget-title font-semibold">Brands</span>
+                            </div>
+                            <div class="__cate-side-price pb-3">
+                                <div class="input-group-overlay input-group-sm">
+                                    <input style="" placeholder="Search by brands"
+                                        class="__inline-38 cz-filter-search form-control form-control-sm appended-form-control"
+                                        type="text" id="search-brand">
+                                    <div class="input-group-append-overlay">
+                                        <span class="input-group-text">
+                                            <i class="czi-search"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <ul id="lista1" class="__brands-cate-wrap" data-simplebar data-simplebar-auto-hide="false">
+                                                                    <div class="brand mt-2 for-brand-hover " id="brand">
+                                        <li class="flex-between __inline-39"
+                                            onclick="location.href='https://medplusnig.com/products?id=2&amp;data_from=brand&amp;page=1'">
+                                            <div >
+                                                Non - Drugs
+                                            </div>
+                                                                                            <div class="__brands-cate-badge">
+                                                    <span>
+                                                    437
+                                                    </span>
+                                                </div>
+                                                                                    </li>
+                                    </div>
+                                                                    <div class="brand mt-2 for-brand-hover " id="brand">
+                                        <li class="flex-between __inline-39"
+                                            onclick="location.href='https://medplusnig.com/products?id=1&amp;data_from=brand&amp;page=1'">
+                                            <div >
+                                                Drugs
+                                            </div>
+                                                                                            <div class="__brands-cate-badge">
+                                                    <span>
+                                                    498
+                                                    </span>
+                                                </div>
+                                                                                    </li>
+                                    </div>
+                                                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 __cate-side-arrordion">
+                        <!-- Categories-->
+                        <div>
+                            <div  class="text-center __cate-side-title">
+                                <span class="widget-title font-semibold">Categories</span>
+                            </div>
+                                                        <div class="accordion mt-n1 __cate-side-price" id="shop-categories">
+                                                                                                    <div class="menu--caret-accordion">
+                                        <div class="card-header flex-between">
+                                            <div>
+                                                <label class="for-hover-lable cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=12&amp;data_from=category&amp;page=1'">
+                                                    Drugs
+                                                </label>
+                                            </div>
+                                            <div class="px-2 cursor-pointer menu--caret">
+                                                <strong class="pull-right for-brand-hover">
+                                                                                                            <i class="tio-next-ui fs-13"></i>
+                                                                                                    </strong>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0 ml-2"
+                                             id="collapse-12"
+                                             style="display: none">
+                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=30&amp;data_from=category&amp;page=1'">
+                                                                Vitamins and Supplements
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                                    <i class="tio-next-ui fs-13"></i>
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-30"
+                                                        style="display: none">
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=42&amp;data_from=category&amp;page=1'">
+                                                                    Multivitamins
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=43&amp;data_from=category&amp;page=1'">
+                                                                    Probiotics
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=44&amp;data_from=category&amp;page=1'">
+                                                                    Mineral Supplements
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=45&amp;data_from=category&amp;page=1'">
+                                                                    Sleep Aids
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=46&amp;data_from=category&amp;page=1'">
+                                                                    Stress and Mood Support
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=95&amp;data_from=category&amp;page=1'">
+                                                                    Brain Health
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=47&amp;data_from=category&amp;page=1'">
+                                                                    Detox and Cleansing
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=80&amp;data_from=category&amp;page=1'">
+                                                                    Omega-3
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=96&amp;data_from=category&amp;page=1'">
+                                                                    Blood Sugar Support
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=81&amp;data_from=category&amp;page=1'">
+                                                                    Herbal Supplements
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=48&amp;data_from=category&amp;page=1'">
+                                                                    Weight Management
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=84&amp;data_from=category&amp;page=1'">
+                                                                    Blood Health
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=49&amp;data_from=category&amp;page=1'">
+                                                                    Beauty Supplements
+                                                                </label>
+                                                            </div>
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=31&amp;data_from=category&amp;page=1'">
+                                                                Antimalaria
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-31"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=32&amp;data_from=category&amp;page=1'">
+                                                                Pain Relievers
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                                    <i class="tio-next-ui fs-13"></i>
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-32"
+                                                        style="display: none">
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=50&amp;data_from=category&amp;page=1'">
+                                                                    Anti-Inflammatory
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=51&amp;data_from=category&amp;page=1'">
+                                                                    Muscle Relaxants
+                                                                </label>
+                                                            </div>
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=82&amp;data_from=category&amp;page=1'">
+                                                                Antibiotics
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-82"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=33&amp;data_from=category&amp;page=1'">
+                                                                Anti-asthma
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-33"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=34&amp;data_from=category&amp;page=1'">
+                                                                Cough, Cold and Flu
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                                    <i class="tio-next-ui fs-13"></i>
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-34"
+                                                        style="display: none">
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=52&amp;data_from=category&amp;page=1'">
+                                                                    Cough Syrups
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=53&amp;data_from=category&amp;page=1'">
+                                                                    Cold and Flu
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=54&amp;data_from=category&amp;page=1'">
+                                                                    Nasal Sprays
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=57&amp;data_from=category&amp;page=1'">
+                                                                    Anti-allergy
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=59&amp;data_from=category&amp;page=1'">
+                                                                    Lozenges
+                                                                </label>
+                                                            </div>
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=35&amp;data_from=category&amp;page=1'">
+                                                                Digestive Health
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                                    <i class="tio-next-ui fs-13"></i>
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-35"
+                                                        style="display: none">
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=55&amp;data_from=category&amp;page=1'">
+                                                                    Laxatives
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=56&amp;data_from=category&amp;page=1'">
+                                                                    Antiemesis
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=58&amp;data_from=category&amp;page=1'">
+                                                                    Antiulcers
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=61&amp;data_from=category&amp;page=1'">
+                                                                    Antidiarrheals
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=85&amp;data_from=category&amp;page=1'">
+                                                                    Antispasmodics
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=63&amp;data_from=category&amp;page=1'">
+                                                                    Antacids
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=65&amp;data_from=category&amp;page=1'">
+                                                                    Anti-Hemorrhoids
+                                                                </label>
+                                                            </div>
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=86&amp;data_from=category&amp;page=1'">
+                                                                Antihypertensives
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-86"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=89&amp;data_from=category&amp;page=1'">
+                                                                Antilipidemics
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-89"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=36&amp;data_from=category&amp;page=1'">
+                                                                Eye and Ear Drops
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-36"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=37&amp;data_from=category&amp;page=1'">
+                                                                Topicals
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-37"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=87&amp;data_from=category&amp;page=1'">
+                                                                Antifungals
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-87"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=88&amp;data_from=category&amp;page=1'">
+                                                                Antidiabetics
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-88"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=38&amp;data_from=category&amp;page=1'">
+                                                                Muscle Builders
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-38"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=83&amp;data_from=category&amp;page=1'">
+                                                                Hormonal/Family Planning
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-83"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=39&amp;data_from=category&amp;page=1'">
+                                                                Medical Devices and Diagnostics
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-39"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=41&amp;data_from=category&amp;page=1'">
+                                                                Sexual Health
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                                    <i class="tio-next-ui fs-13"></i>
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-41"
+                                                        style="display: none">
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=60&amp;data_from=category&amp;page=1'">
+                                                                    Oral Contraceptives
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=62&amp;data_from=category&amp;page=1'">
+                                                                    Condoms
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=64&amp;data_from=category&amp;page=1'">
+                                                                    Sexual Enhancers
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=66&amp;data_from=category&amp;page=1'">
+                                                                    Lubricants
+                                                                </label>
+                                                            </div>
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=40&amp;data_from=category&amp;page=1'">
+                                                                First Aid and Surgicals
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-40"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                    </div>
+                                    </div>
+                                                                                                                                        <div class="menu--caret-accordion">
+                                        <div class="card-header flex-between">
+                                            <div>
+                                                <label class="for-hover-lable cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=13&amp;data_from=category&amp;page=1'">
+                                                    Non-Drugs
+                                                </label>
+                                            </div>
+                                            <div class="px-2 cursor-pointer menu--caret">
+                                                <strong class="pull-right for-brand-hover">
+                                                                                                            <i class="tio-next-ui fs-13"></i>
+                                                                                                    </strong>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0 ml-2"
+                                             id="collapse-13"
+                                             style="display: none">
+                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=71&amp;data_from=category&amp;page=1'">
+                                                                Skincare
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-71"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                            <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=67&amp;data_from=category&amp;page=1'">
+                                                                Toiletries
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                                    <i class="tio-next-ui fs-13"></i>
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-67"
+                                                        style="display: none">
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=68&amp;data_from=category&amp;page=1'">
+                                                                    Shower Gels
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=70&amp;data_from=category&amp;page=1'">
+                                                                    Creams &amp; Lotions
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=72&amp;data_from=category&amp;page=1'">
+                                                                    Haircare
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=74&amp;data_from=category&amp;page=1'">
+                                                                    Oral Care
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=94&amp;data_from=category&amp;page=1'">
+                                                                    Oils
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=75&amp;data_from=category&amp;page=1'">
+                                                                    Deodorants
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=93&amp;data_from=category&amp;page=1'">
+                                                                    Lip Care
+                                                                </label>
+                                                            </div>
+                                                                                                                    <div class="card-header">
+                                                                <label class="for-hover-lable d-block cursor-pointer text-left" onclick="location.href='https://medplusnig.com/products?id=79&amp;data_from=category&amp;page=1'">
+                                                                    Men&#039;s Care
+                                                                </label>
+                                                            </div>
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                                                                                                                        <div class="menu--caret-accordion">
+                                                    <div class="for-hover-lable card-header flex-between">
+                                                        <div>
+                                                            <label class="cursor-pointer" onclick="location.href='https://medplusnig.com/products?id=78&amp;data_from=category&amp;page=1'">
+                                                                Mother and Baby Care
+                                                            </label>
+                                                        </div>
+                                                        <div class="px-2 cursor-pointer menu--caret">
+                                                            <strong class="pull-right">
+                                                                                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body p-0 ml-2"
+                                                        id="collapse-78"
+                                                        style="display: none">
+                                                                                                            </div>
+                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
+                                    </div>
+                                                                                                                                                                </div>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- Content  -->
+            <section class="col-lg-9">
+                                    <div class="row" id="ajax-products">
+                        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="973">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="973">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="6608">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/panadol-500mg-1-strips-QzHDDc" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b5176deac95.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('973')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/panadol-500mg-1-strips-QzHDDc">
+                    PANADOL 500MG * 1 STRIP...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦600.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('973')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(973)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="1053">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="1053">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="6121">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/panadol-extra-500mg-1-strips-z1SNpn" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b5186a1f2ab.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('1053')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/panadol-extra-500mg-1-strips-z1SNpn">
+                    PANADOL EXTRA 500MG *1...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦650.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('1053')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(1053)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="930">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="930">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="3644">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/postinor-2-tabs-wzC94e" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b3650d02358.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('930')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/postinor-2-tabs-wzC94e">
+                    POSTINOR * 2 TABS
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦2,450.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('930')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(930)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="919">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="919">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="3273">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/amatem-forte-softgel-6-XyLxwi" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b52427a11b2.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('919')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/amatem-forte-softgel-6-XyLxwi">
+                    AMATEM FORTE SOFTGEL *...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦3,100.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('919')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(919)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="924">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="924">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="3134">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/lonart-ds-6-tabs-GEDnRY" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b5245eeea1e.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('924')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/lonart-ds-6-tabs-GEDnRY">
+                    LONART DS * 6 TABS
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦3,300.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('924')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(924)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="963">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="963">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="2897">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/dkt-postpill-15mg-1-tabs-UTNCqb" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b3652b2c64f.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('963')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/dkt-postpill-15mg-1-tabs-UTNCqb">
+                    DKT POSTPILL 1.5MG * 1...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦2,100.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('963')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(963)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="1034">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="1034">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="2852">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/loratyn-10mg-10-strips-mwpSsN" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b36575d57f9.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('1034')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/loratyn-10mg-10-strips-mwpSsN">
+                    LORATYN 10MG * 10 STRIP...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦1,050.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('1034')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(1034)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="994">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="994">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="2849">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/tothema-oral-solution-20-uBKU9F" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b3654c74df8.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('994')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/tothema-oral-solution-20-uBKU9F">
+                    TOT&#039;HEMA ORAL SOLUTION...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦950.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('994')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(994)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="911">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="911">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="2653">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/coartem-80480mg-6-tabs-MTcxQI" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b5214dd1c48.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('911')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/coartem-80480mg-6-tabs-MTcxQI">
+                    COARTEM 80/480MG * 6 TA...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦5,600.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('911')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(911)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="927">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="927">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="2043">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/vigor-chocolate-for-men-25g-QOmUkk" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b3650ac6994.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('927')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/vigor-chocolate-for-men-25g-QOmUkk">
+                    VIGOR CHOCOLATE FOR MEN...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦3,100.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('927')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(927)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="1147">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="1147">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="1952">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/neurovit-forte-10-strips-cJx967" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b3a389038a3.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('1147')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/neurovit-forte-10-strips-cJx967">
+                    NEUROVIT FORTE * 10 STR...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦2,200.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('1147')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(1147)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="1151">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="1151">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="1486">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/voltaren-retard-100mg-10-strips-Belh6k" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b3a51a26e95.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('1151')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/voltaren-retard-100mg-10-strips-Belh6k">
+                    VOLTAREN RETARD 100MG *...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦4,000.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('1151')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(1151)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="964">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="964">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="1390">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/ciprotab-500mg-14-SHgoNp" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b513a0760c5.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('964')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/ciprotab-500mg-14-SHgoNp">
+                    CIPROTAB 500MG * 14
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦5,350.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('964')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(964)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="920">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="920">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="1338">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/norvasc-10mg-10-strips-YQGNft" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b4f8a72a2e0.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('920')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/norvasc-10mg-10-strips-YQGNft">
+                    NORVASC 10MG * 10 STRIP...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦9,300.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('920')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(920)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="985">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="985">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="1284">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/imodium-6-caps-local-QatEfx" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b36542b852e.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('985')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/imodium-6-caps-local-QatEfx">
+                    IMODIUM * 6 CAPS (LOCAL...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦4,200.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('985')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(985)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="1104">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="1104">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="1266">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/moko-methylated-spirit-200ml-zvyn2m" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b39ecbe8364.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('1104')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/moko-methylated-spirit-200ml-zvyn2m">
+                    MOKO METHYLATED SPIRIT...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦1,700.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('1104')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(1104)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="969">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="969">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="1088">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/nurofen-express-400mg-10-liq-caps-EnnSg8" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b5194126660.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('969')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/nurofen-express-400mg-10-liq-caps-EnnSg8">
+                    NUROFEN EXPRESS 400MG *...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦6,600.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('969')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(969)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="1101">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="1101">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="1086">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/moxie-vit-c-syrup-100ml-ifF9w7" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b39ec9721fb.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('1101')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/moxie-vit-c-syrup-100ml-ifF9w7">
+                    MOXIE VIT-C SYRUP 100ML
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦2,400.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('1101')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(1101)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="934">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="934">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="997">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/naturals-power-plus-for-men-125ml-fTv427" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-07-66b3650f0e661.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('934')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/naturals-power-plus-for-men-125ml-fTv427">
+                    NATURALS POWER PLUS FOR...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦9,750.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('934')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(934)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+        <div class=" col-lg-3 col-md-4 col-sm-4 col-6  p-2">
+                    <form class="product-single-hover style--card mb-3.5" id="1005">
+    <input type="hidden" name="_token" value="oaTMqjVPcris4QTOpDkan8rXrLox3AzgUZ8BxIQb">    <input type="hidden" name="id" value="1005">
+    <input type="hidden" name="quantity"
+    class="form-control input-number text-center cart-qty-field __inline-29 border-0 "
+    placeholder="1" value="1" product-type="physical" min="1" max="996">
+    <div class="overflow-hidden position-relative">
+        <div class=" inline_product clickable d-flex justify-content-center">
+                            <div class="d-flex justify-content-end for-dicount-div-null">
+                    <span class="for-discoutn-value-null"></span>
+                </div>
+                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                <a href="https://medplusnig.com/product/ciprotab-500mg-10-soflets-WmDUtN" class="w-100">
+                    <img src="https://medplusnig.com/storage/app/public/product/thumbnail/2024-08-08-66b512fa11890.webp"
+                        onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'">
+                </a>
+            </div>
+
+            <div class="quick-view">
+                <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('1005')">
+                    
+                </a>
+            </div>
+                    </div>
+        <div class="single-product-details">
+            <div>
+                <a href="https://medplusnig.com/product/ciprotab-500mg-10-soflets-WmDUtN">
+                    CIPROTAB 500MG * 10 SOF...
+                </a>
+            </div>
+            <div class="justify-content-between">
+                <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                        <span class="text-accent text-dark">
+                        ₦4,050.00
+                    </span>
+                </div>
+            </div>
+            <div
+                class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap"
+            >
+                                <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                    <button onclick="quickView('1005')" type="button" class="h-10 text-[#75869D] text-sm md:text-[16px] border-[1px] border-[#75869D] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md">View</button>
+                    <button
+                    onclick="addToCart(1005)" type="button"
+                    class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md"
+                    >
+                    Add To Cart
+                    </button>
+                </div>
+                            </div>
+        </div>
+    </div>
+</form>
+            </div>
+
+<div class="col-12">
+    <nav class="d-flex justify-content-between pt-2" aria-label="Page navigation"
+         id="paginator-ajax">
+        <nav>
+        <ul class="pagination">
+            
+                            <li class="page-item disabled" aria-disabled="true" aria-label="&laquo; Previous">
+                    <span class="page-link" aria-hidden="true">&lsaquo;</span>
+                </li>
+            
+            
+                            
+                
+                
+                                                                                        <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=2">2</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=3">3</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=4">4</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=5">5</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=6">6</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=7">7</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=8">8</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=9">9</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=10">10</a></li>
+                                                                                        
+                                    <li class="page-item disabled" aria-disabled="true"><span class="page-link">...</span></li>
+                
+                
+                                            
+                
+                
+                                                                                        <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=46">46</a></li>
+                                                                                                <li class="page-item"><a class="page-link" href="https://medplusnig.com/products?page=47">47</a></li>
+                                                                        
+            
+                            <li class="page-item">
+                    <a class="page-link" href="https://medplusnig.com/products?page=2" rel="next" aria-label="Next &raquo;">&rsaquo;</a>
+                </li>
+                    </ul>
+    </nav>
+
+    </nav>
+</div>
+                    </div>
+                            </section>
+        </div>
+    </div>
+
+        <span id="update_nav_cart_url" data-url="https://medplusnig.com/cart/nav-cart-items"></span>
+        <span id="remove_from_cart_url" data-url="https://medplusnig.com/cart/remove"></span>
+        <span id="update_quantity_url" data-url="https://medplusnig.com/cart/updateQuantity-guest"></span>
+        <span id="order_again_url" data-url="https://medplusnig.com/cart/order-again"></span>
+        <!-- Footer-->
+</body>
+
+</html>
+{% endblock %}

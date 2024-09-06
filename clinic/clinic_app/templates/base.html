@@ -411,11 +411,13 @@
         }
     </style>
 
+    
         
 </head>
 
 
 <body>
+    
     {% include 'partials/messages.html' %}
     {% include 'partials/nav.html' %}
     {% include 'partials/flooting.html' %}
@@ -459,6 +461,49 @@
 
 <script src=https://medplusnig.com/public/assets/back-end/js/toastr.js></script>
 <script type="text/javascript"></script>
+
+
+<!-- Add this script at the end of your template -->
+<script>
+    function addTobeBought(productId) {
+      console.log('Function called with productId:', productId);
+      
+      const form = document.getElementById(`form-${productId}`);
+      console.log('Form found:', form);
+      
+      const formData = new FormData(form);
+      console.log('FormData created:');
+      
+      // Debugging the contents of FormData
+      for (let pair of formData.entries()) {
+          console.log(`${pair[0]}: ${pair[1]}`);
+      }
+  
+      fetch("{% url 'add_to_cart' %}", {
+          method: "POST",
+          body: formData,
+          headers: {
+              "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+          }
+      })
+      .then(response => {
+          console.log('Response received:', response);
+          return response.json();
+      })
+      .then(data => {
+          console.log('Data received:', data);
+          if (data.success) {
+              alert("Product added to cart successfully!");
+              $('#cart-count').text(response.cart_quantity);
+              // Update cart quantity or any other UI changes here
+          } else {
+              alert("Failed to add product to cart.");
+          }
+      })
+      .catch(error => console.error('Error:', error));
+  }
+  
+  </script>
 <script>
     (function(d, t) {
         var BASE_URL = "https://engage.myserviceagent.net";

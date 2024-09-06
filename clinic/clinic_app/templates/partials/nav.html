@@ -13,8 +13,8 @@ Start Navigation Bar
                     <img src="https://medplusnig.com/public/assets/front-end/img/hamburger.svg" alt="hamburger" class="w-full" />
                 </button>
 
-                <a href="" class="h-[47px] md:h-[77px]">
-                     <img src="static\images\jolly_life.jpg"
+                <a href="{% url 'home' %}" class="h-[47px] md:h-[77px]">
+                     <img src="\static\images\jolly_life.jpg"
                      alt="Jolly Life Health Limited" class="h-full" />
                  </a>
             
@@ -60,7 +60,9 @@ Start Navigation Bar
         <div
           class="h-[16px] min-w-4 p-[4px] absolute left-2 -top-1.5 bg-[#FF2222] text-white rounded-full text-xs flex items-center justify-center"
         >
-                0
+                
+            <div id="cart-message"></div>
+
         </div>
         <img src="https://medplusnig.com/public/assets/front-end/img/cart.svg" alt="cart" />
         <span class="hidden md:block ml-1">Cart</span>
@@ -135,24 +137,42 @@ Start Navigation Bar
             </div>
             <div class="dropdown-menu px-3 text-sm" aria-labelledby="dropdownMenuButton">
                 <div class="py-2">
+                    <a href="{% url 'category' %}">
                     Sexual Health
+                    </a>
                 </div>
+            
                 <div class="py-2">
-                    Beauty and Skin Care
+                    <a href="{% url 'category' %}">
+                        Beauty and Skin Care
+                    </a>
                 </div>
+        
+            
                 <div class="py-2">
-                    Body Fitness
+                    <a href="{% url 'category' %}">
+                        Body Fitness
+                    </a>
                 </div>
+                
                 <div class="py-2">
-                    Vitamins and Supplement
+                    <a href="{% url 'category' %}">
+                        Vitamins and Supplement
+                    </a>
                 </div>
+                
                 <div class="py-2">
-                    Sex Products
-                </div>
-                <div class="py-2">
-                    Consult a Pharmacist
+                    <a href="{% url 'category' %}">
+                        Sex Products
+                    </a>
                 </div>
 
+                <div class="py-2">
+                    <a href="{% url 'category' %}">
+                    Consult a Pharmacist
+                    </a>
+                </div>
+            
             </div>
         </div>
           <a href="" class="flex items-center">
@@ -176,23 +196,42 @@ Start Navigation Bar
                     </div>
                     <div class="dropdown-menu px-3 text-sm" aria-labelledby="dropdownMenuButton">
                         <div class="py-2">
+                            <a href="{% url 'category' %}">
                             Sexual Health
+                            </a>
                         </div>
+                    
                         <div class="py-2">
-                            Beauty and Skin Care
+                            <a href="{% url 'category' %}">
+                                Beauty and Skin Care
+                            </a>
                         </div>
+                
+                    
                         <div class="py-2">
-                            Body Fitness
+                            <a href="{% url 'category' %}">
+                                Body Fitness
+                            </a>
                         </div>
+                        
                         <div class="py-2">
-                            Vitamins and Supplement
+                            <a href="{% url 'category' %}">
+                                Vitamins and Supplement
+                            </a>
                         </div>
+                        
                         <div class="py-2">
-                            Sex Products
+                            <a href="{% url 'category' %}">
+                                Sex Products
+                            </a>
                         </div>
+
                         <div class="py-2">
+                            <a href="{% url 'category' %}">
                             Consult a Pharmacist
+                            </a>
                         </div>
+                    
         
                     </div>
                 </div>
