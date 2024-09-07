@@ -1,20 +1,20 @@
 from django.contrib import admin
 from .models import Category, Product, Order, OrderItem, CartItem, Cart
-"""
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}
-"""
+
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product']
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'price', 'stock', 'category', 'available', 'created_at', 'updated_at']
-    list_filter = ['available', 'category', 'created_at', 'updated_at']
-    list_editable = ['price', 'stock', 'available', 'category',]
+    list_display = ['name', 'slug', 'price', 'stock', 'category', 'section', 'available', 'created_at', 'updated_at']
+    list_filter = ['available', 'category', 'section', 'created_at', 'updated_at']
+    list_editable = ['price', 'stock', 'available', 'category', 'section']
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
 

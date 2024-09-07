@@ -10,8 +10,8 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
-    description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='category_images/', blank=True, null=True)
+    #description = models.TextField(blank=True)
+    #image = models.ImageField(upload_to='category_images/', blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -31,8 +31,8 @@ class Product(models.Model):
     slug = models.SlugField(max_length=200, unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
-    #category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    section = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     url = models.URLField(max_length=500, blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)
     available = models.BooleanField(default=True)

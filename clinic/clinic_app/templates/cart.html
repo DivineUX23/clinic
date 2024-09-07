@@ -46,6 +46,12 @@ End CSS
                                     Product
                                 </div>
                             </th>
+                            <th class="font-weight-bold __w-45">
+                                <div class="pl-3">
+                                    Delete
+                                </div>
+                            </th>
+                            
                             <th class="font-weight-bold pl-0 __w-15p text-capitalize">Unit price</th>
                             <th class="font-weight-bold __w-15p">
                                 <span class="pl-3">Qty</span>
@@ -110,13 +116,14 @@ End CSS
                                     </form>
                                 
                                 <p>Price: ₦{{ item.product.price }}</p>
-                                <form method="post" action="{% url 'update_cart' %}" class="d-flex align-items-center">
+                                <form  class="d-flex align-items-center cart-update-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                    <button type="submit" name="action" value="decrease" class="btn btn-sm btn-outline-secondary">-</button>
-                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm mx-2" style="width: 60px;">
-                                    <button type="submit" name="action" value="increase" class="btn btn-sm btn-outline-secondary">+</button>
+                                    <button type="button" name="action" value="decrease" class="btn btn-sm btn-outline-secondary btn-number" data-type="minus" style="padding: 10px;">-</button>
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm mx-2 input-number text-center" style="width: 60px;">
+                                    <button type="button" name="action" value="increase" class="btn btn-sm btn-outline-secondary btn-number" data-type="plus" style="padding: 10px;">+</button>
                                 </form>
+                                
                                 <p class="mt-2">Total: ₦{{ item.total_price }}</p>
                             </div>
                         </div>
@@ -138,10 +145,42 @@ End CSS
                 </div>
             </div>
             {% endif %}
-
             <div class="px-3 px-md-0 mt-3 mt-md-0">
                 <form method="post" action="{% url 'update_order_note' %}">
                     {% csrf_token %}
+                    
+                    <!-- Delivery Location Section -->
+                    <div class="mb-lg-3">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="delivery_location" class="form-label input-label">Delivery Location</label>
+                                <input type="text" class="form-control w-100 border-aliceblue" id="delivery_location" name="delivery_location" placeholder="Enter your delivery location">
+                            </div>
+                        </div>
+                    </div>
+            
+                    <!-- Name Section -->
+                    <div class="mb-lg-3">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="name" class="form-label input-label">Name</label>
+                                <input type="text" class="form-control w-100 border-aliceblue" id="name" name="name" placeholder="Enter your full name">
+                            </div>
+                        </div>
+                    </div>
+            
+                    <!-- Phone Number Section -->
+                    <div class="mb-lg-3">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="phone_number" class="form-label input-label">Phone Number</label>
+                                <input type="tel" class="form-control w-100 border-aliceblue" id="phone_number" name="phone_number" placeholder="Enter your phone number">
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <!-- Order Note Section -->
                     <div class="mb-lg-3">
                         <div class="row">
                             <div class="col-12">
@@ -150,9 +189,13 @@ End CSS
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-sm btn-outline-primary">Update Note</button>
+            
+            
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Update Order</button>
                 </form>
             </div>
+            
         </section>
 
         <!-- Sidebar-->

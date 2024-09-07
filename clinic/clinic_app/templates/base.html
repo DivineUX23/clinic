@@ -412,6 +412,20 @@
     </style>
 
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.3/sweetalert2.min.css">
+
+    
+<style>
+    .swal-custom-popup {
+        background-color: #FFE4E1 !important; /* Light pink background */
+        color: #FF69B4 !important; /* Hot pink text */
+    }
+    .swal-custom-confirm-button {
+        background-color: #FF69B4 !important; /* Hot pink button */
+        color: white !important;
+    }
+</style>
+  
         
 </head>
 
@@ -462,48 +476,111 @@
 <script src=https://medplusnig.com/public/assets/back-end/js/toastr.js></script>
 <script type="text/javascript"></script>
 
+<!-- Add this in the head of your HTML document -->
 
 <!-- Add this script at the end of your template -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.3/sweetalert2.all.min.js"></script>
 <script>
     function addTobeBought(productId) {
-      console.log('Function called with productId:', productId);
-      
-      const form = document.getElementById(`form-${productId}`);
-      console.log('Form found:', form);
-      
-      const formData = new FormData(form);
-      console.log('FormData created:');
-      
-      // Debugging the contents of FormData
-      for (let pair of formData.entries()) {
-          console.log(`${pair[0]}: ${pair[1]}`);
-      }
-  
-      fetch("{% url 'add_to_cart' %}", {
-          method: "POST",
-          body: formData,
-          headers: {
-              "X-CSRFToken": formData.get("csrfmiddlewaretoken")
-          }
-      })
-      .then(response => {
-          console.log('Response received:', response);
-          return response.json();
-      })
-      .then(data => {
-          console.log('Data received:', data);
-          if (data.success) {
-              alert("Product added to cart successfully!");
-              document.getElementById('cart-count').textContent = data.cart_quantity;              // Update cart quantity or any other UI changes here
-          } else {
-              alert("Failed to add product to cart.");
-          }
-      })
-      .catch(error => console.error('Error:', error));
-  }
-  
-  </script>
+        console.log('Function called with productId:', productId);
+        
+        const form = document.getElementById(`form-${productId}`);
+        console.log('Form found:', form);
+        
+        const formData = new FormData(form);
+        console.log('FormData created:');
+        
+        // Debugging the contents of FormData
+        for (let pair of formData.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
+
+        fetch("{% url 'add_to_cart' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+            }
+        })
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data received:', data);
+            if (data.success) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Product added to cart successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        popup: 'swal-custom-popup',
+                        confirmButton: 'swal-custom-confirm-button'
+                    }
+                });
+                document.getElementById('cart-count').textContent = data.cart_quantity;
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to add product to cart.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        popup: 'swal-custom-popup',
+                        confirmButton: 'swal-custom-confirm-button'
+                    }
+                });
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get all plus and minus buttons
+        const minusButtons = document.querySelectorAll('.btn-number[data-type="minus"]');
+        const plusButtons = document.querySelectorAll('.btn-number[data-type="plus"]');
+    
+        minusButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const input = this.closest('.input-group').querySelector('input[name="quantity"]');
+                let currentValue = parseInt(input.value);
+    
+                // Decrease value if it's greater than the minimum (1 in this case)
+                if (currentValue > parseInt(input.min)) {
+                    input.value = currentValue - 1;
+                }
+    
+                // Optionally, disable the minus button if value hits the minimum
+                if (parseInt(input.value) === parseInt(input.min)) {
+                    this.setAttribute('disabled', 'disabled');
+                }
+            });
+        });
+    
+        plusButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const input = this.closest('.input-group').querySelector('input[name="quantity"]');
+                let currentValue = parseInt(input.value);
+    
+                // Increase value if it's less than the maximum (product stock)
+                if (currentValue < parseInt(input.max)) {
+                    input.value = currentValue + 1;
+    
+                    // Enable the minus button if it was disabled
+                    const minusButton = this.closest('.input-group').querySelector('.btn-number[data-type="minus"]');
+                    minusButton.removeAttribute('disabled');
+                }
+            });
+        });
+    });
+    
+</script>    
+
+#------------------
+<!--<script>
     (function(d, t) {
         var BASE_URL = "https://engage.myserviceagent.net";
         var g = d.createElement(t),
@@ -519,8 +596,7 @@
             })
         }
     })(document, "script");
-</script>
-
+</script>-->
 <script>
     $(document).ready(function() {
         const $stickyElement = $('.bottom-sticky_ele');

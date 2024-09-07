@@ -23,8 +23,8 @@ from decimal import Decimal
 
 # Create your views here.
 def home(request):
-    new_arrivals = Product.objects.filter(category='new_arrival')
-    most_popular = Product.objects.filter(category='most_popular')
+    new_arrivals = Product.objects.filter(section='new_arrival')
+    most_popular = Product.objects.filter(section='most_popular')
     return render(request, 'home.html', {
         'new_arrivals': new_arrivals,
         'most_popular': most_popular
@@ -38,9 +38,11 @@ def category(request):
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
     related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:5]
+    more_products = Product.objects.all().exclude(id=product.id)[:5]
     context = {
         'product': product,
         'related_products': related_products,
+        'more_products': more_products,
     }
     return render(request, 'product.html', context)
 """
@@ -288,3 +290,90 @@ def calculate_total(cart):
     discount = Decimal('0.00')  # Implement your discount logic
     
     return subtotal + tax + shipping - discount
+
+
+
+
+
+
+
+
+
+
+
+
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from .models import Product
+
+def product_list(request, category_id=None):
+
+    if category_id:
+        category = Category.objects.get(id=category_id)
+        products = Product.objects.filter(category=category)
+    else:
+        products = Product.objects.all()
+
+    categories = Category.objects.all()
+    
+    sort = request.GET.get('sort', 'latest')
+
+    if sort == 'low-high':
+        products = products.order_by('price')
+    elif sort == 'high-low':
+        products = products.order_by('-price')
+    elif sort == 'a-z':
+        products = products.order_by('name')
+    elif sort == 'z-a':
+        products = products.order_by('-name')
+    else:  # latest
+        products = products.order_by('-created_at')
+
+    paginator = Paginator(products, 20)  # Show 20 products per page
+    page = request.GET.get('page')
+    products = paginator.get_page(page)
+
+    context = {
+        'products': products,
+        'sort': sort,
+        'categories': categories,
+        'total': products.count
+    }
+    return render(request, 'products.html', context)
+"""
+def product_detail(request, product_id):
+    product = Product.objects.get(id=product_id)
+    context = {
+        'product': product,
+    }
+    return render(request, 'products/product_detail.html', context)
+
+"""
+
+# views.py
+from django.views.generic import ListView
+from django.shortcuts import render
+from .models import Product, Category
+"""
+class ProductListView(ListView):
+    model = Product
+    template_name = 'product_list.html'
+    context_object_name = 'products'
+    paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        return context
+"""
+def category_products(request):
+    #category = Category.objects.get(id=category_id)
+    #products = Product.objects.filter(category=category)
+    categories = Category.objects.all()
+    return render(request, 'nav.html', {
+        #'products': products,
+        'categories': categories,
+        #'current_category': category
+    })
+
+

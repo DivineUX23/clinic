@@ -45,6 +45,13 @@ urlpatterns = [
     path('category', views.category, name='category'),
 
 
+    path('products/', views.product_list, name='products'),
+    path('product/<int:product_id>/', views.product_detail, name='product_detail'),
+    path('category/<int:category_id>/', views.product_list, name='category_products'),
+    
+    #path('products/<str:category>/', views.product_list, name='product_list_by_category'),
+
+
 ]
 
 
