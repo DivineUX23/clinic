@@ -305,10 +305,26 @@ def calculate_total(cart):
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from .models import Product
+from django.db.models import Q
 
 def product_list(request, category_id=None):
 
-    if category_id:
+    #query = request.GET.get('query', '')
+    #products = Product.objects.filter(name__icontains=query) if query else Product.objects.none()
+    
+    query = request.GET.get('q')
+    page = request.GET.get('page', 1)
+    
+
+    if query:
+        print("it's working")
+
+        products = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query)
+        )
+    elif category_id:
         category = Category.objects.get(id=category_id)
         products = Product.objects.filter(category=category)
     else:
@@ -377,3 +393,75 @@ def category_products(request):
     })
 
 
+from django.shortcuts import render
+from .models import Product   # Ensure this imports your Product model
+
+def product_search(request):
+    query = request.GET.get('query', '')
+    products = Product.objects.filter(name__icontains=query) if query else Product.objects.none()
+    context = {
+        'products': products,
+    }
+    return render(request, 'your_template_name.html', context)
+
+
+
+"""
+from difflib import SequenceMatcher
+from django.core.paginator import Paginator
+from django.db.models import Q
+
+def product_list(request, category_id=None):
+    query = request.GET.get('q')
+    page = request.GET.get('page', 1)
+    
+    if query:
+        # Get all products and calculate similarity ratio
+        products = Product.objects.all()
+        similar_products = []
+        
+        for product in products:
+            ratio = SequenceMatcher(None, query.lower(), product.name.lower()).ratio()
+            if ratio > 0.6:  # Adjust the threshold as needed
+                similar_products.append((product, ratio))
+        
+        # Sort products by similarity ratio
+        similar_products.sort(key=lambda x: x, reverse=True)
+        
+        # Extract just the products for pagination
+        products = [p for p in similar_products]
+        
+    elif category_id:
+        category = Category.objects.get(id=category_id)
+        products = Product.objects.filter(category=category)
+    else:
+        products = Product.objects.all()
+
+    categories = Category.objects.all()
+    
+    sort = request.GET.get('sort', 'latest')
+
+    if sort == 'low-high':
+        products = products.order_by('price')
+    elif sort == 'high-low':
+        products = products.order_by('-price')
+    elif sort == 'a-z':
+        products = products.order_by('name')
+    elif sort == 'z-a':
+        products = products.order_by('-name')
+    else:  # latest
+        products = products.order_by('-created_at')
+
+    paginator = Paginator(products, 20)  # Show 20 products per page
+    page = request.GET.get('page')
+    products = paginator.get_page(page)
+
+    context = {
+        'products': products,
+        'sort': sort,
+        'categories': categories,
+        'total': products.count,
+        'query': query  # Pass the query to the template
+    }
+    return render(request, 'products.html', context)
+"""

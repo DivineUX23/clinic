@@ -25,7 +25,6 @@ End CSS
   End Content
   ================================= -->
 
-  form
   {% block content %}
 
   <div class="container py-3">
@@ -51,6 +50,15 @@ End CSS
                 </select>
             </div>
         </form>
+        <!-- Mobile sorting and filter buttons -->
+        <div class="d-lg-none">
+            <button class="btn btn-outline-secondary mr-2" data-toggle="modal" data-target="#sortingModal">
+                Sort
+            </button>
+            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#filterModal">
+                Filter
+            </button>
+        </div>
     </div>
 </div>
 
@@ -224,6 +232,90 @@ End CSS
       </div>
   </div>
 
+
+  <!-- Mobile Sorting Modal -->
+  <div class="modal fade" id="sortingModal" tabindex="-1" role="dialog" aria-labelledby="sortingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sortingModalLabel">Sort Products</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'products' %}" method="GET">
+                    <div class="form-group">
+                        <select name="sort" class="form-control" onchange="this.form.submit()">
+                            <option value="latest" {% if sort == 'latest' %}selected{% endif %}>Latest</option>
+                            <option value="low-high" {% if sort == 'low-high' %}selected{% endif %}>Low to High Price</option>
+                            <option value="high-low" {% if sort == 'high-low' %}selected{% endif %}>High to Low Price</option>
+                            <option value="a-z" {% if sort == 'a-z' %}selected{% endif %}>A to Z Order</option>
+                            <option value="z-a" {% if sort == 'z-a' %}selected{% endif %}>Z to A Order</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Products</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Price filter -->
+                <div class="mb-4">
+                    <h6 class="font-semibold">Price</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <input type="number" class="form-control form-control-sm mr-2" id="mobile_min_price" placeholder="Min">
+                        <span>To</span>
+                        <input type="number" class="form-control form-control-sm ml-2" id="mobile_max_price" placeholder="Max">
+                    </div>
+                    <button class="btn btn-sm btn-primary mt-2" onclick="searchByPrice()">Apply</button>
+                </div>
+                
+                <!-- Categories -->
+                <div>
+                    <h6 class="font-semibold">Categories</h6>
+                    <div id="mobile-categories-accordion">
+                        {% for category in categories %}
+                            <div class="card">
+                                <div class="card-header" id="heading-{{ category.id }}">
+                                    <h2 class="mb-0">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ category.id }}" aria-expanded="true" aria-controls="collapse-{{ category.id }}">
+                                            {{ category.name }}
+                                        </button>
+                                    </h2>
+                                </div>
+                                {% if category.subcategories %}
+                                    <div id="collapse-{{ category.id }}" class="collapse" aria-labelledby="heading-{{ category.id }}" data-parent="#mobile-categories-accordion">
+                                        <div class="card-body">
+                                            {% for subcategory in category.subcategories %}
+                                                <div>
+                                                    <a href="{% url 'category_products' subcategory.id %}" class="d-block py-1">
+                                                        {{ subcategory.name }}
+                                                    </a>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
   
 

@@ -28,22 +28,27 @@ Start Navigation Bar
                             <i class="tio-clear"></i>
                         </button>
                     </div>
-                    <form action="{% url 'products' %}" type="submit" class="search_form relative">
+                    <form action="{% url 'products' %}" method="GET" class="search_form relative">
                         <input
                             class="form-control appended-form-control search-bar-input h-[46px] w-full bg-transparent text-[#263238] placeholder:text-black/40 text-[12px] outline-none"
-                            type="text" autocomplete="off" placeholder="Search for an item" name="name">
+                            type="text"
+                            autocomplete="off"
+                            placeholder="Search for an item"
+                            name="q"
+                            value="{{ request.GET.q }}"
+                        >
                         <button type="submit" class="absolute right-0 border-none"
                             style="border-radius: 0px 7px 7px 0px; left: unset; right: 0;top:0; bottom: 1px;">
                             <span class="input-group-text __text-20px !border-none !bg-transparent">
                                 <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
                             </span>
                         </button>
-                        <input name="data_from" value="search" hidden>
                         <input name="page" value="1" hidden>
-                        <diV class="card search-card __inline-13">
+                        <div class="card search-card __inline-13">
                             <div class="card-body search-result-box __h-[16px]00px overflow-x-hidden overflow-y-auto">
+                                <!-- Search results will be displayed here -->
                             </div>
-                        </diV>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -167,17 +172,10 @@ Start Navigation Bar
                         Sex Products
                     </a>
                 </div>
-
-                <div class="py-2">
-                    <a href="{% url 'category_products' 8 %}">
-                    Consult a Pharmacist
-                    </a>
-                </div>
-            
             </div>
         </div>
           <a href="{% url 'products' %}" class="flex items-center">
-              <span>Cares Foundation</span>
+              <span>Consult a Pharmacist</span>
           </a>
         </div>
       </div>
@@ -227,18 +225,12 @@ Start Navigation Bar
                             </a>
                         </div>
         
-                        <div class="py-2">
-                            <a href="{% url 'category_products' 8 %}">
-                            Consult a Pharmacist
-                            </a>
-                        </div>
-                    
                     </div>
                 </div>
                 <a href="{% url 'products' %}" class="flex items-center gap-[8px] text-white">
-                    <span>Cares Foundation</span>
+                    <span>Consult a Pharmacist</span>
                 </a>
-            </div>
+              </div>
         </div>
     </div>
 

@@ -52,6 +52,7 @@ urlpatterns = [
     #path('products/<str:category>/', views.product_list, name='product_list_by_category'),
 
 
+    path('products/search/', views.product_list, name='product_search'),
 
 ]
 
