@@ -1,4 +1,4 @@
-
+"""
 # api/serializers.py
 from rest_framework import serializers
 from .models import Order, OrderItem
@@ -15,3 +15,4 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'name', 'phone_number', 'delivery_location', 'order_note', 
                   'total_amount', 'status', 'created_at', 'items']
+"""
