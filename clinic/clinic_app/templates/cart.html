@@ -146,7 +146,7 @@ End CSS
             </div>
             {% endif %}
             <div class="px-3 px-md-0 mt-3 mt-md-0">
-                <form method="post" action="{% url 'update_order_note' %}">
+                <form id="orderForm" method="post" action="{% url 'update_order_note' %}">
                     {% csrf_token %}
                     
                     <!-- Delivery Location Section -->
@@ -191,8 +191,6 @@ End CSS
                     </div>
             
             
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn btn-sm btn-outline-primary">Update Order</button>
                 </form>
             </div>
             
@@ -227,16 +225,92 @@ End CSS
                 <div class="mt-4">
                     <!--<a href="" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}">Proceed to Next</a>
                 -->
-                    <form action="{% url 'initialize_payment' %}" method="POST">
+                    <form id="paymentForm" action="{% url 'initialize_payment' %}" method="POST">
                         {% csrf_token %}
+                        <input type="hidden" name="delivery_location" id="hidden_delivery_location">
+                        <input type="hidden" name="name" id="hidden_name">
+                        <input type="hidden" name="phone_number" id="hidden_phone_number">
                         <script src="https://js.paystack.co/v1/inline.js"></script>
-                        <button type="submit" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}" {% if not cart_items %}disabled{% endif %}>
+                        <button type="button" id="payWithPaystack" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}" {% if not cart_items %}disabled{% endif %}>
                             Pay with Paystack
                         </button>
                     </form>
+
                 </div>
             </div>
         </aside>
     </div>
 </div>
+
+
+    
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const payWithPaystackBtn = document.getElementById('payWithPaystack');
+        const orderForm = document.getElementById('orderForm');
+        const paymentForm = document.getElementById('paymentForm');
+    
+        const deliveryLocationInput = document.getElementById('delivery_location');
+        const nameInput = document.getElementById('name');
+        const phoneNumberInput = document.getElementById('phone_number');
+    
+        const hiddenDeliveryLocation = document.getElementById('hidden_delivery_location');
+        const hiddenName = document.getElementById('hidden_name');
+        const hiddenPhoneNumber = document.getElementById('hidden_phone_number');
+    
+        // Update hidden fields whenever the visible fields change
+        deliveryLocationInput.addEventListener('input', function() {
+            hiddenDeliveryLocation.value = this.value;
+        });
+        nameInput.addEventListener('input', function() {
+            hiddenName.value = this.value;
+        });
+        phoneNumberInput.addEventListener('input', function() {
+            hiddenPhoneNumber.value = this.value;
+        });
+    
+        payWithPaystackBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+    
+            // Check if required fields are filled
+            if (!deliveryLocationInput.value || !nameInput.value || !phoneNumberInput.value) {
+                //alert('Please fill in your delivery location, name, and phone number before proceeding to payment.');
+                
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please fill in your delivery location, name, and phone number before proceeding to payment.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        popup: 'swal-custom-popup',
+                        confirmButton: 'swal-custom-confirm-button'
+                    }
+                });
+                return;
+            }
+    
+            // If all required fields are filled, submit the payment form
+            paymentForm.submit();
+        });
+    
+        // Prevent default form submission of the order form
+        orderForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // You can add AJAX submission here if needed
+            //alert('Order information updated successfully!');
+            Swal.fire({
+                title: 'Success!',
+                text: 'Product added to cart successfully!',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    confirmButton: 'swal-custom-confirm-button'
+                }
+            });
+
+        });
+    });
+    </script>    
 {% endblock %}

@@ -185,9 +185,10 @@ End CSS
                                             <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">View
                                             </a>
                                             
-                                              <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white text-sm md:text-[16px] bg-[#FF0077] transition duration-500 px-[10px] xl:px-3 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md">
-                                                  Add To Cart
-                                              </button>
+                                              
+
+                                              <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
+
                                           </div>
                                       </div>
                                   </div>

@@ -41,107 +41,46 @@ End CSS
     </div>
 </div>
     <!-- Navbar Electronics Store-->
+
     <style>
-    .for-count-value {
-        color: {
-                {
-                $web_config['primary_color']
+        .for-count-value {
+            color: #800080;
+        }
+    
+        .count-value {
+            color: #800080;
+        }
+    
+        @media (min-width: 768px) {
+            .navbar-stuck-menu {
+                background-color: #800080;
             }
         }
-
-        ;
-    }
-
-    .count-value {
-        color: {
-                {
-                $web_config['primary_color']
+    
+        @media (max-width: 767px) {
+            .search_button .input-group-text i {
+                color: #800080 !important;
+            }
+    
+            .mega-nav1 {
+                color: #800080 !important;
+            }
+    
+            .mega-nav1 .nav-link {
+                color: #800080 !important;
             }
         }
-
-        ;
-    }
-
-    @media (min-width: 768px) {
-        .navbar-stuck-menu {
-            background-color: {
-                    {
-                    $web_config['primary_color']
-                }
+    
+        @media (max-width: 471px) {
+            .mega-nav1 {
+                color: #800080 !important;
             }
-
-            ;
-        }
-
-    }
-
-    @media (max-width: 767px) {
-        .search_button .input-group-text i {
-            color: {
-                    {
-                    $web_config['primary_color']
-                }
+    
+            .mega-nav1 .nav-link {
+                color: #800080 !important;
             }
-
-             !important;
         }
-
-        .navbar-expand-md .dropdown-menu>.dropdown>.dropdown-toggle {
-            padding- {
-                    {
-                    Session: :get('direction')==="rtl" ? 'left': 'right'
-                }
-            }
-
-            : 1.95rem;
-        }
-
-        .mega-nav1 {
-            color: {
-                    {
-                    $web_config['primary_color']
-                }
-            }
-
-             !important;
-        }
-
-        .mega-nav1 .nav-link {
-            color: {
-                    {
-                    $web_config['primary_color']
-                }
-            }
-
-             !important;
-        }
-    }
-
-    @media (max-width: 471px) {
-        .mega-nav1 {
-            color: {
-                    {
-                    $web_config['primary_color']
-                }
-            }
-
-             !important;
-        }
-
-        .mega-nav1 .nav-link {
-            color: {
-                    {
-                    $web_config['primary_color']
-                }
-            }
-
-             !important;
-        }
-    }
-
-    /**/
-</style>
-
+    </style>
 
 
     
@@ -219,7 +158,7 @@ End CSS
               View
             </a>
 
-            <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-[#FF0077] transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
+<button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
           </div>
         </div>
       </form>
@@ -265,7 +204,7 @@ End CSS
             <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">
               View
             </a>
-            <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-[#FF0077] transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
+<button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
           </div>
         </div>
       </form>
@@ -333,20 +272,15 @@ End CSS
       </div>
     </section>
     
-    <span id="update_nav_cart_url" data-url="https://medplusnig.com/cart/nav-cart-items"></span>
-    <span id="remove_from_cart_url" data-url="https://medplusnig.com/cart/remove"></span>
-    <span id="update_quantity_url" data-url="https://medplusnig.com/cart/updateQuantity-guest"></span>
-    <span id="order_again_url" data-url="https://medplusnig.com/cart/order-again"></span>
     <!-- Footer-->
     
     <!-- Toolbar for handheld devices-->
 
     <!-- Back To Top Button-->
-    <a class="btn-scroll-top btn--primary" href="#top" data-scroll>
-        <span class="btn-scroll-top-tooltip text-muted font-size-sm mr-2">Top</span><i
-            class="btn-scroll-top-icon czi-arrow-up"> </i>
+    <a class="btn-scroll-top btn-purple" href="#top" data-scroll>
+        <span class="btn-scroll-top-tooltip text-muted font-size-sm mr-2">Top</span>
+        <i class="btn-scroll-top-icon czi-arrow-up"></i>
     </a>
-
     
 </body>
 
@@ -355,35 +289,6 @@ End CSS
   <!-- ================================
   End Content
   ================================= -->
-<!--<script>
-    function addToCart(productId) {
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        fetch('{% url "add_to_cart" %}', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                'product_id': productId,
-                'quantity': 1
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Product added to cart!');
-            } else {
-                alert('Failed to add product to cart.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-</script>
-
--->
 
 
 <div class="container mt-4">

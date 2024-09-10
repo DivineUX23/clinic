@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'clinic_app',
 ]
 
@@ -150,3 +151,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 PAYSTACK_SECRET_KEY = config("PAYSTACK_SECRET_KEY")
 PAYSTACK_PUBLIC_KEY = config("PAYSTACK_PUBLIC_KEY")
+
+
+
+
+#For API
+EXTERNAL_SITE_URL = 'https://example.com/receive_order'  # Replace with actual URL

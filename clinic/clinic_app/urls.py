@@ -54,8 +54,23 @@ urlpatterns = [
 
     path('products/search/', views.product_list, name='product_search'),
 
+    path('api/search/', views.search_products, name='api_search_products'),
+
 ]
 
+"""
+# api/urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import OrderViewSet
+
+router = DefaultRouter()
+router.register(r'orders', OrderViewSet)
+
+urlpatterns = [
+    path('api', include(router.urls)),
+]
+"""
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

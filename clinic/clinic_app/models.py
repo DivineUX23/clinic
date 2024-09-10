@@ -20,6 +20,8 @@ class Category(models.Model):
         return self.name
 
 #class Product(models.Model):
+from django.urls import reverse
+
 
 class Product(models.Model):
     CATEGORY_CHOICES = [
@@ -43,12 +45,23 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('product_detail', args=[self.slug])
+
+
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+
+    #session_key = models.CharField(max_length=40, unique=True)
+    session_key = models.CharField(max_length=40)
+    delivery_location = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=20)
+    order_note = models.TextField(blank=True, null=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_reference = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     paid = models.BooleanField(default=False)
-    
+        
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('processing', 'Processing'),
@@ -61,8 +74,9 @@ class Order(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+
     def __str__(self):
-        return f'Order {self.id}'
+        return f"Order {self.id} by {self.name}"
 
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
@@ -104,34 +118,11 @@ class CartItem(models.Model):
         return self.quantity * self.product.price
 
     
-"""
-class CartItem(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+# In models.py
+class SearchedProduct(models.Model):
+    name = models.CharField(max_length=200)
+    searched_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.quantity} of {self.product.name}"
-
-    def total_price(self):
-        return self.quantity * self.product.price
-
-
-class Cart(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f'Cart for {self.user.username}'
-
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-
-    def __str__(self):
-        return f'{self.quantity} of {self.product.name}'
-"""
+        return self.name
