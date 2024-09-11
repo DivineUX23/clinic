@@ -26,7 +26,19 @@ import datetime
 def home(request):
     new_arrivals = Product.objects.filter(section='new_arrival')
     most_popular = Product.objects.filter(section='most_popular')
+    categories = Category.objects.all()
+
+
+    cart = Cart.objects.filter(session_key=request.session.session_key).first()
+        
+    if cart:  
+        item_count = cart.items.count()
+    else:
+        item_count = 0
+        
     return render(request, 'home.html', {
+        'quantity': item_count,
+        'categories': categories,
         'new_arrivals': new_arrivals,
         'most_popular': most_popular
     })
@@ -40,7 +52,19 @@ def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
     related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:5]
     more_products = Product.objects.all().exclude(id=product.id)[:5]
+    
+    categories = Category.objects.all()
+    
+    cart = Cart.objects.filter(session_key=request.session.session_key).first()
+        
+    if cart:  
+        item_count = cart.items.count()
+    else:
+        item_count = 0
+        
     context = {
+        'quantity': item_count,
+        'categories': categories,
         'product': product,
         'related_products': related_products,
         'more_products': more_products,
@@ -125,13 +149,20 @@ def cart_view(request):
                 'quantity': quantity,
                 'total_price': total_price,
             })
+            item_count = cart.items.count()
+        else:
+            item_count = 0
         
     tax = subtotal * Decimal('0.05')  # Assuming 5% tax
     shipping = Decimal('1000.00')  # Flat shipping rate
     discount = Decimal('0.00')  # You can implement discounts later
     total = subtotal + tax + shipping - discount
-    
+
+    categories = Category.objects.all()
+
     context = {
+        'categories': categories,
+        'quantity': item_count,
         'cart_items': cart_items,
         'subtotal': subtotal,
         'tax': tax,
@@ -363,11 +394,21 @@ def product_list(request, category_id=None):
     page = request.GET.get('page')
     products = paginator.get_page(page)
 
+
+
+    cart = Cart.objects.filter(session_key=request.session.session_key).first()
+        
+    if cart:  
+        item_count = cart.items.count()
+    else:
+        item_count = 0
+        
     context = {
+        'quantity': item_count,
         'products': products,
         'sort': sort,
         'categories': categories,
-        'total': products.count
+        'total': len(products)
     }
     return render(request, 'products.html', context)
 """
@@ -460,6 +501,9 @@ from decimal import Decimal
 import requests
 from .models import Cart, Product, Order, OrderItem
 from django.conf import settings
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 def initialize_payment(request):
     if request.method == 'POST':
@@ -490,7 +534,7 @@ def initialize_payment(request):
             phone_number=phone_number,
             order_note=order_note,
             total_amount=total_amount,
-            payment_reference=f"cart_{request.session.session_key}_{total_amount}_ok",
+            payment_reference=f"cart_{request.session.session_key}_{total_amount}",
             status='pending'
         )
 
@@ -521,6 +565,16 @@ def initialize_payment(request):
         )
         response_data = response.json()
         if response.status_code == 200:
+            # After creating the order
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "orders",
+                {
+                    "type": "new_order",
+                    "order_id": order.id
+                }
+            )
+
             return redirect(response_data['data']['authorization_url'])
         else:
             error_message = response_data.get('message', 'Unknown error occurred')
@@ -628,3 +682,75 @@ def send_order_to_external_site(order):
     except requests.RequestException as e:
         print(f"Failed to send order to external site: {e}")
 """
+
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
+from .models import Order
+from .serializers import OrderSerializer
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAdminUser
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
+
+class FlexiblePagination(PageNumberPagination):
+    page_size = 20  # Number of items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        return Response({
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'count': self.page.paginator.count,
+            'total_pages': self.page.paginator.num_pages,
+            'results': data
+        })
+
+class OrderList(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    pagination_class = FlexiblePagination
+    
+    def get_queryset(self):
+        queryset = Order.objects.all()
+        status = self.request.query_params.get('status', None)
+        if status is not None:
+            queryset = queryset.filter(status=status)
+        return queryset
+
+
+class OrderDetail(generics.RetrieveUpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
+
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    #permission_classes = [IsAdminUser]
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        
+        # Only allow updating the status field
+        if 'status' in serializer.validated_data:
+            instance.status = serializer.validated_data['status']
+            instance.save()
+
+            # Notify connected clients about the status change
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "orders",
+                {
+                    "type": "order_updated",
+                    "order_id": instance.id
+                }
+            )
+
+            return Response(serializer.data)
+        else:
+            return Response({"detail": "Only status field can be updated."}, status=status.HTTP_400_BAD_REQUEST)

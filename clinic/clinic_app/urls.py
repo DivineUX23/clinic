@@ -56,7 +56,12 @@ urlpatterns = [
 
     path('api/search/', views.search_products, name='api_search_products'),
 
+    # ... FOR API ...
+    path('api/orders/', views.OrderList.as_view(), name='order-list'),
+    path('api/orders/<int:pk>/', views.OrderDetail.as_view(), name='order-detail'),
+
 ]
+
 
 """
 # api/urls.py

@@ -34,14 +34,30 @@ ALLOWED_HOSTS = ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(",")
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'clinic_app',
+    
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
+
+
+ASGI_APPLICATION ='clinic.asgi.application'
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -156,3 +172,19 @@ PAYSTACK_PUBLIC_KEY = config("PAYSTACK_PUBLIC_KEY")
 
 #For API
 #EXTERNAL_SITE_URL = 'https://example.com/receive_order'  # Replace with actual URL
+"""
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+"""
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}

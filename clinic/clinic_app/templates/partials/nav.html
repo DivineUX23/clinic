@@ -4,123 +4,80 @@ Start Navigation Bar
 ================================= -->
 
 
-<!-- Add this near the top of your body, just after the opening <body> tag -->
-    <div id="mobile-search-overlay" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 hidden">
-        <div class="p-4">
-            <form id="mobile-search-form" class="relative">
-                <input
-                    id="mobile-search-input"
-                    class="w-full p-2 border rounded"
-                    type="text"
-                    placeholder="Search for an item"
-                    name="q"
-                >
-                <button type="submit" class="absolute right-2 top-2">
-                    <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
-                </button>
-            </form>
-            <div id="mobile-search-results" class="mt-4 max-h-64 overflow-y-auto">
-                <!-- Search results will be displayed here -->
-            </div>
-            <button id="close-mobile-search" class="mt-4 p-2 bg-gray-200 rounded">Close</button>
+<!-- Mobile Search Overlay -->
+<div id="mobile-search-overlay" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 hidden">
+    <div class="p-4">
+        <form id="mobile-search-form" class="relative">
+            <input
+                id="mobile-search-input"
+                class="w-full p-2 border rounded"
+                type="text"
+                placeholder="Search for an item"
+                name="q"
+            >
+            <button type="submit" class="absolute right-2 top-2">
+                <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
+            </button>
+        </form>
+        <div id="mobile-search-results" class="mt-4 max-h-64 overflow-y-auto">
+            <!-- Search results will be displayed here -->
         </div>
+        <button id="close-mobile-search" class="mt-4 p-2 bg-gray-200 rounded">Close</button>
     </div>
-    
+</div>
 
 <header class="box-shadow-sm rtl __inline-10">
     <div class="navbar-sticky bg-white mobile-head">
-
-        <div
-            class="h-[60px] lg:h-[110px] relative flex justify-between items-center medplus_container px-[16px] py-[16px] mx-auto">
+        <div class="h-[60px] lg:h-[110px] relative flex justify-between items-center medplus_container px-[16px] py-[16px] mx-auto">
+            <!-- Logo and hamburger menu -->
             <div class="flex items-center justify-between">
                 <button id="hamburger_menu" class="md:hidden w-10">
                     <img src="https://medplusnig.com/public/assets/front-end/img/hamburger.svg" alt="hamburger" class="w-full" />
                 </button>
-
                 <a href="{% url 'home' %}" class="h-[47px] md:h-[77px]">
-                     <img src="\static\images\jolly_life.jpg"
-                     alt="JollyLife Health Limited" class="h-full" />
-                 </a>
-            
+                    <img src="\static\images\jolly_life.jpg" alt="JollyLife Health Limited" class="h-full" />
+                </a>
             </div>
-            <div class="md:w-[300px] xl:w-[480px] h-[46px]">
-                <div class="input-group-overlay mx-lg-4 search-form-mobile"
-                    style="text-align: left">
-                    <div style="text-align: right"
-                        class="d-lg-none">
-                        <button class="btn close-search-form-mobile">
-                            <i class="tio-clear"></i>
-                        </button>
-                    </div>
-
-                    <form id="search-form" class="search_form relative">
-                        <input
-                            id="search-input"
-                            class="form-control appended-form-control search-bar-input h-[46px] w-full bg-transparent text-[#263238] placeholder:text-black/40 text-[12px] outline-none"
-                            type="text"
-                            autocomplete="off"
-                            placeholder="Search for an item"
-                            name="q"
-                        >
-                        <button type="submit" class="absolute right-0 border-none"
-                            style="border-radius: 0px 7px 7px 0px; left: unset; right: 0;top:0; bottom: 1px;">
-                            <span class="input-group-text __text-20px !border-none !bg-transparent">
-                                <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
-                            </span>
-                        </button>
-                        <div id="search-results" class="card search-card __inline-13 shadow" style="display: none;">
-                            <div class="card-body search-result-box __h-[16px]00px overflow-x-hidden overflow-y-auto">
-                                <!-- Search results will be displayed here -->
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-            <div class="flex items-center gap-[12px] md:gap-[16px]">
-                
-                    <!-- Update your mobile search button -->
-
-    <!-- Update your mobile search button -->
-    <button id="open-mobile-search" class="navbar-tool open-search-form-mobile md:hidden ml-md-3">
-        <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
-    </button>
 
 
-                <div class="search-form-mobile" style="display: none;">
-                    <form id="mobile-search-form" class="search_form relative">
-                        <input
-                            id="mobile-search-input"
-                            class="form-control appended-form-control search-bar-input h-[46px] w-full bg-transparent text-[#263238] placeholder:text-black/40 text-[12px] outline-none"
-                            type="text"
-                            autocomplete="off"
-                            placeholder="Search for an item"
-                            name="q"
-                        >
-                        <button type="submit" class="absolute right-0 border-none"
-                            style="border-radius: 0px 7px 7px 0px; left: unset; right: 0;top:0; bottom: 1px;">
-                            <span class="input-group-text __text-20px !border-none !bg-transparent">
-                                <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
-                            </span>
-                        </button>
-                        <div id="mobile-search-results" class="card search-card __inline-13 shadow" style="display: none;">
-                            <div class="card-body search-result-box __h-[16px]00px overflow-x-hidden overflow-y-auto">
-                                <!-- Search results will be displayed here -->
-                            </div>
-                        </div>
-                    </form>
-                    <button class="btn close-search-form-mobile">
-                        <i class="tio-clear"></i>
+
+            <!-- Desktop Search Bar -->
+            <div class="hidden md:block md:w-[300px] xl:w-[480px] h-[46px]">
+                <form id="search-form" class="search_form relative">
+                    <input
+                        id="search-input"
+                        class="form-control appended-form-control search-bar-input h-[46px] w-full bg-transparent text-[#263238] placeholder:text-black/40 text-[12px] outline-none"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="Search for an item"
+                        name="q"
+                    >
+                    <button type="submit" class="absolute right-0 border-none" style="border-radius: 0px 7px 7px 0px; left: unset; right: 0;top:0; bottom: 1px;">
+                        <span class="input-group-text __text-20px !border-none !bg-transparent">
+                            <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
+                        </span>
                     </button>
-                </div>
+                    <div id="search-results" class="card search-card __inline-13 shadow" style="display: none;">
+                        <div class="card-body search-result-box __h-[16px]00px overflow-x-hidden overflow-y-auto">
+                            <!-- Search results will be displayed here -->
+                        </div>
+                    </div>
+                </form>
+            </div>
 
 
+            <!-- Cart, Wishlist, and Sign In buttons -->
+            <div class="flex items-center gap-[12px] md:gap-[16px]">
+                <!-- Mobile Search Button (visible only on mobile and tablet screens) -->
+                <button id="open-mobile-search" class="navbar-tool open-search-form-mobile ml-md-3 md:hidden">
+                    <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
+                </button>
 
                 <div id="cart_items">
                     <div class="navbar-tool dropdown" style="margin-right: 0px">
                         <a href="{% url 'cart' %}"class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
-                            <div class="h-[16px] min-w-4 p-[4px] absolute left-2 -top-1.5 bg-[#FF2222] text-white rounded-full text-xs flex items-center justify-center">
-                                <span id="cart-count">0</span>
+                            <div class="h-[16px] min-w-4 p-[4px] absolute left-2 -top-1.5 btn-purple text-white rounded-full text-xs flex items-center justify-center">
+                                <span id="cart-count">{{ quantity }}</span>
                             </div>
                             <img src="https://medplusnig.com/public/assets/front-end/img/cart.svg" alt="cart" />
                             <span class="hidden md:block ml-1">Cart</span>
@@ -154,31 +111,37 @@ Start Navigation Bar
                     </div>
                 </div>
 
-                <a href=""
+                <!--<a href=""
                     class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
                     <div
-                        class="h-[16px] min-w-4 p-[4px] absolute left-2 -top-1.5 bg-[#FF2222] text-white rounded-full text-xs flex items-center justify-center">
+                        class="h-[16px] min-w-4 p-[4px] absolute left-2 -top-1.5 btn-purple text-white rounded-full text-xs flex items-center justify-center">
                         0
                     </div>
                     <img src="https://medplusnig.com/public/assets/front-end/img/heart.svg" alt="heart" />
 
                     <span class="hidden md:block ml-1">Wishlist</span>
-                </a>
-                <a href=""
-                    class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
-                    <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                            d="M8.08824 3.79479C8.08824 5.50806 6.71455 6.88182 5.00008 6.88182C3.28619 6.88182 1.91192 5.50806 1.91192 3.79479C1.91192 2.08152 3.28619 0.708344 5.00008 0.708344C6.71455 0.708344 8.08824 2.08152 8.08824 3.79479ZM5.00007 12.3751C2.46979 12.3751 0.333405 11.9638 0.333405 10.3771C0.333405 8.78988 2.48321 8.39321 5.00007 8.39321C7.53094 8.39321 9.66674 8.80446 9.66674 10.3911C9.66674 11.9784 7.51693 12.3751 5.00007 12.3751Z"
-                            fill="black" />
-                    </svg>
+                </a>-->
 
+                <!-- Sign In -->
+                <a href="" class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
+                    <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.08824 3.79479C8.08824 5.50806 6.71455 6.88182 5.00008 6.88182C3.28619 6.88182 1.91192 5.50806 1.91192 3.79479C1.91192 2.08152 3.28619 0.708344 5.00008 0.708344C6.71455 0.708344 8.08824 2.08152 8.08824 3.79479ZM5.00007 12.3751C2.46979 12.3751 0.333405 11.9638 0.333405 10.3771C0.333405 8.78988 2.48321 8.39321 5.00007 8.39321C7.53094 8.39321 9.66674 8.80446 9.66674 10.3911C9.66674 11.9784 7.51693 12.3751 5.00007 12.3751Z" fill="black" />
+                    </svg>
                     <span class="hidden md:block ml-1">Sign in</span>
                 </a>
             </div>
         </div>
         
-        <nav id="mobile_nav" class="fixed hidden md:hidden top-0 left-0 h-screen w-full bg-white z-[999999] px-4 py-7">
+    <nav id="mobile_nav" class="fixed hidden md:hidden top-0 left-0 h-screen w-full bg-white z-[999999] px-4 py-7">
     <div>
+        
+
+        <div class="flex h-7 items-center mb-8">
+            <button type="button" id="close_btn" class="relative rounded-md bg-transparent focus:outline-none focus:ring-2 focus:ring-white">
+              Close
+              <i class="fa fa-times"></i>
+            </button>
+        </div>
 
         <div class="grid gap-5 text-lg">
           <a href="{% url 'products' %}" class="flex items-center">
@@ -193,45 +156,22 @@ Start Navigation Bar
                 </div>
             </div>
             <div class="dropdown-menu px-3 text-sm" aria-labelledby="dropdownMenuButton">
-                <div class="py-2">
-                    <a href="{% url 'category_products' 3 %}">
-                    Sexual Health
-                    </a>
-                </div>
-            
-                <div class="py-2">
-                    <a href="{% url 'category_products' 4 %}">
-                        Beauty and Skin Care
-                    </a>
-                </div>
-        
-            
-                <div class="py-2">
-                    <a href="{% url 'category_products' 5 %}">
-                        Body Fitness
-                    </a>
-                </div>
-                
-                <div class="py-2">
-                    <a href="{% url 'category_products' 6 %}">
-                        Vitamins and Supplement
-                    </a>
-                </div>
-                
-                <div class="py-2">
-                    <a href="{% url 'category_products' 7 %}">
-                        Sex Products
-                    </a>
-                </div>
+                {% for category in categories %}
+                    <div class="py-2">
+                        <a href="{% url 'category_products' category.id %}">
+                        {{ category.name }}
+                        </a>
+                    </div>
+                {% endfor %}
             </div>
         </div>
-          <a href="{% url 'products' %}" class="flex items-center">
-              <span>Consult a Pharmacist</span>
+            <a href="https://wa.me/+2347078522512" target="_blank">
+                <span>Consult a Pharmacist</span>
           </a>
         </div>
     </div>
   </nav>
-          <div class="bg-black text-white hidden md:block text-xs lg:text-base">
+        <div class="bg-black text-white hidden md:block text-xs lg:text-base">
             <div class="flex items-center gap-[24px] h-[55px] medplus_container mx-auto px-[16px]">
                 <a href="{% url 'products' %}" class="flex items-center gap-[8px] text-white">
                     <span> All Products </span>
@@ -244,41 +184,18 @@ Start Navigation Bar
                             <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down.svg" alt="arrow_down" />
                         </div>
                     </div>
+
                     <div class="dropdown-menu px-3 text-sm" aria-labelledby="dropdownMenuButton">
-                        <div class="py-2">
-                            <a href="{% url 'category_products' 3 %}">
-                            Sexual Health
-                            </a>
-                        </div>
-                    
-                        <div class="py-2">
-                            <a href="{% url 'category_products' 4 %}">
-                                Beauty and Skin Care
-                            </a>
-                        </div>
-                
-                    
-                        <div class="py-2">
-                            <a href="{% url 'category_products' 5 %}">
-                                Body Fitness
-                            </a>
-                        </div>
-                        
-                        <div class="py-2">
-                            <a href="{% url 'category_products' 6 %}">
-                                Vitamins and Supplement
-                            </a>
-                        </div>
-                        
-                        <div class="py-2">
-                            <a href="{% url 'category_products' 7 %}">
-                                Sex Products
-                            </a>
-                        </div>
-        
+                        {% for category in categories %}
+                            <div class="py-2">
+                                <a href="{% url 'category_products' category.id %}">
+                                {{ category.name }}
+                                </a>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
-                <a href="{% url 'products' %}" class="flex items-center gap-[8px] text-white">
+                <a href="https://wa.me/+2347078522512" class="flex items-center gap-[8px] text-white" target="_blank">
                     <span>Consult a Pharmacist</span>
                 </a>
               </div>
@@ -290,17 +207,19 @@ Start Navigation Bar
 <!-- ================================
 End Navigation Bar
 ================================= -->
+
+<!-- Add this script at the end of your body tag -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
     var desktopSearchInput = $('#search-input');
     var desktopSearchResults = $('#search-results');
     var desktopSearchForm = $('#search-form');
-
     var mobileSearchInput = $('#mobile-search-input');
     var mobileSearchResults = $('#mobile-search-results');
     var mobileSearchForm = $('#mobile-search-form');
     var mobileSearchOverlay = $('#mobile-search-overlay');
+    var openMobileSearchBtn = $('#open-mobile-search');
 
     function performSearch(query, resultsContainer) {
         if (query.length > 2) {
@@ -364,5 +283,27 @@ $(document).ready(function() {
     $('#close-mobile-search').on('click', function() {
         mobileSearchOverlay.slideUp(200);
     });
+
+
+
+    // Toggle mobile search overlay
+    openMobileSearchBtn.on('click', function() {
+        mobileSearchOverlay.slideDown(200);
+    });
+
+    $('#close-mobile-search').on('click', function() {
+        mobileSearchOverlay.slideUp(200);
+    });
+
+    // Handle window resize to show/hide appropriate search elements
+    $(window).on('resize', function() {
+        if ($(window).width() >= 768) { // md breakpoint
+            mobileSearchOverlay.hide();
+            openMobileSearchBtn.hide();
+        } else {
+            openMobileSearchBtn.show();
+        }
+    }).trigger('resize'); // Trigger on page load
+
 });
 </script>
