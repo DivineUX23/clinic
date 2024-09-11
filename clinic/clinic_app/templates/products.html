@@ -197,6 +197,19 @@ End CSS
                       </div>
                   {% endfor %}
               </div>
+              
+            {% if not cart_items %}
+            <div class="card mb-4">
+                <div class="card-body py-5">
+                    <div class="py-md-4">
+                        <div class="text-center text-capitalize">
+                            <img class="mb-3 mw-100" src="{% static 'assets/front-end/img/icons/empty-cart.svg' %}" alt="">
+                            <p class="text-capitalize">Product is not Available!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
               <!-- Pagination -->
               <div class="col-12">
                   <nav class="d-flex justify-content-between pt-2" aria-label="Page navigation" id="paginator-ajax">
