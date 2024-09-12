@@ -10,21 +10,6 @@
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--<link rel="apple-touch-icon" sizes="180x180"
-        href="https://medplusnig.com/storage/app/public/company/2024-02-15-65ce14f0e2a0a.webp">
-    <link rel="icon" type="image/png" sizes="32x32"
-        href="https://medplusnig.com/storage/app/public/company/2024-02-15-65ce14f0e2a0a.webp">
-
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
-    <link rel="stylesheet" media="screen"
-        href="https://medplusnig.com/public/assets/front-end/vendor/simplebar/dist/simplebar.min.css" />
-    <link rel="stylesheet" media="screen"
-        href="https://medplusnig.com/public/assets/front-end/vendor/tiny-slider/dist/tiny-slider.css" />
-    <link rel="stylesheet" media="screen"
-        href="https://medplusnig.com/public/assets/front-end/vendor/drift-zoom/dist/drift-basic.min.css" />
-    <link rel="stylesheet" media="screen"
-        href="https://medplusnig.com/public/assets/front-end/vendor/lightgallery.js/dist/css/lightgallery.min.css" />
-    <link rel="stylesheet" href="https://medplusnig.com/public/assets/back-end/css/toastr.css" />-->
 
     <!-- Main Theme Styles + Bootstrap-->
     <link rel="stylesheet" media="screen" href="https://medplusnig.com/public/assets/front-end/css/theme.min.css">
@@ -37,11 +22,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Titillium+Web:wght@400;600;700&display=swap"
         rel="stylesheet">
-    
-    <!--<link rel="stylesheet" href="https://medplusnig.com/public/css/lightbox.css">
-    <link rel="stylesheet" href="https://medplusnig.com/public/assets/back-end/vendor/icon-set/style.css">
-        <meta property="og:image" content="https://medplusnig.com/storage/app/public/company/2024-03-04-65e578a1b0e52.webp"/>
-    <meta property="og:title" content="Welcome To Jolly Life Health Home"/>-->
 
     <meta property="og:description" content="JollyLife Health is a wholesale, retail, and dispensing healthcare platform established for the distribution and retailing of locally manufactured and imported drugs, b">
 
@@ -177,7 +157,7 @@
     <meta name="_token" content="OTQTE4iOouBPrNT2IPv3oyPGLzjibwEo5nixwzhP">
     
     <!--to make http ajax request to https-->
-    <!--<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">-->
+    <!--<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">#800080-->
     <style>
         .rtl {
             direction: ltr;
@@ -507,15 +487,7 @@
  * @license GPLv3 
  */
 </script>
-<!--<script src=https://medplusnig.com/public/assets/back-end/js/toastr.js></script>-->
-<!-- Main theme script-->
-<!--<script src="https://medplusnig.com/public/assets/front-end/js/theme.min.js"></script>
-<script src="https://medplusnig.com/public/assets/front-end/js/custom.js"></script>
-<script src="https://medplusnig.com/public/assets/front-end/js/slick.min.js"></script>
 
-<script src="https://medplusnig.com/public/assets/front-end/js/sweet_alert.js"></script>
-
-<script src=https://medplusnig.com/public/assets/back-end/js/toastr.js></script>-->
 <script type="text/javascript"></script>
 
 <!-- Add this in the head of your HTML document -->
@@ -625,23 +597,6 @@
 
 
 
-<!--<script>
-    (function(d, t) {
-        var BASE_URL = "https://engage.myserviceagent.net";
-        var g = d.createElement(t),
-            s = d.getElementsByTagName(t)[0];
-        g.src = BASE_URL + "/packs/js/sdk.js";
-        g.defer = true;
-        g.async = true;
-        s.parentNode.insertBefore(g, s);
-        g.onload = function() {
-            window.chatwootSDK.run({
-                websiteToken: 'YG8XGwuLBF1iqYPDbqcxivZb',
-                baseUrl: BASE_URL
-            })
-        }
-    })(document, "script");
-</script>-->
 <script>
     $(document).ready(function() {
         const $stickyElement = $('.bottom-sticky_ele');
@@ -663,83 +618,6 @@
 </script>
 
 
-<script>
-
-    jQuery(".search-bar-input").keyup(function() {
-        $(".search-card").css("display", "block");
-        let name = $(".search-bar-input").val();
-        if (name.length > 0) {
-            $.get({
-                url: 'https://medplusnig.com/searched-products',
-                dataType: 'json',
-                data: {
-                    name: name
-                },
-                beforeSend: function() {
-                    $('#loading').show();
-                },
-                success: function(data) {
-                    $('.search-result-box').empty().html(data.result)
-                },
-                complete: function() {
-                    $('#loading').hide();
-                },
-            });
-        } else {
-            $('.search-result-box').empty();
-        }
-    });
-
-    jQuery(".search-bar-input-mobile").keyup(function() {
-        $(".search-card").css("display", "block");
-        let name = $(".search-bar-input-mobile").val();
-        if (name.length > 0) {
-            $.get({
-                url: 'https://medplusnig.com/searched-products',
-                dataType: 'json',
-                data: {
-                    name: name
-                },
-                beforeSend: function() {
-                    $('#loading').show();
-                },
-                success: function(data) {
-                    $('.search-result-box').empty().html(data.result)
-                },
-                complete: function() {
-                    $('#loading').hide();
-                },
-            });
-        } else {
-            $('.search-result-box').empty();
-        }
-    });
-
-    jQuery(document).mouseup(function(e) {
-        var container = $(".search-card");
-        if (!container.is(e.target) && container.has(e.target).length === 0) {
-            container.hide();
-        }
-    });
-
-    function route_alert(route, message) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: message,
-            type: 'warning',
-            showCancelButton: true,
-            cancelButtonColor: 'default',
-            confirmButtonColor: '#ff0077',
-            cancelButtonText: 'No',
-            confirmButtonText: 'Yes',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.value) {
-                location.href = route;
-            }
-        })
-    }
-</script>
 
 
 <script>

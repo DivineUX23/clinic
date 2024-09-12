@@ -271,16 +271,48 @@ End CSS
             hiddenPhoneNumber.value = this.value;
         });
     
+        function validateForm() {
+            let isValid = true;
+            let errorMessage = '';
+    
+            // Validate delivery location
+            if (!deliveryLocationInput.value.trim()) {
+                isValid = false;
+                errorMessage += 'Delivery location is required.\n';
+            }
+    
+            // Validate name
+            const nameValue = nameInput.value.trim();
+            if (!nameValue) {
+                isValid = false;
+                errorMessage += 'Name is required.\n';
+            } else if (!/^[a-zA-Z\s]+$/.test(nameValue)) {
+                isValid = false;
+                errorMessage += 'Name should only contain letters and spaces.\n';
+            }
+    
+            // Validate phone number
+            const phoneValue = phoneNumberInput.value.trim();
+            if (!phoneValue) {
+                isValid = false;
+                errorMessage += 'Phone number is required.\n';
+            } else if (!/^\d{10,14}$/.test(phoneValue)) {
+                isValid = false;
+                errorMessage += 'Please enter a valid phone number (10-14 digits).\n';
+            }
+    
+            return { isValid, errorMessage };
+        }
+    
         payWithPaystackBtn.addEventListener('click', function(e) {
             e.preventDefault();
     
-            // Check if required fields are filled
-            if (!deliveryLocationInput.value || !nameInput.value || !phoneNumberInput.value) {
-                //alert('Please fill in your delivery location, name, and phone number before proceeding to payment.');
-                
+            const { isValid, errorMessage } = validateForm();
+    
+            if (!isValid) {
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Please fill in your delivery location, name, and phone number before proceeding to payment.',
+                    text: errorMessage,
                     icon: 'error',
                     confirmButtonText: 'OK',
                     customClass: {
@@ -291,7 +323,7 @@ End CSS
                 return;
             }
     
-            // If all required fields are filled, submit the payment form
+            // If all required fields are filled and valid, submit the payment form
             paymentForm.submit();
         });
     
@@ -299,10 +331,9 @@ End CSS
         orderForm.addEventListener('submit', function(e) {
             e.preventDefault();
             // You can add AJAX submission here if needed
-            //alert('Order information updated successfully!');
             Swal.fire({
                 title: 'Success!',
-                text: 'Product added to cart successfully!',
+                text: 'Order information updated successfully!',
                 icon: 'success',
                 confirmButtonText: 'OK',
                 customClass: {
@@ -310,8 +341,7 @@ End CSS
                     confirmButton: 'swal-custom-confirm-button'
                 }
             });
-
         });
     });
-    </script>    
+</script>    
 {% endblock %}

@@ -169,9 +169,6 @@ PAYSTACK_PUBLIC_KEY = config("PAYSTACK_PUBLIC_KEY")
 
 
 
-
-#For API
-#EXTERNAL_SITE_URL = 'https://example.com/receive_order'  # Replace with actual URL
 """
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

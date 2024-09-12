@@ -1,33 +1,45 @@
-from django.shortcuts import render
 from .models import Product
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Product, CartItem
-
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
-from .models import Product, Cart, CartItem
+from .models import Product, Cart, CartItem, Category, Order, OrderItem, PaymentSettings
 from django.db.models import F
 from django.utils.crypto import get_random_string
-
-
-
-
-from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
-from .models import Product
 from decimal import Decimal
 import datetime
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.views.generic import ListView
+from .models import Product, SearchedProduct
+from django.conf import settings
+from django.urls import reverse
+import requests
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from decimal import Decimal
+import re
+from django.contrib import messages
 
 
-# Create your views here.
+#API IMPORTS
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
+from .serializers import OrderSerializer
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAdminUser
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
+
+
+from .models import FAQ
+
 def home(request):
     new_arrivals = Product.objects.filter(section='new_arrival')
     most_popular = Product.objects.filter(section='most_popular')
     categories = Category.objects.all()
-
+    
 
     cart = Cart.objects.filter(session_key=request.session.session_key).first()
         
@@ -36,17 +48,26 @@ def home(request):
     else:
         item_count = 0
         
+    faqs = FAQ.objects.filter(is_visible=True)
+    initial_faqs = faqs[:2]  # Show first 2 FAQs initially
+    extra_faqs = faqs[2:]    # Remaining FAQs
+
     return render(request, 'home.html', {
         'quantity': item_count,
         'categories': categories,
         'new_arrivals': new_arrivals,
-        'most_popular': most_popular
+        'most_popular': most_popular,
+
+
+        'initial_faqs': initial_faqs,
+        'extra_faqs': extra_faqs,
     })
 
 
 
 def category(request):
     return render(request, 'category.html', {})
+
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
@@ -70,15 +91,8 @@ def product_detail(request, slug):
         'more_products': more_products,
     }
     return render(request, 'product.html', context)
-"""
-def get_cart(request):
-    session_key = request.session.session_key
-    if not session_key:
-        request.session.create()
-    cart, created = Cart.objects.get_or_create(session_key=request.session.session_key)
-    print(f"Cart retrieved/created. Cart ID: {cart.id}, Created: {created}")
-    return cart
-"""
+
+
 
 def add_to_cart(request):
     print("add_to_cart view called")
@@ -113,10 +127,6 @@ def add_to_cart(request):
 
 
 
-
-#---------------------
-
-
 def get_cart(request):
     return request.session.get('cart', {})
 
@@ -125,11 +135,6 @@ def save_cart(request, cart):
     request.session.modified = True
 
 def cart_view(request):
-    #cart = get_cart(request)
-    print(request.session.session_key)
-    print("-----------------------", request.session.get('cart'))  # Check if the cart exists in the session.
-    #cart = get_object_or_404(Cart, session_key=request.session.session_key)
-    #print(cart)
 
     cart = Cart.objects.filter(session_key=request.session.session_key).first()
         
@@ -138,9 +143,7 @@ def cart_view(request):
     
     if cart:    
         for item in cart.items.all():
-            print("-----", item.product.id)
             product = Product.objects.get(id=item.product.id)
-            print("-----", product)
             quantity = item.quantity
             total_price = product.price * quantity
             subtotal += total_price
@@ -149,13 +152,18 @@ def cart_view(request):
                 'quantity': quantity,
                 'total_price': total_price,
             })
-            item_count = cart.items.count()
-        else:
-            item_count = 0
-        
-    tax = subtotal * Decimal('0.05')  # Assuming 5% tax
-    shipping = Decimal('1000.00')  # Flat shipping rate
-    discount = Decimal('0.00')  # You can implement discounts later
+        item_count = cart.items.count()
+    else:
+        item_count = 0
+    
+    settings = PaymentSettings.objects.first()  
+    if not settings:
+        settings = PaymentSettings.objects.create()
+
+    tax = subtotal * settings.tax_rate
+    shipping = settings.shipping_rate
+    discount = settings.discount_rate
+
     total = subtotal + tax + shipping - discount
 
     categories = Category.objects.all()
@@ -202,173 +210,24 @@ def update_order_note(request):
 
 @require_POST
 def remove_from_cart(request):
-    print(request.session.session_key)
-    print("-----------------------", request.session.get('cart'))  # Check if the cart exists in the session.
-    #cart = get_object_or_404(Cart, session_key=request.session.session_key)
-    #print(cart)
-
-    cart = Cart.objects.filter(session_key=request.session.session_key).first()
-        
+    
+    cart = Cart.objects.filter(session_key=request.session.session_key).first()        
     product_id = request.POST.get('product_id')
-
-    # Find and remove the item from the cart
     cart_item = CartItem.objects.filter(cart=cart, product_id=product_id).first()
     if cart_item:
-        cart_item.delete()  # Remove the item from the database
-    
-    # Check if cart is empty and remove it if needed
+        cart_item.delete()
+
     if not cart.items.exists():
         cart.delete()
-
-
-    # Save the cart if modifications were made to the cart itself
     cart.save()
     
     return redirect('cart')
 
 
 
-#PAYMENTS VIEW
-"""
-import requests
-from django.conf import settings
-from django.shortcuts import redirect
-from django.urls import reverse
-from django.http import JsonResponse
-from decimal import Decimal
-
-def initialize_payment(request):
-    if request.method == 'POST':
-        cart = get_object_or_404(Cart, session_key=request.session.session_key)
-        total_amount = calculate_total(cart)
-        amount_in_kobo = int(total_amount * 100)
-
-
-        # Get user information from the form
-        delivery_location = request.POST.get('delivery_location')
-        name = request.POST.get('name')
-        phone_number = request.POST.get('phone_number')
-        order_note = request.POST.get('order_note')
-
-        # Create the order (unpaid at this point)
-        order = Order.objects.create(
-            session_key=request.session.session_key,
-            delivery_location=delivery_location,
-            name=name,
-            phone_number=phone_number,
-            order_note=order_note,
-            total_amount=total_amount,
-            payment_reference=f"cart_{request.session.session_key}_{total_amount}",
-            status='pending'
-        )
-
-        # Create OrderItems
-        for item in cart.items.all():
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                price=item.product.price,
-                quantity=item.quantity
-            )
-
-        # Paystack API request data
-        headers = {
-            "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "amount": amount_in_kobo,
-            "email": request.user.email if request.user.is_authenticated else "guest@example.com",
-            "callback_url": request.build_absolute_uri(reverse('payment_callback')),
-            "reference": f"cart_{request.session.session_key}_{total_amount}",  # Use a unique reference
-        }
-
-        # Initialize transaction with Paystack
-        response = requests.post(
-            "https://api.paystack.co/transaction/initialize",
-            headers=headers,
-            json=data
-        )
-        response_data = response.json()
-        if response.status_code == 200:
-            response_data = response.json()
-            return redirect(response_data['data']['authorization_url'])
-        else:
-            # Handle error
-            #return JsonResponse({'error': 'Failed to initialize payment'}, status=400)
-
-            error_message = response_data.get('message', 'Unknown error occurred')
-            return JsonResponse({
-                'error': 'Payment initialization failed',
-                'message': error_message,
-                'details': response_data
-            }, status=400)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-def payment_callback(request):
-    # Verify the payment
-    reference = request.GET.get('reference')
-    if verify_payment(reference):
-        cart = Cart.objects.filter(session_key=request.session.session_key).first()
-        if cart:
-            cart.delete()  # Example action: delete cart after successful payment
-        return redirect('home')  # Redirect to the homepage
-    else:
-        # Payment failed
-        return redirect('cart_view')
-
-def verify_payment(reference):
-    # Verify the payment with Paystack
-    headers = {
-        "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
-    }
-    response = requests.get(
-        f"https://api.paystack.co/transaction/verify/{reference}",
-        headers=headers
-    )
-    if response.status_code == 200:
-        response_data = response.json()
-        return response_data['data']['status'] == 'success'
-    return False
-
-def calculate_total(cart):
-    # Implement the logic to calculate the total from the cart
-    # This should match the logic in your cart view
-    subtotal = Decimal('0.00')
-    for item in cart.items.all():
-        product = Product.objects.get(id=item.product.id)
-        quantity = item.quantity
-        total_price = product.price * quantity
-        subtotal += total_price
-    # Add tax and shipping, subtract discounts
-    tax = subtotal * Decimal('0.05')  # Assuming 5% tax
-    shipping = Decimal('10.00')  # Flat shipping rate
-    discount = Decimal('0.00')  # Implement your discount logic
-    
-    return subtotal + tax + shipping - discount
-
-"""
-
-
-
-
-
-
-
-
-
-
-from django.shortcuts import render
-from django.core.paginator import Paginator
-from .models import Product
-from django.db.models import Q
 
 def product_list(request, category_id=None):
 
-    #query = request.GET.get('query', '')
-    #products = Product.objects.filter(name__icontains=query) if query else Product.objects.none()
-    
     if category_id:
         category = Category.objects.get(id=category_id)
         products = Product.objects.filter(category=category)
@@ -394,8 +253,6 @@ def product_list(request, category_id=None):
     page = request.GET.get('page')
     products = paginator.get_page(page)
 
-
-
     cart = Cart.objects.filter(session_key=request.session.session_key).first()
         
     if cart:  
@@ -411,59 +268,8 @@ def product_list(request, category_id=None):
         'total': len(products)
     }
     return render(request, 'products.html', context)
-"""
-def product_detail(request, product_id):
-    product = Product.objects.get(id=product_id)
-    context = {
-        'product': product,
-    }
-    return render(request, 'products/product_detail.html', context)
-
-"""
-
-# views.py
-from django.views.generic import ListView
-from django.shortcuts import render
-from .models import Product, Category
-"""
-class ProductListView(ListView):
-    model = Product
-    template_name = 'product_list.html'
-    context_object_name = 'products'
-    paginate_by = 20
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
-        return context
-"""
-def category_products(request):
-    #category = Category.objects.get(id=category_id)
-    #products = Product.objects.filter(category=category)
-    categories = Category.objects.all()
-    return render(request, 'nav.html', {
-        #'products': products,
-        'categories': categories,
-        #'current_category': category
-    })
 
 
-from django.shortcuts import render
-from .models import Product   # Ensure this imports your Product model
-
-def product_search(request):
-    query = request.GET.get('query', '')
-    products = Product.objects.filter(name__icontains=query) if query else Product.objects.none()
-    context = {
-        'products': products,
-    }
-    return render(request, 'your_template_name.html', context)
-
-
-
-from django.http import JsonResponse
-from django.db.models import Q
-from .models import Product, SearchedProduct
 
 def search_products(request):
     query = request.GET.get('q', '')
@@ -485,44 +291,33 @@ def search_products(request):
 
 
 
-
-
-
-
-
-
-
-
-# views.py
-from django.shortcuts import get_object_or_404, redirect
-from django.http import JsonResponse
-from django.urls import reverse
-from decimal import Decimal
-import requests
-from .models import Cart, Product, Order, OrderItem
-from django.conf import settings
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
+#PAYMENT:
 
 def initialize_payment(request):
     if request.method == 'POST':
 
-        delivery_location = request.POST.get('delivery_location')
-        name = request.POST.get('name')
-        phone_number = request.POST.get('phone_number')
+        delivery_location = request.POST.get('delivery_location', '').strip()
+        name = request.POST.get('name', '').strip()
+        phone_number = request.POST.get('phone_number', '').strip()
 
         # Ensure all required fields are provided
         if not all([delivery_location, name, phone_number]):
-            #messages.error(request, "Please fill out all required fields.")
+            messages.error(request, "Please fill out all required fields.")
             return redirect('cart') 
         
+        # Validate name
+        if not re.match(r'^[a-zA-Z\s]+$', name):
+            messages.error(request, "Name should only contain letters and spaces.")
+            return redirect('cart')
+
+        # Validate phone number
+        if not re.match(r'^\d{10,14}$', phone_number):
+            messages.error(request, "Please enter a valid phone number (10-14 digits).")
+            return redirect('cart')
 
         cart = get_object_or_404(Cart, session_key=request.session.session_key)
         total_amount = calculate_total(cart)
         amount_in_kobo = int(total_amount * 100)
-
-        # Get user information from the form
 
         order_note = request.POST.get('order_note')
 
@@ -587,23 +382,22 @@ def initialize_payment(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
+
 def payment_callback(request):
     reference = request.GET.get('reference')
     if verify_payment(reference):
         order = get_object_or_404(Order, payment_reference=reference)
         
-        # Update order status
         order.paid = True
         order.status = 'processing'
         order.save()
 
-        # Clear the cart
         Cart.objects.filter(session_key=order.session_key).delete()
 
-        #return redirect('order_confirmation', order_id=order.id)
         return redirect('home')
     else:
         return redirect('cart')
+
 
 def verify_payment(reference):
     # Verify the payment with Paystack
@@ -619,20 +413,24 @@ def verify_payment(reference):
         return response_data['data']['status'] == 'success'
     return False
 
+
 def calculate_total(cart):
-    # Implement the logic to calculate the total from the cart
-    # This should match the logic in your cart view
+
     subtotal = Decimal('0.00')
     for item in cart.items.all():
         product = Product.objects.get(id=item.product.id)
         quantity = item.quantity
         total_price = product.price * quantity
         subtotal += total_price
-    # Add tax and shipping, subtract discounts
-    tax = subtotal * Decimal('0.05')  # Assuming 5% tax
-    shipping = Decimal('10.00')  # Flat shipping rate
-    discount = Decimal('0.00')  # Implement your discount logic
-    
+
+    settings = PaymentSettings.objects.first()  
+    if not settings:
+        settings = PaymentSettings.objects.create()
+
+    tax = subtotal * settings.tax_rate
+    shipping = settings.shipping_rate
+    discount = settings.discount_rate
+
     return subtotal + tax + shipping - discount
 
 
@@ -640,59 +438,7 @@ def calculate_total(cart):
 
 
 
-
-# api/views.py
-"""
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.conf import settings
-import requests
-from .models import Order
-from .serializers import OrderSerializer
-
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-
-    @action(detail=True, methods=['post'])
-    def mark_completed(self, request, pk=None):
-        order = self.get_object()
-        order.status = 'completed'
-        order.save()
-        return Response({'status': 'order marked as completed'})
-
-    def perform_create(self, serializer):
-        order = serializer.save()
-        send_order_to_external_site(order)
-
-@receiver(post_save, sender=Order)
-def order_created_signal(sender, instance, created, **kwargs):
-    if created:
-        send_order_to_external_site(instance)
-
-def send_order_to_external_site(order):
-    url = settings.EXTERNAL_SITE_URL
-    serializer = OrderSerializer(order)
-    try:
-        response = requests.post(url, json=serializer.data)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        print(f"Failed to send order to external site: {e}")
-"""
-
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
-from .models import Order
-from .serializers import OrderSerializer
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAdminUser
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-
+#API CODE
 
 class FlexiblePagination(PageNumberPagination):
     page_size = 20  # Number of items per page
@@ -726,10 +472,8 @@ class OrderList(generics.ListAPIView):
 class OrderDetail(generics.RetrieveUpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminUser]
-
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    #permission_classes = [IsAdminUser]
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()

@@ -117,9 +117,16 @@ End CSS
                               <div class="menu--caret-accordion">
                                   <div class="card-header flex-between">
                                       <div>
-                                          <label class="for-hover-lable cursor-pointer" onclick="location.href='{% url 'category_products' category.id %}'">
-                                              {{ category.name }}
-                                          </label>
+                                        {% if category.url %}
+                                        <label class="for-hover-lable cursor-pointer" onclick="location.href='{{ category.url }}'">
+                                            {{ category.name }}
+                                        </label>
+                                            </a>
+                                        {% else %}
+                                        <label class="for-hover-lable cursor-pointer" onclick="location.href='{% url 'category_products' category.id %}'">
+                                            {{ category.name }}
+                                        </label>
+                                        {% endif %}
                                       </div>
                                       <div class="px-2 cursor-pointer menu--caret">
                                           <strong class="pull-right for-brand-hover">
@@ -146,105 +153,106 @@ End CSS
           </aside>
   
           <!-- Content -->
-          <section class="col-lg-9">
-              <div class="row" id="products-container">
-                  {% for product in products %}
-                      <div class="col-lg-3 col-md-4 col-sm-4 col-6 p-2">
-                            <form class="product-single-hover style--card mb-3.5" id="form-{{ product.id }}">
-                              {% csrf_token %}
-                              <input type="hidden" name="product_id" value="{{ product.id }}">
-                              <input type="hidden" name="quantity" value="1" min="1" max="{{ product.stock }}">
-                        
-                              <div class="overflow-hidden position-relative">
-                                  <div class="inline_product clickable d-flex justify-content-center">
-                                      <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
-                                          <a href="{% url 'product_detail' product.slug %}" class="w-100">
-                                              <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                                          </a>
-                                      </div>
-                                      <div class="quick-view">
-                                          <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('{{ product.id }}')"></a>
-                                      </div>
-                                  </div>
-                                  <div class="single-product-details">
-                                      <div>
-                                          <a href="{% url 'product_detail' product.slug %}">
-                                              {{ product.name }}
-                                          </a>
-                                      </div>
-                                      <div class="justify-content-between">
-                                          <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
-                                              <span class="text-accent text-dark">
-                                                  ₦{{ product.price }}
-                                              </span>
-                                          </div>
-                                      </div>
-                                      <div class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap">
-                                          <div class="flex items-center flex-wrap gap-1 md:gap-2">
-                                                                            
-                                            <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">View
+            <section class="col-lg-9">
+                <div class="row" id="products-container">
+                    {% for product in products %}
+                        <div class="col-lg-3 col-md-4 col-sm-4 col-6 p-2">
+                                <form class="product-single-hover style--card mb-3.5" id="form-{{ product.id }}">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <input type="hidden" name="quantity" value="1" min="1" max="{{ product.stock }}">
+                            
+                                <div class="overflow-hidden position-relative">
+                                    <div class="inline_product clickable d-flex justify-content-center">
+                                        <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
+                                            <a href="{% url 'product_detail' product.slug %}" class="w-100">
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
                                             </a>
-                                            
-                                              
+                                        </div>
+                                        <div class="quick-view">
+                                            <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('{{ product.id }}')"></a>
+                                        </div>
+                                    </div>
+                                    <div class="single-product-details">
+                                        <div>
+                                            <a href="{% url 'product_detail' product.slug %}">
+                                                {{ product.name }}
+                                            </a>
+                                        </div>
+                                        <div class="justify-content-between">
+                                            <div class="product-price d-flex flex-wrap align-items-center gap-8 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                                                <span class="text-accent text-dark">
+                                                    ₦{{ product.price }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap">
+                                            <div class="flex items-center flex-wrap gap-1 md:gap-2">
+                                                                                
+                                                <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">View
+                                                </a>
+                                                
+                                                
 
-                                              <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
+                                                <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
 
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </form>
-                      </div>
-                  {% endfor %}
-              </div>
-              
-            {% if not cart_items %}
-            <div class="card mb-4">
-                <div class="card-body py-5">
-                    <div class="py-md-4">
-                        <div class="text-center text-capitalize">
-                            <img class="mb-3 mw-100" src="{% static 'assets/front-end/img/icons/empty-cart.svg' %}" alt="">
-                            <p class="text-capitalize">Product is not Available!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+                    
+                {% if not products %}
+                <div class="card mb-4">
+                    <div class="card-body py-5">
+                        <div class="py-md-4">
+                            <div class="text-center text-capitalize">
+                                <img class="mb-3 mw-100" src="{% static 'assets/front-end/img/icons/empty-cart.svg' %}" alt="">
+                                <p class="text-capitalize">Product is not Available!</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endif %}
-              <!-- Pagination -->
-              <div class="col-12">
-                  <nav class="d-flex justify-content-between pt-2" aria-label="Page navigation" id="paginator-ajax">
-                      {% if is_paginated %}
-                          <ul class="pagination">
-                              {% if page_obj.has_previous %}
-                                  <li class="page-item">
-                                      <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                                          <span aria-hidden="true">&laquo;</span>
-                                      </a>
-                                  </li>
-                              {% endif %}
-  
-                              {% for num in page_obj.paginator.page_range %}
-                                  {% if page_obj.number == num %}
-                                      <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
-                                  {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                      <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                                  {% endif %}
-                              {% endfor %}
-  
-                              {% if page_obj.has_next %}
-                                  <li class="page-item">
-                                      <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                                          <span aria-hidden="true">&raquo;</span>
-                                      </a>
-                                  </li>
-                              {% endif %}
-                          </ul>
-                      {% endif %}
-                  </nav>
-              </div>
-          </section>
-      </div>
-  </div>
+                {% endif %}
+                
+                <!-- Pagination -->
+                <div class="col-12">
+                    <nav class="d-flex justify-content-between pt-2" aria-label="Page navigation" id="paginator-ajax">
+                        {% if is_paginated %}
+                            <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+    
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+    
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                    </nav>
+                </div>
+            </section>
+        </div>
+    </div>
 
 
   <!-- Mobile Sorting Modal -->
@@ -305,11 +313,16 @@ End CSS
                                 <div class="card-header" id="heading-{{ category.id }}">
                                     <h2 class="mb-0">
                                         <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ category.id }}" aria-expanded="true" aria-controls="collapse-{{ category.id }}">
-                                            <label class="for-hover-lable cursor-pointer" onclick="location.href='{% url 'category_products' category.id %}'">
-
+                                            {% if category.url %}
+                                            <label class="for-hover-lable cursor-pointer" onclick="location.href='{{ category.url }}'">
                                                 {{ category.name }}
                                             </label>
-
+                                                </a>
+                                            {% else %}
+                                            <label class="for-hover-lable cursor-pointer" onclick="location.href='{% url 'category_products' category.id %}'">
+                                                {{ category.name }}
+                                            </label>
+                                            {% endif %}
                                         </button>
                                     </h2>
                                 </div>
@@ -335,7 +348,13 @@ End CSS
     </div>
 </div>
 
-  
+
+    <!-- Back To Top Button-->
+    <a class="btn-scroll-top btn-purple" href="#top" data-scroll>
+        <span class="btn-scroll-top-tooltip text-muted font-size-sm mr-2">Top</span>
+        <i class="btn-scroll-top-icon czi-arrow-up"></i>
+    </a>
+    
 
 <!-- Add this script at the end of your template -->
 <script>

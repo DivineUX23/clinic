@@ -158,9 +158,15 @@ Start Navigation Bar
             <div class="dropdown-menu px-3 text-sm" aria-labelledby="dropdownMenuButton">
                 {% for category in categories %}
                     <div class="py-2">
-                        <a href="{% url 'category_products' category.id %}">
-                        {{ category.name }}
-                        </a>
+                        {% if category.url %}
+                            <a href="{{ category.url }}">
+                                {{ category.name }}
+                            </a>
+                        {% else %}
+                            <a href="{% url 'category_products' category.id %}">
+                                {{ category.name }}
+                            </a>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
@@ -188,9 +194,15 @@ Start Navigation Bar
                     <div class="dropdown-menu px-3 text-sm" aria-labelledby="dropdownMenuButton">
                         {% for category in categories %}
                             <div class="py-2">
-                                <a href="{% url 'category_products' category.id %}">
-                                {{ category.name }}
-                                </a>
+                                {% if category.url %}
+                                    <a href="{{ category.url }}">
+                                        {{ category.name }}
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'category_products' category.id %}">
+                                        {{ category.name }}
+                                    </a>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>

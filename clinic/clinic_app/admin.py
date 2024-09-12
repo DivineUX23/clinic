@@ -1,5 +1,17 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem, CartItem, Cart
+from .models import Category, Product, Order, OrderItem, CartItem, Cart, FAQ
+from .models import PaymentSettings
+
+@admin.register(PaymentSettings)
+class PaymentSettingsAdmin(admin.ModelAdmin):
+    list_display = ['tax_rate', 'shipping_rate', 'discount_rate']
+
+
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ('question', 'order', 'is_visible')
+    list_editable = ('order', 'is_visible')
 
 
 @admin.register(Category)
@@ -64,12 +76,12 @@ class OrderAdmin(admin.ModelAdmin):
     get_total_amount.short_description = 'Total Amount'
 
     def get_readonly_fields(self, request, obj=None):
-        if obj:  # editing an existing object
+        if obj:  
             return self.readonly_fields #+ ('total_amount')
         return self.readonly_fields
 
     def has_delete_permission(self, request, obj=None):
-        return False  # Prevent deletion of orders
+        return False  
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
@@ -79,10 +91,10 @@ class OrderItemAdmin(admin.ModelAdmin):
     search_fields = ['order__name', 'product__name']
 
     def has_add_permission(self, request):
-        return False  # Prevent adding order items directly
+        return False  
 
     def has_delete_permission(self, request, obj=None):
-        return False  # Prevent deletion of order items
+        return False  
 """
 @admin.register(Newsletter)
 class NewsletterAdmin(admin.ModelAdmin):

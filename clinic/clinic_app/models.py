@@ -1,17 +1,38 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
-
 from django.contrib.auth.models import User
+from django.urls import reverse
+from decimal import Decimal
+
+
+class PaymentSettings(models.Model):
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.05'))  # 5% tax by default
+    shipping_rate = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('1000.00'))  # Flat shipping rate
+    discount_rate = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))  # Discount rate default
+
+    def __str__(self):
+        return "Payment Settings"
+
+
+
+class FAQ(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    order = models.IntegerField(default=0)
+    is_visible = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.question
+
+    class Meta:
+        ordering = ['order']
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
-    #description = models.TextField(blank=True)
-    #image = models.ImageField(upload_to='category_images/', blank=True, null=True)
+    url = models.URLField(max_length=500, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -19,8 +40,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-#class Product(models.Model):
-from django.urls import reverse
 
 
 class Product(models.Model):
@@ -98,7 +117,7 @@ class OrderItem(models.Model):
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    session_key = models.CharField(max_length=40, unique=True)  # To associate with a session
+    session_key = models.CharField(max_length=40, unique=True)  
 
     def __str__(self):
         return f"Cart {self.id}"
@@ -119,7 +138,6 @@ class CartItem(models.Model):
 
     
 
-# In models.py
 class SearchedProduct(models.Model):
     name = models.CharField(max_length=200)
     searched_at = models.DateTimeField(auto_now_add=True)
