@@ -87,31 +87,72 @@ End CSS
 <!-- Page Content-->
 <div class="__inline-61">
                 <!-- Hero (Banners + Slider)-->
-    <section class="bg-transparent">
-            <div>
-                <div class="px-0 home-carousel-container">
-    <div class="hero-banner owl-carousel owl-theme h-full">
-                <a href="" class="d-block h-full">
-            <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
-                src="https://medplusnig.com/storage/app/public/banner/2024-08-05-66b1096a24d9c.webp" alt="">
-        </a>
-                <a href="" class="d-block h-full">
-            <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
-                src="https://medplusnig.com/storage/app/public/banner/2024-06-28-667ea649437ab.webp" alt="">
-        </a>
-                <a href="" class="d-block h-full">
-            <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
-                src="https://medplusnig.com/storage/app/public/banner/2024-08-05-66b1096a24d9c.webp" alt="">
-        </a>
-            </a>
-        <a href="" class="d-block h-full">
-            <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
-            src="https://medplusnig.com/storage/app/public/banner/2024-08-05-66b1096a24d9c.webp" alt="">
-        </a>
-            </div>
-        </div>            
+  <section class="bg-transparent">
+    <div>
+      <div class="px-0 home-carousel-container">
+        <div class="hero-banner owl-carousel owl-theme h-full">
+          <a href="" class="d-block h-full">
+              <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
+                  src="\static\images\IMG-20240913-WA0001.jpg" alt="JollyLife Health Limited">
+          </a>
+                  <a href="" class="d-block h-full">
+              <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
+                src="\static\images\IMG-20240913-WA0002.jpg" alt="JollyLife Health Limited">
+          </a>
+                  <a href="" class="d-block h-full">
+              <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
+                  src="\static\images\IMG-20240913-WA0003.jpg" alt="JollyLife Health Limited">
+          </a>
+              </a>
+          <a href="" class="d-block h-full">
+              <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
+              src="\static\images\IMG-20240913-WA0004.jpg" alt="JollyLife Health Limited">
+          </a>
+        </div>
+      </div>            
     </div>
-    </section>
+  </section>  
+
+
+
+
+
+
+<!--category -->
+<section class="md:py-16 py-[24px] bg-[#F9F5F5]">
+  <div class="container mx-auto bg-[#F9F5F5]">
+      <div class="text-[28px] md:text-[36px]">Shop by category</div>
+      
+      <div class="category-carousel-container w-full">
+          <div id="categories" class="mt-8 tab-content">
+            <div class="category-slider owl-carousel owl-theme">
+
+              {% for category in categories %}
+                  <div class="mb-4">
+                      <a href="{% url 'products' %}?id={{ category.id }}&data_from=category&page=1" class="w-full">
+                          <div class="relative h-[200px] border border-[#75869D] bg-purple-100 rounded-2xl w-full">
+                              {% if category.image %}
+                                  <img src="{{ category.image.url }}"
+                                      alt="{{ category.name }}" class="w-full h-full object-cover rounded-[16px]" />
+                              {% else %}
+                                  <p>No image available</p>
+                              {% endif %}
+                              <div class="absolute bottom-8 left-5 right-5">
+                                  <div class="text-lg font-medium">{{ category.name }}</div>
+                                  <span class="flex items-center gap-[4px] text-sm text-[#75869D]"> Explore </span>
+                              </div>
+                          </div>
+                      </a>
+                  </div>
+              {% empty %}
+                  <p>No categories available.</p>
+              {% endfor %}
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+
 
 
 
@@ -217,97 +258,42 @@ End CSS
 
 
 
-<!--FREQUENTLY ASKED QUESTIONS
+<!--FREQUENTLY ASKED QUESTIONS-->
 
-    <section id="faq" class="py-10 container mx-auto">
+  <section id="faq" class="py-10 container mx-auto">
       <div class="text-center text-xl md:text-[28px] mb-6">
-        Frequently Asked Question
+          Frequently Asked Questions
       </div>
-                <div class="mt-3 faq-div">
-            <button
-              class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full"
-            >
-              <span>GENERAL COMPANY INFORMATION</span>
-              <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
-            </button>
-            <div class="accordion-content hidden py-4 px-2">I have a question about one of your pharmaceutical products. Visit the Products Section on this Web site to find a list of many of our products. If you are a Customer seeking medical information about our prescription products, please contact us</div>
+      {% for faq in initial_faqs %}
+          <div class="mt-3 faq-div">
+              <button class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full">
+                  <span>{{ faq.question }}</span>
+                  <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
+
+              </button>
+              <div class="accordion-content hidden py-4 px-2">{{ faq.answer }}</div>
           </div>
-                <div class="mt-3 faq-div">
-            <button
-              class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full"
-            >
-              <span>What is JollyLife's phone number?</span>
-              <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
-            </button>
-            <div class="accordion-content hidden py-4 px-2">Call/Whatsapp - 08115174429</div>
-          </div>
-                <div class="mt-3 hidden extra-faq faq-div">
-            <button
-              class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full"
-            >
-              <span>How do I find information about JollyLife Healthcare stores across Nigeria?</span>
-              <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
-            </button>
-            <div class="accordion-content hidden py-4 px-2">You can find information about JollyLife Healthcare stores by visiting the store locator on the Websites.</div>
-          
-                <div class="mt-3 hidden extra-faq faq-div">
-            <button
-              class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full"
-            >
-              <span>WEB SITE FEEDBACK</span>
-              <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
-            </button>
-            <div class="accordion-content hidden py-4 px-2">Please use our contact form to report a Web site problem or make suggestions to improve the Medplus Web site. Although your message is important to us and we read all messages, you may not receive a personal reply due to the large volume of messages we receive. Go to Contact Us form</div>
-          </div>
-                <div class="mt-3 hidden extra-faq faq-div">
-            <button
-              class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full"
-            >
-              <span>Product Information Contacts</span>
-              <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
-            </button>
-            <div class="accordion-content hidden py-4 px-2">Consumers who have general product-related questions, please call 0818-712-2408 Monday through Friday 9:00am to 6:00pm. If you are a Customer seeking medical information about our prescription products, please contact any of our nearest stores.</div>
-          
-            <div class="flex justify-center mt-4">
-          <button id="viewMoreBtn" class="h-10 text-white bg-[#FF0077] transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white hover:border-[#FF0077] hover:bg-[#FF0077] font-medium tracking-[0.18px] font-poppins rounded-md">View More</button>
+      {% endfor %}
+      
+      <div id="extraFaqsContainer" class="hidden">
+          {% for faq in extra_faqs %}
+              <div class="mt-3 faq-div">
+                  <button class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full">
+                      <span>{{ faq.question }}</span>
+                      <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
+
+                  </button>
+                  <div class="accordion-content hidden py-4 px-2">{{ faq.answer }}</div>
+              </div>
+          {% endfor %}
       </div>
-    </section>-->
-    {% load static %}
-
-    <section id="faq" class="py-10 container mx-auto">
-        <div class="text-center text-xl md:text-[28px] mb-6">
-            Frequently Asked Questions
-        </div>
-        {% for faq in initial_faqs %}
-            <div class="mt-3 faq-div">
-                <button class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full">
-                    <span>{{ faq.question }}</span>
-                    <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
-
-                </button>
-                <div class="accordion-content hidden py-4 px-2">{{ faq.answer }}</div>
-            </div>
-        {% endfor %}
-        
-        <div id="extraFaqsContainer" class="hidden">
-            {% for faq in extra_faqs %}
-                <div class="mt-3 faq-div">
-                    <button class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full">
-                        <span>{{ faq.question }}</span>
-                        <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
-
-                    </button>
-                    <div class="accordion-content hidden py-4 px-2">{{ faq.answer }}</div>
-                </div>
-            {% endfor %}
-        </div>
-        
-        {% if extra_faqs %}
-            <div class="flex justify-center mt-4">
-                <button id="toggleFaqBtn" class=" bg-purple btn-purple h-10 text-white transition duration-500 px-[10px] md:px-5 flex items-center justify-cente font-medium tracking-[0.18px] font-poppins rounded-md">Show More</button>
-            </div>
-        {% endif %}
-    </section>
+      
+      {% if extra_faqs %}
+          <div class="flex justify-center mt-4">
+              <button id="toggleFaqBtn" class=" bg-purple btn-purple h-10 text-white transition duration-500 px-[10px] md:px-5 flex items-center justify-cente font-medium tracking-[0.18px] font-poppins rounded-md">Show More</button>
+          </div>
+      {% endif %}
+  </section>
         
         <!-- Footer-->
     
@@ -349,9 +335,44 @@ End CSS
           });
       });
   });
+
+
   </script>
     
-
+  <script>
+    $(document).ready(function(){
+      $('.category-slider').owlCarousel({
+        loop: true,
+        margin: 20,
+        nav: true,
+        navText: [
+          "<i class='fa fa-chevron-left'></i>",
+          "<i class='fa fa-chevron-right'></i>"
+        ],
+        autoplay: true,
+        autoplayHoverPause: true,
+        responsive: {
+          0: {
+            items: 1
+          },
+          600: {
+            items: 2
+          },
+          1000: {
+            items: 3      }
+     }
+      });
+    
+      // Apply custom styles to the navigation buttons
+      $('.owl-prev, .owl-next').css({
+        'background-color': '#800080',
+        'color': 'white',
+        'border-radius': '50%',
+        'padding': '10px',
+        'font-size':'20px'
+      });
+    });
+    </script>
 {% endblock %}
   <!-- ================================
   End Content

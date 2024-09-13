@@ -5,26 +5,120 @@ Page title
 
 
         <!-- Page title-->
-        <div class="__floating-btn">
-            <div class="wa-widget-send-button">
-<a href="https://wa.me/+2347078522512" target="_blank">
-    <img src="https://medplusnig.com/public/assets/front-end/img/whatsapp.svg"
-        class="wa-messenger-svg-whatsapp wh-svg-icon" alt="Chat with us on WhatsApp">
-</a>
+<div class="__floating-btn">
+    <div class="wa-widget-send-button">
+        <a href="https://wa.me/+2347078522512" target="_blank">
+            <img src="https://medplusnig.com/public/assets/front-end/img/whatsapp.svg"
+            class="wa-messenger-svg-whatsapp wh-svg-icon" alt="Chat with us on WhatsApp">
+        </a>
 </div>
 
 </div>
 <span id="authentication-status" data-auth="false"></span>
 
 <div class="row">
-<div class="col-12" style="margin-top:10rem;position: fixed;z-index: 9999;">
-<div id="loading" style="display: none;">
-    <center>
-        <img width="200"
-            src="https://medplusnig.com/storage/app/public/company/"
-            onerror="this.src='https://medplusnig.com/public/assets/front-end/img/loader.gif'"
-            class="bg-white p-8">
-    </center>
+    <div class="col-12" style="margin-top:10rem;position: fixed;z-index: 9999;">
+        <!--<div id="loading" style="display: none;">
+            <center>
+                <img width="200"
+                    src="https://medplusnig.com/storage/app/public/company/"
+                    onerror="this.src='https://medplusnig.com/public/assets/front-end/img/loader.gif'"
+                    class="bg-white p-8">
+            </center>
+        </div>-->
+    </div>
 </div>
+
+
+<!-- Cart Floating -->
+<div class="floating-cart-btn">
+    <a href="{% url 'cart' %}" id="floating-cart-link">
+        <img src="https://medplusnig.com/public/assets/front-end/img/cart.svg" alt="Go to Cart">
+        <span class="cart-item-count" id="floating-cart-count">0</span>
+    </a>
 </div>
-</div>
+
+<style>
+    .floating-cart-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .floating-cart-btn a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #800080;  /* Changed to a purple color */
+        box-shadow: 0 4px 8px rgba(138, 43, 226, 0.3);  /* Purple shadow */
+        transition: all 0.3s ease;
+    }
+
+    .floating-cart-btn a:hover {
+        transform: scale(1.1);
+        background-color: #6a006a;  /* Slightly lighter purple on hover */
+    }
+
+    .floating-cart-btn img {
+        width: 30px;
+        height: 30px;
+        filter: invert(1);  /* This will make the icon white */
+    }
+
+    .cart-item-count {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background-color: #FF4500;  /* Contrasting color for the count */
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+</style>
+<script>
+    // Function to update the floating cart count
+    function updateFloatingCartCount(count) {
+        const floatingCartCount = document.getElementById('floating-cart-count');
+        if (floatingCartCount) {
+            floatingCartCount.textContent = count;
+        }
+    }
+    
+    // Modify your existing addTobeBought function to update the floating cart count
+    function addTobeBought(productId) {
+        // ... (keep your existing code here)
+    
+        fetch("{% url 'add_to_cart' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    // ... (keep your existing Swal.fire code)
+                });
+                document.getElementById('cart-count').textContent = data.cart_quantity;
+                updateFloatingCartCount(data.cart_quantity);  // Update floating cart count
+            } else {
+                // ... (keep your existing error handling)
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    
+    // Initialize the floating cart count when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const initialCartCount = document.getElementById('cart-count').textContent;
+        updateFloatingCartCount(initialCartCount);
+    });
+    </script>

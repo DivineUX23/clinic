@@ -29,7 +29,7 @@ End CSS
 
 {% block content %}
 <!-- Body-->
-<!-- Page Content-->
+<!-- Page Content +-->
 <div class="container mt-3 rtl px-0 px-md-3" style="text-align: left;" id="cart-summary">
     <h3 class="mt-4 mb-3 text-center text-lg-left mobile-fs-20">Shopping cart</h3>
 
@@ -68,8 +68,11 @@ End CSS
                         <tr>
                             <td class="__w-45">
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="mr-2" style="width: 60px; height: 60px;">
-                                    <div>{{ item.product.name }}</div>
+                                    <a href="{% url 'product_detail' item.product.slug %}" class="w-100">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="mr-2" style="width: 60px; height: 60px;">
+                                    
+                                        <div>{{ item.product.name }}</div>
+                                    </a>
                                 </div>
                             </td>
                             <td>
@@ -81,13 +84,10 @@ End CSS
                             </td>
                             <td class="__w-15p">₦{{ item.product.price }}</td>
                             <td class="__w-15p">
-                                <form method="post" action="{% url 'update_cart' %}" class="d-flex align-items-center">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                    <button type="submit" name="action" value="decrease" class="btn btn-sm btn-outline-secondary">-</button>
-                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm mx-2" style="width: 60px;">
-                                    <button type="submit" name="action" value="increase" class="btn btn-sm btn-outline-secondary">+</button>
-                                </form>
+                                
+                                <span class="form-control form-control-sm mx-2" style="width: 60px; display: inline-block; text-align: center;">
+                                    {{ item.quantity }}
+                                </span>                                    
                             </td>
                             <td class="__w-15p text-end">₦{{ item.total_price }}</td>
                         </tr>
@@ -104,12 +104,14 @@ End CSS
                     <div class="card-body">
                         <div class="row">
                             <div class="col-4">
-                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid">
+                                <a href="{% url 'product_detail' item.product.slug %}" class="w-100">
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid">
+                                </a>
                             </div>
                             <div class="col-8">
-                                <h5>{{ item.product.name }}</h5>
-                                
-                                
+                                <a href="{% url 'product_detail' item.product.slug %}" class="w-100">
+                                    <h5>{{ item.product.name }}</h5>
+                                </a>
                                 <form method="post" action="{% url 'remove_from_cart' %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
@@ -117,13 +119,11 @@ End CSS
                                 </form>
                                 
                                 <p>Price: ₦{{ item.product.price }}</p>
-                                <form  class="d-flex align-items-center cart-update-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
-                                    <button type="button" name="action" value="decrease" class="btn btn-sm btn-outline-secondary btn-number" data-type="minus" style="padding: 10px;">-</button>
-                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm mx-2 input-number text-center" style="width: 60px;">
-                                    <button type="button" name="action" value="increase" class="btn btn-sm btn-outline-secondary btn-number" data-type="plus" style="padding: 10px;">+</button>
-                                </form>
+                                
+                                
+                                <span class="form-control form-control-sm mx-2" style="width: 60px; display: inline-block; text-align: center;">
+                                    {{ item.quantity }}
+                                </span>         
                                 
                                 <p class="mt-2">Total: ₦{{ item.total_price }}</p>
                             </div>
@@ -345,3 +345,5 @@ End CSS
     });
 </script>    
 {% endblock %}
+
+

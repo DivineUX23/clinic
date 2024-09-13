@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem, CartItem, Cart, FAQ
+from .models import Category, Product, Order, OrderItem, CartItem, Cart, FAQ, SearchedProduct
 from .models import PaymentSettings
 
 @admin.register(PaymentSettings)
@@ -16,9 +16,9 @@ class FAQAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug']
+    list_display = ['name', 'slug', 'url']
     prepopulated_fields = {'slug': ('name',)}
-
+    fields = ['name', 'slug', 'url']
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -95,6 +95,22 @@ class OrderItemAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False  
+
+
+@admin.register(SearchedProduct)
+class SearchedProductAdmin(admin.ModelAdmin):
+    list_display = ['name', 'searched_at']
+    list_filter = ['searched_at']
+    search_fields = ['name']
+    readonly_fields = ['searched_at']
+    ordering = ['-searched_at']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
 """
 @admin.register(Newsletter)
 class NewsletterAdmin(admin.ModelAdmin):

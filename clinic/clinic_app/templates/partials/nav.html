@@ -4,29 +4,9 @@ Start Navigation Bar
 ================================= -->
 
 
-<!-- Mobile Search Overlay -->
-<div id="mobile-search-overlay" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 hidden">
-    <div class="p-4">
-        <form id="mobile-search-form" class="relative">
-            <input
-                id="mobile-search-input"
-                class="w-full p-2 border rounded"
-                type="text"
-                placeholder="Search for an item"
-                name="q"
-            >
-            <button type="submit" class="absolute right-2 top-2">
-                <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
-            </button>
-        </form>
-        <div id="mobile-search-results" class="mt-4 max-h-64 overflow-y-auto">
-            <!-- Search results will be displayed here -->
-        </div>
-        <button id="close-mobile-search" class="mt-4 p-2 bg-gray-200 rounded">Close</button>
-    </div>
-</div>
 
-<header class="box-shadow-sm rtl __inline-10">
+<!-- Sticky Header -->
+<header class="sticky top-0 z-50 w-full bg-white shadow-md">
     <div class="navbar-sticky bg-white mobile-head">
         <div class="h-[60px] lg:h-[110px] relative flex justify-between items-center medplus_container px-[16px] py-[16px] mx-auto">
             <!-- Logo and hamburger menu -->
@@ -35,11 +15,9 @@ Start Navigation Bar
                     <img src="https://medplusnig.com/public/assets/front-end/img/hamburger.svg" alt="hamburger" class="w-full" />
                 </button>
                 <a href="{% url 'home' %}" class="h-[47px] md:h-[77px]">
-                    <img src="\static\images\jolly_life.jpg" alt="JollyLife Health Limited" class="h-full" />
+                    <img src="\static\images\IMG-20240913-WA0000.jpg" alt="JollyLife Health Limited" class="h-full" />
                 </a>
             </div>
-
-
 
             <!-- Desktop Search Bar -->
             <div class="hidden md:block md:w-[300px] xl:w-[480px] h-[46px]">
@@ -49,7 +27,7 @@ Start Navigation Bar
                         class="form-control appended-form-control search-bar-input h-[46px] w-full bg-transparent text-[#263238] placeholder:text-black/40 text-[12px] outline-none"
                         type="text"
                         autocomplete="off"
-                        placeholder="Search for an item"
+                        placeholder="Enter product name, brand, or category"
                         name="q"
                     >
                     <button type="submit" class="absolute right-0 border-none" style="border-radius: 0px 7px 7px 0px; left: unset; right: 0;top:0; bottom: 1px;">
@@ -64,7 +42,6 @@ Start Navigation Bar
                     </div>
                 </form>
             </div>
-
 
             <!-- Cart, Wishlist, and Sign In buttons -->
             <div class="flex items-center gap-[12px] md:gap-[16px]">
@@ -122,6 +99,7 @@ Start Navigation Bar
                     <span class="hidden md:block ml-1">Wishlist</span>
                 </a>-->
 
+
                 <!-- Sign In -->
                 <a href="" class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
                     <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -132,7 +110,47 @@ Start Navigation Bar
             </div>
         </div>
         
-    <nav id="mobile_nav" class="fixed hidden md:hidden top-0 left-0 h-screen w-full bg-white z-[999999] px-4 py-7">
+
+        <!-- Black bar with categories -->
+        <div class="bg-black text-white hidden md:block text-xs lg:text-base">
+            <div class="flex items-center gap-[24px] h-[55px] medplus_container mx-auto px-[16px]">
+                <a href="{% url 'products' %}" class="flex items-center gap-[8px] text-white">
+                    <span> All Products </span>
+                </a>
+                
+                <div class="dropdown text-white cursor-pointer">
+                    <div data-toggle="dropdown" class="flex items-center gap-[8px]">
+                        <span>Select Categories</span>
+                        <div>
+                            <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down.svg" alt="arrow_down" />
+                        </div>
+                    </div>
+
+                    <div class="dropdown-menu px-3 text-sm" aria-labelledby="dropdownMenuButton">
+                        {% for category in categories %}
+                            <div class="py-2">
+                                {% if category.url %}
+                                    <a href="{{ category.url }}">
+                                        {{ category.name }}
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'category_products' category.id %}">
+                                        {{ category.name }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <a href="https://wa.me/+2347078522512" class="flex items-center gap-[8px] text-white" target="_blank">
+                    <span>Consult a Pharmacist</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav id="mobile_nav" class="fixed hidden md:hidden top-0 left-0 h-screen w-full bg-white z-[999999] px-4 py-7">
     <div>
         
 
@@ -177,51 +195,61 @@ Start Navigation Bar
         </div>
     </div>
   </nav>
-        <div class="bg-black text-white hidden md:block text-xs lg:text-base">
-            <div class="flex items-center gap-[24px] h-[55px] medplus_container mx-auto px-[16px]">
-                <a href="{% url 'products' %}" class="flex items-center gap-[8px] text-white">
-                    <span> All Products </span>
-                </a>
-                
-                <div class="dropdown text-white cursor-pointer">
-                    <div data-toggle="dropdown" class="flex items-center gap-[8px]">
-                        <span>Select Categories</span>
-                        <div>
-                            <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down.svg" alt="arrow_down" />
-                        </div>
-                    </div>
 
-                    <div class="dropdown-menu px-3 text-sm" aria-labelledby="dropdownMenuButton">
-                        {% for category in categories %}
-                            <div class="py-2">
-                                {% if category.url %}
-                                    <a href="{{ category.url }}">
-                                        {{ category.name }}
-                                    </a>
-                                {% else %}
-                                    <a href="{% url 'category_products' category.id %}">
-                                        {{ category.name }}
-                                    </a>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <a href="https://wa.me/+2347078522512" class="flex items-center gap-[8px] text-white" target="_blank">
-                    <span>Consult a Pharmacist</span>
-                </a>
-              </div>
+  <!-- Mobile Search Overlay -->
+<div id="mobile-search-overlay" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 hidden">
+    <div class="p-4">
+        <form id="mobile-search-form" class="relative">
+            <input
+                id="mobile-search-input"
+                class="w-full p-2 border rounded"
+                type="text"
+                placeholder="Enter product name, brand, or category"
+                name="q"
+            >
+            <button type="submit" class="absolute right-2 top-2">
+                <img src="https://medplusnig.com/public/assets/front-end/img/search.svg" alt="search" />
+            </button>
+        </form>
+        <div id="mobile-search-results" class="mt-4 max-h-64 overflow-y-auto">
+            <!-- Search results will be displayed here -->
         </div>
+        <button id="close-mobile-search" class="mt-4 p-2 bg-gray-200 rounded">Close</button>
     </div>
-
-</header>
+</div>
 
 <!-- ================================
 End Navigation Bar
 ================================= -->
 
 <!-- Add this script at the end of your body tag -->
+ 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var header = document.querySelector('header');
+        var headerHeight = header.offsetHeight;
+        var lastScrollTop = 0;
+    
+        window.addEventListener('scroll', function() {
+            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop) {
+                // Scrolling down
+                header.style.transform = `translateY(-${headerHeight}px)`;
+            } else {
+                // Scrolling up
+                header.style.transform = 'translateY(0)';
+            }
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        }, false);
+    });
+</script>
+
+
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
     var desktopSearchInput = $('#search-input');
@@ -265,6 +293,13 @@ $(document).ready(function() {
         }
     }
 
+    function requestItemViaWhatsApp(item) {
+        var message = encodeURIComponent("Hello, I would like to request the following item: " + item);
+        var whatsappNumber = "+2347078522512"; // Replace with your WhatsApp number
+        var whatsappUrl = "https://wa.me/" + whatsappNumber + "?text=" + message;
+        window.open(whatsappUrl, '_blank');
+    }
+
     desktopSearchInput.on('input', function() {
         performSearch($(this).val(), desktopSearchResults);
     });
@@ -281,10 +316,32 @@ $(document).ready(function() {
         }
     });
 
-    // Prevent form submission
+    // Handle form submission
     desktopSearchForm.add(mobileSearchForm).on('submit', function(e) {
         e.preventDefault();
-        // You can add logic here to handle form submission if needed
+        var query = $(this).find('input[type="search"]').val();
+        
+        $.ajax({
+            url: '{% url "api_search_products" %}',
+            data: { 'q': query },
+            dataType: 'json',
+            success: function(data) {
+                if (!data.exists) {
+                    Swal.fire({
+                        title: 'Item Not Found',
+                        text: 'Would you like to request this item?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, request it!',
+                        cancelButtonText: 'No, thanks'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            requestItemViaWhatsApp(query);
+                        }
+                    });
+                }
+            }
+        });
     });
 
     // Toggle mobile search overlay
@@ -295,7 +352,6 @@ $(document).ready(function() {
     $('#close-mobile-search').on('click', function() {
         mobileSearchOverlay.slideUp(200);
     });
-
 
 
     // Toggle mobile search overlay
@@ -316,6 +372,5 @@ $(document).ready(function() {
             openMobileSearchBtn.show();
         }
     }).trigger('resize'); // Trigger on page load
-
 });
 </script>
