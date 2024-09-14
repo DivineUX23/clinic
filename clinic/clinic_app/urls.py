@@ -19,6 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     #path('admin/', admin.site.urls),
@@ -34,7 +35,8 @@ urlpatterns = [
 
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),
 
-
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('signup/', views.signup, name='signup'),
     #path('category', views.category, name='category'),
 
 
