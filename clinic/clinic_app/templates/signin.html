@@ -1,0 +1,127 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block description %}{% endblock %}
+{% block keywords %}{% endblock %}
+
+ 
+<!-- ================================
+Start CSS
+================================= -->
+{% block extend_header %}{% endblock %}
+
+<!-- ================================
+End CSS
+================================= -->
+{% block extend_footer %}{% endblock %}
+
+ 
+ <!-- ================================
+  Start Content
+  ================================= -->
+
+  <!-- ================================
+  End Content
+  ================================= -->
+
+  {% block title %}Sign In{% endblock %}
+
+  
+  {% load widget_tweaks %}
+
+  {% block content %}
+
+  <div class="md:h-screen">
+    <div class="grid md:grid-cols-[0.8fr_1fr] h-full">
+      <div class="hidden md:block">
+        <img src="\static\images\IMG-20240913-WA0003.jpg" class="h-full w-full object-cover" alt="register">
+      </div>
+      <div class="container py px-9 __inline-7" style="text-align: left;">
+        <div class="">
+          <div class="mx-auto max-w-[509px]">
+            <div class="mb-8">
+              <a href="{% url 'home' %}" class="h-[47px] md:h-[70px]">
+                <img src="\static\images\IMG-20240913-WA0000.jpg" alt="Medplus Limited" class="h-full" />
+              </a>
+            </div>
+            <h2 class="mb-4 text-purple text-3xl font-bold text-capitalize fs-18-mobile">Login To Your Account</h2>
+            <form method="post" class="needs-validation mt-2" autocomplete="off">
+              {% csrf_token %}
+              {% for field in form %}
+              <div class="form-group mb-4">
+                <label for="{{ field.id_for_label }}" class="form-label font-semibold block mb-2">{{ field.label }}</label>
+                  {% if field.name == 'password' %}
+                    <div class="password-toggle rtl">
+                      {% render_field field class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %}
+                      <label class="password-toggle-btn">
+                        <input class="custom-control-input" type="checkbox">
+                        <i class="tio-hidden password-toggle-indicator"></i>
+                        <span class="sr-only">Show password</span>
+                      </label>
+                    </div>
+                  {% else %}
+                    {% render_field field class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %}
+                  {% endif %}
+                  {% for error in field.errors %}
+                    <div class="invalid-feedback text-red-500 text-sm mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+              
+              <div class="form-group d-flex flex-wrap justify-content-between mb-4">
+                <div class="rtl">
+                  <div class="custom-control custom-checkbox">
+                    {{ form.remember }}
+                    <label class="custom-control-label text-primary ml-2 cursor-pointer" for="{{ form.remember.id_for_label }}">Remember me</label>
+                  </div>
+                </div>
+                <a class="font-size-sm text-primary text-underline" href="">
+                  Forgot password?
+                </a>
+              </div>
+              
+              {% if form.captcha %}
+                <div class="row py-2 mb-4">
+                  <div class="col-2">
+                    {{ form.captcha|add_class:"form-control border __h-40 w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+                  </div>
+                  <div class="col-6 input-icons mb-2 w-100 rounded bg-white">
+                    <a onclick="re_captcha();" class="d-flexcenter align-items-center">
+                      <img src="{{ captcha_image_url }}" class="input-field rounded __h-40" id="customer_login_recaptcha_id">
+                      <i class="tio-refresh icon cursor-pointer p-2"></i>
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+              
+              <button class="btn btn--primary btn-block btn-shadow w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 :ring-offset-2 transition-colors duration-300" type="submit">Log in</button>
+            </form>
+            
+            <div class="text-center m-3 text">
+              <small>Or continue with</small>
+            </div>
+            <div class="d-flex justify-content-center my-3 gap-2">
+              <!-- Social login buttons can be added here -->
+            </div>
+            <div class="text-black-50 text-center">
+              <small>
+                Enjoy New experience
+                <a class="text-primary text-underline" href="{% url 'signup' %}">
+                  Sign up
+                </a>
+              </small>
+            </div>
+            <div class="text-black-50 text-center mt-3">
+              <small>
+                <a class="text-primary text-underline" href="{% url 'home' %}">
+                  Return to Homepage
+                </a>
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}

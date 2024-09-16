@@ -36,7 +36,7 @@ urlpatterns = [
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),
 
     path('login/', auth_views.LoginView.as_view(), name='login'),
-    path('signup/', views.signup, name='signup'),
+    #path('signup/', views.signup, name='signup'),
     #path('category', views.category, name='category'),
 
 
@@ -53,6 +53,9 @@ urlpatterns = [
     path('api/orders/', views.OrderList.as_view(), name='order-list'),
     path('api/orders/<int:pk>/', views.OrderDetail.as_view(), name='order-detail'),
 
+
+    path('signup/', views.signup_view, name='signup'),
+    path('signin/', views.signin_view, name='signin'),
 ]
 
 
