@@ -514,6 +514,34 @@
     function addTobeBought(productId) {
         console.log('Function called with productId:', productId);
         
+        // Check if user is authenticated
+        const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+        
+        if (!isAuthenticated) {
+            Swal.fire({
+                title: 'Not Logged In',
+                text: 'You need to be logged in to add items to your cart.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Log In',
+                cancelButtonText: 'Continue as Guest',
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    confirmButton: 'swal-custom-confirm-button',
+                    cancelButton: 'swal-custom-cancel-button'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to login page
+                    window.location.href = "{% url 'signin' %}?next=" + encodeURIComponent(window.location.pathname);
+                } else {
+                    // User chose to continue as guest, you can handle this as needed
+                    console.log('User continued as guest');
+                }
+            });
+            return; // Stop execution if not authenticated
+        }
+        
         const form = document.getElementById(`form-${productId}`);
         console.log('Form found:', form);
         
@@ -576,6 +604,8 @@
         .catch(error => console.error('Error:', error));
     }
     </script>
+
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

@@ -30,27 +30,28 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-
-
-
 from .models import FAQ
+
+
+
+
+def get_cart_item_count(user):
+    if user.is_authenticated:
+        cart = Cart.objects.filter(user=user).first()
+        return cart.items.count() if cart else 0
+    return 0
 
 def home(request):
     new_arrivals = Product.objects.filter(section='new_arrival')
     most_popular = Product.objects.filter(section='most_popular')
     categories = Category.objects.all()
-    
+        
+    item_count = get_cart_item_count(request.user)
 
-    cart = Cart.objects.filter(session_key=request.session.session_key).first()
-        
-    if cart:  
-        item_count = cart.items.count()
-    else:
-        item_count = 0
-        
+            
     faqs = FAQ.objects.filter(is_visible=True)
-    initial_faqs = faqs[:2]  # Show first 2 FAQs initially
-    extra_faqs = faqs[2:]    # Remaining FAQs
+    initial_faqs = faqs[:2]
+    extra_faqs = faqs[2:]
 
     return render(request, 'home.html', {
         'quantity': item_count,
@@ -69,20 +70,15 @@ def category(request):
     return render(request, 'category.html', {})
 
 
+
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
     related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:5]
     more_products = Product.objects.all().exclude(id=product.id)[:5]
-    
     categories = Category.objects.all()
     
-    cart = Cart.objects.filter(session_key=request.session.session_key).first()
-        
-    if cart:  
-        item_count = cart.items.count()
-    else:
-        item_count = 0
-        
+    item_count = get_cart_item_count(request.user)
+            
     context = {
         'quantity': item_count,
         'categories': categories,
@@ -92,55 +88,55 @@ def product_detail(request, slug):
     }
     return render(request, 'product.html', context)
 
+def get_or_create_cart(request):
+    if request.user.is_authenticated:
+        try:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            return cart
+        except Exception as e:
+            messages.error(request, f"Error creating cart: {str(e)}")
+            return None
+    else:
+        messages.warning(request, "Sign up to add to cart.")
+        return None
 
 
 def add_to_cart(request):
-    print("add_to_cart view called")
+
     if request.method == 'POST':
-        print("POST request received")
-        
         product_id = request.POST.get('product_id')
         quantity = int(request.POST.get('quantity', 1))
-        print(f"Product ID: {product_id}, Quantity: {quantity}")
-
-        product = get_object_or_404(Product, id=product_id)
-        #cart = get_cart(request)
-            
-        session_key = request.session.session_key
-        if not session_key:
-            request.session.create()
-        cart, created = Cart.objects.get_or_create(session_key=request.session.session_key)
-        print(f"Cart retrieved/created. Cart ID: {cart.id}, Created: {created}")
+        product = get_object_or_404(Product, id=product_id)            
+        cart = get_or_create_cart(request)
             
         
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
         if not created:
             cart_item.quantity = F('quantity') + quantity
         cart_item.save()
-        print(f"Cart item saved. Created: {created}, Quantity: {cart_item.quantity}")
+
         return JsonResponse({'success': True, 'cart_quantity': cart.items.count()})
-    print("Non-POST request received")
+
     return JsonResponse({'success': False}, status=400)
 
 
 
 
 
+from django.contrib.auth.decorators import login_required
+from .models import Profile
 
-def get_cart(request):
-    return request.session.get('cart', {})
-
-def save_cart(request, cart):
-    request.session['cart'] = cart
-    request.session.modified = True
 
 def cart_view(request):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please log in to view your cart.")
+        return redirect('home')
 
-    cart = Cart.objects.filter(session_key=request.session.session_key).first()
+    cart = Cart.objects.filter(user=request.user).first()  
         
     cart_items = []
     subtotal = Decimal('0.00')
-    
+    """
     if cart:    
         for item in cart.items.all():
             product = Product.objects.get(id=item.product.id)
@@ -155,6 +151,21 @@ def cart_view(request):
         item_count = cart.items.count()
     else:
         item_count = 0
+    """
+    item_count = 0
+    
+    if cart:
+        for item in cart.items.select_related('product').all():
+            product = item.product
+            quantity = item.quantity
+            total_price = product.price * quantity
+            subtotal += total_price
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'total_price': total_price,
+            })
+        item_count = len(cart_items)
     
     settings = PaymentSettings.objects.first()  
     if not settings:
@@ -168,6 +179,18 @@ def cart_view(request):
 
     categories = Category.objects.all()
 
+    # Get user profile data
+
+    #user_profile = request.user.profile
+    user_profile, created = Profile.objects.get_or_create(user=request.user)
+
+    profile_data = {
+        'delivery_location': user_profile.delivery_location or '',
+        'name': request.user.get_full_name() or request.user.username,
+        'phone_number': user_profile.phone_number or '',
+    }
+
+
     context = {
         'categories': categories,
         'quantity': item_count,
@@ -178,40 +201,51 @@ def cart_view(request):
         'discount': discount,
         'total': total,
         'order_note': request.session.get('order_note', ''),
+        'profile_data': profile_data,
     }
-    print(context)  # This will print the context in the console for debugging.
-
     return render(request, 'cart.html', context)
+
 
 @require_POST
 def update_cart(request):
-    cart = get_cart(request)
+    cart = get_or_create_cart(request)
     product_id = request.POST.get('product_id')
     action = request.POST.get('action')
+
+    product = get_object_or_404(Product, id=product_id)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
     
-    if product_id in cart:
-        if action == 'increase':
-            cart[product_id]['quantity'] += 1
-        elif action == 'decrease':
-            cart[product_id]['quantity'] -= 1
-            if cart[product_id]['quantity'] <= 0:
-                del cart[product_id]
+    if action == 'increase':
+        cart_item.quantity = F('quantity') + 1
+    elif action == 'decrease':
+        if cart_item.quantity > 1:
+            cart_item.quantity = F('quantity') - 1
+        else:
+            cart_item.delete()
+            #return redirect('cart')
     
-    save_cart(request, cart)
+    cart_item.save()
     return redirect('cart')
+
+
+
+
 
 @require_POST
 def update_order_note(request):
+    cart = get_or_create_cart(request)
     order_note = request.POST.get('order_note', '')
-    request.session['order_note'] = order_note
+    cart.order_note = order_note
+    cart.save()
     return redirect('cart')
-
 
 
 @require_POST
 def remove_from_cart(request):
-    
-    cart = Cart.objects.filter(session_key=request.session.session_key).first()        
+    cart = Cart.objects.filter(user=request.user).first()
+    if not cart:
+        messages.error(request, "Cart not found.")
+
     product_id = request.POST.get('product_id')
     cart_item = CartItem.objects.filter(cart=cart, product_id=product_id).first()
     if cart_item:
@@ -249,17 +283,12 @@ def product_list(request, category_id=None):
     else:  # latest
         products = products.order_by('-created_at')
 
-    paginator = Paginator(products, 20)  # Show 20 products per page
+    paginator = Paginator(products, 20)
     page = request.GET.get('page')
     products = paginator.get_page(page)
+    item_count = get_cart_item_count(request.user)
 
-    cart = Cart.objects.filter(session_key=request.session.session_key).first()
-        
-    if cart:  
-        item_count = cart.items.count()
-    else:
-        item_count = 0
-        
+
     context = {
         'quantity': item_count,
         'products': products,
@@ -293,12 +322,18 @@ def search_products(request):
 
 #PAYMENT:
 
+@login_required
+@require_POST
 def initialize_payment(request):
     if request.method == 'POST':
 
         delivery_location = request.POST.get('delivery_location', '').strip()
+        print(f"-------------{delivery_location}")
         name = request.POST.get('name', '').strip()
+        print(f"-------------{name}")
+
         phone_number = request.POST.get('phone_number', '').strip()
+        print(f"-------------{phone_number}")
 
         # Ensure all required fields are provided
         if not all([delivery_location, name, phone_number]):
@@ -315,7 +350,7 @@ def initialize_payment(request):
             messages.error(request, "Please enter a valid phone number (10-14 digits).")
             return redirect('cart')
 
-        cart = get_object_or_404(Cart, session_key=request.session.session_key)
+        cart = get_object_or_404(Cart, user=request.user)
         total_amount = calculate_total(cart)
         amount_in_kobo = int(total_amount * 100)
 
@@ -323,13 +358,14 @@ def initialize_payment(request):
 
         # Create the order (unpaid at this point)
         order = Order.objects.create(
-            session_key=request.session.session_key,
+            #session_key=request.session.session_key,
+            user=request.user,
             delivery_location=delivery_location,
             name=name,
             phone_number=phone_number,
             order_note=order_note,
             total_amount=total_amount,
-            payment_reference=f"cart_{request.session.session_key}_{total_amount}",
+            payment_reference=f"cart_{request.session.session_key}___{total_amount}",
             status='pending'
         )
 
@@ -392,7 +428,7 @@ def payment_callback(request):
         order.status = 'processing'
         order.save()
 
-        Cart.objects.filter(session_key=order.session_key).delete()
+        Cart.objects.filter(user=request.user).delete()
 
         return redirect('home')
     else:
@@ -437,25 +473,6 @@ def calculate_total(cart):
 
 
 
-"""
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import render, redirect
-
-def signup(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('home')  # Redirect to your home page
-    else:
-        form = UserCreationForm()
-    return render(request, 'cart.html', {'form': form})
-"""
 
 #API CODE
 
@@ -532,15 +549,24 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
 
 
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from django.contrib import messages
-from .forms import CustomUserCreationForm
+from .forms import SignUpForm
 
 def signup_view(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
+            user.refresh_from_db()
+            user.profile.email = form.cleaned_data.get('email')
+            user.profile.phone_number = form.cleaned_data.get('phone_number')
+            user.profile.delivery_location = form.cleaned_data.get('delivery_location')
+
+            user.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
             login(request, user)
             messages.success(request, "You have successfully signed up!")
             return redirect('home')
@@ -549,7 +575,7 @@ def signup_view(request):
                 for error in errors:
                     messages.error(request, f"{field.capitalize()}: {error}")
     else:
-        form = CustomUserCreationForm()
+        form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
 

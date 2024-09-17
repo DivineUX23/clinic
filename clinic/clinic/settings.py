@@ -188,6 +188,7 @@ REST_FRAMEWORK = {
 }
 
 
+#AUTH_USER_MODEL = 'clinic_app.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

@@ -1,5 +1,37 @@
 {% if messages %}
     {% for message in messages %}
-        {% if message.tags %} <script>Swal.fire("{{ message }}")</script> {% endif %}
+        <script>
+            {% if "Sign up to add to cart." in message.message %}
+                Swal.fire({
+                    title: 'Sign Up Required',
+                    text: "{{ message }}",
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sign Up',
+                    cancelButtonText: 'Continue Shopping',
+                    customClass: {
+                        popup: 'swal-custom-popup',
+                        confirmButton: 'swal-custom-confirm-button',
+                        cancelButton: 'swal-custom-cancel-button'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to sign up page
+                        window.location.href = "{% url 'signup' %}";  // Replace 'signup' with your actual signup URL name
+                    }
+                });
+            {% else %}
+                Swal.fire({
+                    title: '{{ message.tags|title }}',
+                    text: "{{ message }}",
+                    icon: '{{ message.tags }}',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        popup: 'swal-custom-popup',
+                        confirmButton: 'swal-custom-confirm-button'
+                    }
+                });
+            {% endif %}
+        </script>
     {% endfor %}
 {% endif %}

@@ -1,22 +1,26 @@
-
-# In your app's forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser
+from django.contrib.auth.models import User
+#from .models import CustomUser
 
-class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    phone_number = forms.CharField(max_length=15, required=False)
+
+class SignUpForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True, 
+        help_text='Required. Enter a valid email address.'
+    )
+    phone_number = forms.CharField(
+        max_length=15, 
+        required=False, 
+        help_text='Optional. Enter your phone number.'
+    )
+    delivery_location = forms.CharField(
+        max_length=255, 
+        required=False, 
+        help_text='Optional. Enter your delivery address.',
+        widget=forms.Textarea(attrs={'rows': 3})
+    )
 
     class Meta:
-        model = CustomUser
-        fields = ("username", "email", "phone_number", "password1", "password2")
-        exclude = ('password_based_authentication',) 
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data["email"]
-        user.phone_number = self.cleaned_data["phone_number"]
-        if commit:
-            user.save()
-        return user
+        model = User
+        fields = ("username", "email", "phone_number", "delivery_location", "password1", "password2")

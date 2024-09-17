@@ -1,41 +1,30 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
-from django.contrib.auth.models import User
 from django.urls import reverse
 from decimal import Decimal
-from django.contrib.auth.models import AbstractUser
 
-# In your app's models.py
-from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.db import models
 
-class CustomUser(AbstractUser):
-    email = models.EmailField(unique=True)
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+class Profile(models.Model):
+    #user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    email = models.EmailField(max_length=150)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    delivery_location = models.CharField(max_length=255, blank=True, null=True)
+    def __str__(self):
+        return self.user.username
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+@receiver(post_save, sender=User)
+def update_profile_signal(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    instance.profile.save()
 
-    # Add related_name arguments to resolve the clashes
-    groups = models.ManyToManyField(
-        Group,
-        verbose_name='groups',
-        blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
-        related_name='custom_user_set',
-        related_query_name='custom_user',
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        verbose_name='user permissions',
-        blank=True,
-        help_text='Specific permissions for this user.',
-        related_name='custom_user_set',
-        related_query_name='custom_user',
-    )
 
-# The rest of your code (forms.py, views.py, etc.) remains the same as in the previous artifact
 
 class PaymentSettings(models.Model):
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.05'))  # 5% tax by default
@@ -101,8 +90,9 @@ class Product(models.Model):
 
 class Order(models.Model):
 
-    #session_key = models.CharField(max_length=40, unique=True)
-    session_key = models.CharField(max_length=40)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    session_key = models.CharField(max_length=40, null=True, blank=True)
     delivery_location = models.CharField(max_length=255)
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20)
@@ -124,12 +114,12 @@ class Order(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-
     def __str__(self):
         return f"Order {self.id} by {self.name}"
 
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
+    
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
@@ -148,13 +138,14 @@ class OrderItem(models.Model):
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    session_key = models.CharField(max_length=40, unique=True)  
-
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    session_key = models.CharField(max_length=40, unique=True, null=True, blank=True)
     def __str__(self):
         return f"Cart {self.id}"
 
     def get_total_price(self):
         return sum(item.get_total_price() for item in self.items.all())
+    
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)

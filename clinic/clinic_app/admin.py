@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import Category, Product, Order, OrderItem, CartItem, Cart, FAQ, SearchedProduct
 from .models import PaymentSettings
 
+
+
 @admin.register(PaymentSettings)
 class PaymentSettingsAdmin(admin.ModelAdmin):
     list_display = ['tax_rate', 'shipping_rate', 'discount_rate']
@@ -34,7 +36,7 @@ class CartItemInline(admin.TabularInline):
 
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ['session_key', 'created_at', 'updated_at']
+    list_display = ['user', 'created_at', 'updated_at']
     inlines = [CartItemInline]
 
 
@@ -46,7 +48,7 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'get_name', 'get_phone_number', 'get_total_amount', 'paid', 'status', 'created_at']
+    list_display = ['user', 'get_name', 'get_phone_number', 'get_total_amount', 'paid', 'status', 'created_at']
     list_filter = ['paid', 'status', 'created_at']
     search_fields = ['name', 'phone_number', 'delivery_location']
     inlines = [OrderItemInline]
@@ -118,6 +120,6 @@ class NewsletterAdmin(admin.ModelAdmin):
     search_fields = ['email']
 """
 # If you want to customize the admin site header and title
-admin.site.site_header = 'Jolly Life Health E-commerce Admin'
-admin.site.site_title = 'Jolly Life Health E-commerce Admin Portal'
-admin.site.index_title = 'Welcome to Jolly Life Health E-commerce Portal'
+admin.site.site_header = 'JollyLife Health E-commerce Admin'
+admin.site.site_title = 'JollyLife Health E-commerce Admin Portal'
+admin.site.index_title = 'Welcome to JollyLife Health E-commerce Portal'

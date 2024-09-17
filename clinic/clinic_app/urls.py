@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.contrib.auth import views as auth
 
 urlpatterns = [
     #path('admin/', admin.site.urls),
@@ -35,7 +36,7 @@ urlpatterns = [
 
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),
 
-    path('login/', auth_views.LoginView.as_view(), name='login'),
+    #path('login/', auth_views.LoginView.as_view(), name='login'),
     #path('signup/', views.signup, name='signup'),
     #path('category', views.category, name='category'),
 
@@ -56,6 +57,8 @@ urlpatterns = [
 
     path('signup/', views.signup_view, name='signup'),
     path('signin/', views.signin_view, name='signin'),
+    path('logout/', auth.LogoutView.as_view(template_name ='user/index.html'), name ='logout'),
+
 ]
 
 

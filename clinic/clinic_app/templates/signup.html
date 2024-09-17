@@ -32,7 +32,7 @@ End CSS
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="md:h-screen">
+<div class="min-h-screen">
   <div class="grid md:grid-cols-[0.8fr_1fr] h-full">
     <div class="hidden md:block">
       <img src="\static\images\IMG-20240913-WA0003.jpg" class="h-full w-full object-cover" alt="register">
@@ -41,8 +41,8 @@ End CSS
       <div class="">
         <div class="mx-auto max-w-[509px]">
           <div class="mb-8">
-            <a href="{% url 'home' %}" class="h-[47px] md:h-[70px]">
-              <img src="{% static 'images/logo.webp' %}" alt="Medplus Limited" class="h-full" />
+            <a href="{% url 'home' %}" class="md:h-[70px]">
+              <!--<img src="\static\images\IMG-20240913-WA0000.jpg" alt="JollyLife Limited" class="h-full" />-->
             </a>
           </div>
           
