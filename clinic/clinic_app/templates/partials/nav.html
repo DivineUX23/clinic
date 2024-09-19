@@ -62,33 +62,7 @@ Start Navigation Bar
                     </div>
                 </div>
 
-                <!--<a href=""
-                    class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
-                    <div
-                        class="h-[16px] min-w-4 p-[4px] absolute left-2 -top-1.5 btn-purple text-white rounded-full text-xs flex items-center justify-center">
-                        0
-                    </div>
-                    <img src="https://medplusnig.com/public/assets/front-end/img/heart.svg" alt="heart" />
-
-                    <span class="hidden md:block ml-1">Wishlist</span>
-                </a>-->
-
-
-                <!-- Sign In
-                <a href="" class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
-                    <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.08824 3.79479C8.08824 5.50806 6.71455 6.88182 5.00008 6.88182C3.28619 6.88182 1.91192 5.50806 1.91192 3.79479C1.91192 2.08152 3.28619 0.708344 5.00008 0.708344C6.71455 0.708344 8.08824 2.08152 8.08824 3.79479ZM5.00007 12.3751C2.46979 12.3751 0.333405 11.9638 0.333405 10.3771C0.333405 8.78988 2.48321 8.39321 5.00007 8.39321C7.53094 8.39321 9.66674 8.80446 9.66674 10.3911C9.66674 11.9784 7.51693 12.3751 5.00007 12.3751Z" fill="black" />
-                    </svg>
-                    <span class="hidden md:block ml-1">Sign in</span>
-                </a> -->
-                <!-- Replace the existing Sign In link with this button 
-                <button id="auth-button" class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
-                    <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.08824 3.79479C8.08824 5.50806 6.71455 6.88182 5.00008 6.88182C3.28619 6.88182 1.91192 5.50806 1.91192 3.79479C1.91192 2.08152 3.28619 0.708344 5.00008 0.708344C6.71455 0.708344 8.08824 2.08152 8.08824 3.79479ZM5.00007 12.3751C2.46979 12.3751 0.333405 11.9638 0.333405 10.3771C0.333405 8.78988 2.48321 8.39321 5.00007 8.39321C7.53094 8.39321 9.66674 8.80446 9.66674 10.3911C9.66674 11.9784 7.51693 12.3751 5.00007 12.3751Z" fill="black" />
-                    </svg>
-                    <span class="hidden md:block ml-1">Sign Up / Sign In</span>
-                </button>-->
-
+                <!-- Sign In-->
 
                 <button id="auth-button" class="text-black relative text-sm tracking-[0.16px] font-mont flex items-center gap-[3px]">
                     <svg width="10" height="13" viewBox="0 0 10 13" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -216,29 +190,6 @@ Start Navigation Bar
 
 
 
-
-<!-- Add this modal HTML at the end of your body tag 
-<div id="auth-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 9999;">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" style="z-index: 10000;">
-        <div class="mt-3 text-center">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Authentication</h3>
-            <div class="mt-2 px-7 py-3">
-                <p class="text-sm text-gray-500">
-                    Choose an option to continue:
-                </p>
-            </div>
-            <div class="items-center px-4 py-3">
-                <button id="signup-button" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                    Sign Up
-                </button>
-                <button id="signin-button" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
-                    Sign In
-                </button>
-            </div>
-        </div>
-    </div>
-</div>-->
-
 <!-- Add this modal HTML at the end of your body tag -->
 <div id="auth-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" style="z-index: 9999;">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" style="z-index: 10000;">
@@ -296,7 +247,6 @@ Start Navigation Bar
 End Navigation Bar
 ================================= -->
 
-<!-- Add this script at the end of your body tag -->
  
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -317,7 +267,40 @@ End Navigation Bar
             
             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
         }, false);
+
+
+        //Auth
+        const authButton = document.getElementById('auth-button');
+        const authModal = document.getElementById('auth-modal');
+        const signupButton = document.getElementById('signup-button');
+        const signinButton = document.getElementById('signin-button');
+    
+        authButton.addEventListener('click', function() {
+            authModal.classList.remove('hidden');
+        });
+    
+        authModal.addEventListener('click', function(e) {
+            if (e.target === authModal) {
+                authModal.classList.add('hidden');
+            }
+        });
+    
+        signupButton.addEventListener('click', function() {
+            window.location.href = "{% url 'signup' %}";
+        });
+    
+        signinButton.addEventListener('click', function() {
+            window.location.href = "{% url 'signin' %}";
+        });
+
     });
+
+    const nav_element = document.getElementById("auth-modal")
+    const close_tn = document.getElementById("close_tn")
+
+    close_tn.addEventListener("click", ()=> {
+        nav_element.classList.add("hidden")
+    })
 </script>
 
 
@@ -369,7 +352,7 @@ $(document).ready(function() {
 
     function requestItemViaWhatsApp(item) {
         var message = encodeURIComponent("Hello, I would like to request the following item: " + item);
-        var whatsappNumber = "+2347078522512"; // Replace with your WhatsApp number
+        var whatsappNumber = "+2347078522512";
         var whatsappUrl = "https://wa.me/" + whatsappNumber + "?text=" + message;
         window.open(whatsappUrl, '_blank');
     }
@@ -439,53 +422,12 @@ $(document).ready(function() {
 
     // Handle window resize to show/hide appropriate search elements
     $(window).on('resize', function() {
-        if ($(window).width() >= 768) { // md breakpoint
+        if ($(window).width() >= 768) {
             mobileSearchOverlay.hide();
             openMobileSearchBtn.hide();
         } else {
             openMobileSearchBtn.show();
         }
-    }).trigger('resize'); // Trigger on page load
+    }).trigger('resize');
 });
-</script>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const authButton = document.getElementById('auth-button');
-        const authModal = document.getElementById('auth-modal');
-        const signupButton = document.getElementById('signup-button');
-        const signinButton = document.getElementById('signin-button');
-    
-        authButton.addEventListener('click', function() {
-            authModal.classList.remove('hidden');
-        });
-    
-        authModal.addEventListener('click', function(e) {
-            if (e.target === authModal) {
-                authModal.classList.add('hidden');
-            }
-        });
-    
-        signupButton.addEventListener('click', function() {
-            window.location.href = "{% url 'signup' %}";
-        });
-    
-        signinButton.addEventListener('click', function() {
-            window.location.href = "{% url 'signin' %}";
-        });
-    });
-    </script>
-
-
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const nav_element = document.getElementById("auth-modal")
-        const close_tn = document.getElementById("close_tn")
-    
-        close_tn.addEventListener("click", ()=> {
-            nav_element.classList.add("hidden")
-        })
-    });
 </script>

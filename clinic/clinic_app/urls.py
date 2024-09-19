@@ -36,10 +36,6 @@ urlpatterns = [
 
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),
 
-    #path('login/', auth_views.LoginView.as_view(), name='login'),
-    #path('signup/', views.signup, name='signup'),
-    #path('category', views.category, name='category'),
-
 
     path('products/', views.product_list, name='products'),
     path('product/<int:product_id>/', views.product_detail, name='product_detail'),
@@ -59,6 +55,14 @@ urlpatterns = [
     path('signin/', views.signin_view, name='signin'),
     path('logout/', auth.LogoutView.as_view(template_name ='user/index.html'), name ='logout'),
 
+    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    #-----------------
+    #path('app/', views.test_api, name='app'),
+    #path('api/<path:path>', views.proxy_view, name='proxy'),
 ]
 
 

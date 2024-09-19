@@ -17,17 +17,13 @@ End CSS
 {% block extend_footer %}{% endblock %}
 
  
- <!-- ================================
-  Start Content
-  ================================= -->
+<!-- ================================
+Start Content
+================================= -->
 
-  <!-- ================================
-  End Content
-  ================================= -->
+{% block content %}
 
-  {% block content %}
-
-  <div class="container py-3">
+<div class="container py-3">
     <div class="search-page-header">
         <div>
             <h5 class="font-semibold mb-1">Products</h5>
@@ -63,7 +59,7 @@ End CSS
 </div>
 
 
-  <div class="container py-3">
+<div class="container py-3">
       <div class="row">
         <!-- Sidebar -->
           <aside class="col-lg-3 hidden-xs col-md-3 col-sm-4 SearchParameters" id="SearchParameters">
@@ -349,14 +345,13 @@ End CSS
 </div>
 
 
-    <!-- Back To Top Button-->
-    <a class="btn-scroll-top btn-purple" href="#top" data-scroll>
-        <span class="btn-scroll-top-tooltip text-muted font-size-sm mr-2">Top</span>
-        <i class="btn-scroll-top-icon czi-arrow-up"></i>
-    </a>
+<!-- Back To Top Button-->
+<a class="btn-scroll-top btn-purple" href="#top" data-scroll>
+    <span class="btn-scroll-top-tooltip text-muted font-size-sm mr-2">Top</span>
+    <i class="btn-scroll-top-icon czi-arrow-up"></i>
+</a>
     
 
-<!-- Add this script at the end of your template -->
 <script>
     function addTobeBought(productId) {
       console.log('Function called with productId:', productId);
@@ -387,7 +382,7 @@ End CSS
           console.log('Data received:', data);
           if (data.success) {
               alert("Product added to cart successfully!");
-              document.getElementById('cart-count').textContent = data.cart_quantity;              // Update cart quantity or any other UI changes here
+              document.getElementById('cart-count').textContent = data.cart_quantity; 
           } else {
               alert("Failed to add product to cart.");
           }
@@ -398,4 +393,9 @@ End CSS
   </script>
 
   
-  {% endblock %}
+{% endblock %}
+
+
+<!-- ================================
+End Content
+================================= -->

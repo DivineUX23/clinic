@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #results {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Test Dashboard</h1>
+    <div class="button-container">
+        <button onclick="testAPI('getWalletBalance')">Get Wallet Balance</button>
+        <button onclick="testAPI('getCategories')">Get Categories</button>
+        <button onclick="testAPI('getCategoryProducts')">Get Category Products</button>
+        <button onclick="testAPI('getProducts')">Get All Products</button>
+        <button onclick="testAPI('getSingleProduct')">Get Single Product</button>
+        <button onclick="testAPI('getProductDetails')">Get Product Details</button>
+        <button onclick="testAPI('createOrder')">Create Order</button>
+        <button onclick="testAPI('getOrder')">Get Order</button>
+    </div>
+    <h2>Results:</h2>
+    <pre id="results"></pre>
+
+    <script>
+        const baseUrl = '/api/'; // This now points to your Django proxy
+
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const headers = {
+                'X-Requested-With': 'XMLHttpRequest',
+            };
+            
+            const options = {
+                method,
+                headers
+            };
+        
+            if (body) {
+                options.body = JSON.stringify(body);
+                headers['Content-Type'] = 'application/json';
+            }
+        
+            try {
+                const response = await fetch(baseUrl + endpoint, options);
+                const contentType = response.headers.get("content-type");
+                
+                let result;
+                if (contentType && contentType.includes("application/json")) {
+                    result = await response.json();
+                } else {
+                    result = await response.text();
+                }
+        
+                console.log('API Response:', result);
+                return result;
+            } catch (error) {
+                console.error('API Call Error:', error);
+                throw error;
+            }
+        }
+        
+        async function getWalletBalance() {
+            return apiCall('/wallet-balance');
+        }
+
+        async function getCategories() {
+            return apiCall('categories');
+        }
+
+        async function getCategoryProducts(categoryId = 'some-category-id') {
+            return apiCall(`categories/${categoryId}/products`);
+        }
+
+        async function getProducts() {
+            return apiCall('products');
+        }
+
+        async function getSingleProduct(productId = 'some-product-id') {
+            return apiCall(`products/${productId}`);
+        }
+
+        async function getProductDetails(productId = 'some-product-id') {
+            return apiCall(`products/${productId}/details`);
+        }
+
+        async function createOrder(orderData = {}) {
+            return apiCall('orders', 'POST', orderData);
+        }
+
+        async function getOrder(orderId = 'some-order-id') {
+            return apiCall(`orders/${orderId}`);
+        }
+
+        async function testAPI(functionName) {
+            const resultElement = document.getElementById('results');
+            resultElement.textContent = 'Loading...';
+            
+            try {
+                let result;
+                switch(functionName) {
+                    case 'getWalletBalance':
+                        result = await getWalletBalance();
+                        break;
+                    case 'getCategories':
+                        result = await getCategories();
+                        break;
+                    case 'getCategoryProducts':
+                        result = await getCategoryProducts();
+                        break;
+                    case 'getProducts':
+                        result = await getProducts();
+                        break;
+                    case 'getSingleProduct':
+                        result = await getSingleProduct();
+                        break;
+                    case 'getProductDetails':
+                        result = await getProductDetails();
+                        break;
+                    case 'createOrder':
+                        result = await createOrder();
+                        break;
+                    case 'getOrder':
+                        result = await getOrder();
+                        break;
+                        
+                    default:
+                        throw new Error('Unknown function');
+                }
+                
+        if (typeof result === 'string') {
+            resultElement.textContent = result;
+        } else {
+            resultElement.textContent = JSON.stringify(result, null, 2);
+        }
+            } catch (error) {
+                resultElement.textContent = 'Error: ' + error.message;
+                console.error('API Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+

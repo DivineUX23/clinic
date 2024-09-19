@@ -138,9 +138,11 @@ End CSS
                                   <p>No image available</p>
                               {% endif %}
                               <div class="absolute bottom-8 left-5 right-5">
-                                  <div class="text-lg font-medium">{{ category.name }}</div>
-                                  <span class="flex items-center gap-[4px] text-sm text-[#75869D]"> Explore </span>
-                              </div>
+                                <div style="display: inline-block; background-color: rgba(128, 0, 128, 0.5); border-radius: 0.5rem; padding: 0.5rem;">
+                                    <div class="text-lg font-medium text-white">{{ category.name }}</div>
+                                    <span class="flex items-center gap-[4px] text-sm text-pink-200">Explore</span>
+                                </div>
+                            </div>
                           </div>
                       </a>
                   </div>
@@ -258,49 +260,98 @@ End CSS
 
 
 
+<!-- About Us Section -->
+<section id="about-us" class="container mx-auto py-16 bg-gray-50">
+  <div class="flex flex-col md:flex-row items-center justify-between">
+      <div class="md:w-1/2 mb-8 md:mb-0">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">About Us</h2>
+          <p class="text-gray-600 mb-4">
+              At JollyLife Health Limited, we are committed to providing high-quality healthcare products and services to improve the well-being of our community. With years of experience and a dedicated team of professionals, we strive to make healthcare accessible and affordable for everyone.
+          </p>
+          <p class="text-gray-600 mb-4">
+              Our mission is to enhance the quality of life through innovative health solutions and exceptional customer service. We believe in the power of prevention and the importance of holistic health management.
+          </p>
+          <a href="{% url 'products' %}" class="bg-purple text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-300">Shop with Us</a>
+      </div>
+      <div class="md:w-1/2">
+          <img src="\static\images\image.png" alt="About JollyLife Health" class="rounded-lg shadow-lg w-full h-auto">
+      </div>
+  </div>
+</section>
+
+
+
+<!-- Partners Section -->
+<section class="container mx-auto py-16">
+  <div class="text-center text-xl md:text-[28px] mb-12">
+      Our Partners
+  </div>
+  <div class="partner-carousel-container w-full">
+      <div class="partner-slider owl-carousel owl-theme">
+          <!-- Replace the following with your actual partner logos -->
+          <div class="item">
+              <img src="/static/images/Shipbubble-Logo-Lockup-Horizontalldpi-1.png" alt="Partner 1" class="h-16 w-auto mx-auto partner-logo">
+          </div>
+          <div class="item">
+              <img src="\static\images\imaging.png" alt="Partner 2" class="h-16 w-auto mx-auto partner-logo partner-logo-offset">
+          </div>
+      </div>
+  </div>
+</section>
+
+<style>
+  .partner-slider .item {
+    padding: 20px;
+  }
+  .partner-logo {
+    transition: transform 0.3s ease;
+  }
+  .partner-logo:hover {
+    transform: scale(1.1);
+  }
+  .partner-logo-offset {
+    margin-top: 20px;
+  }
+</style>
+
+
 <!--FREQUENTLY ASKED QUESTIONS-->
 
-  <section id="faq" class="py-10 container mx-auto">
-      <div class="text-center text-xl md:text-[28px] mb-6">
-          Frequently Asked Questions
-      </div>
-      {% for faq in initial_faqs %}
-          <div class="mt-3 faq-div">
-              <button class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full">
-                  <span>{{ faq.question }}</span>
-                  <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
+<section id="faq" class="py-10 container mx-auto">
+    <div class="text-center text-xl md:text-[28px] mb-6">
+        Frequently Asked Questions
+    </div>
+    {% for faq in initial_faqs %}
+        <div class="mt-3 faq-div">
+            <button class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full">
+                <span>{{ faq.question }}</span>
+                <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
 
-              </button>
-              <div class="accordion-content hidden py-4 px-2">{{ faq.answer }}</div>
-          </div>
-      {% endfor %}
-      
-      <div id="extraFaqsContainer" class="hidden">
-          {% for faq in extra_faqs %}
-              <div class="mt-3 faq-div">
-                  <button class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full">
-                      <span>{{ faq.question }}</span>
-                      <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
-
-                  </button>
-                  <div class="accordion-content hidden py-4 px-2">{{ faq.answer }}</div>
-              </div>
-          {% endfor %}
-      </div>
-      
-      {% if extra_faqs %}
-          <div class="flex justify-center mt-4">
-              <button id="toggleFaqBtn" class=" bg-purple btn-purple h-10 text-white transition duration-500 px-[10px] md:px-5 flex items-center justify-cente font-medium tracking-[0.18px] font-poppins rounded-md">Show More</button>
-          </div>
-      {% endif %}
-  </section>
-        
-        <!-- Footer-->
+            </button>
+            <div class="accordion-content hidden py-4 px-2">{{ faq.answer }}</div>
+        </div>
+    {% endfor %}
     
-    <!-- Toolbar for handheld devices-->
+    <div id="extraFaqsContainer" class="hidden">
+        {% for faq in extra_faqs %}
+            <div class="mt-3 faq-div">
+                <button class="accordion-button bg-white border-[1px] border-[#75869D] rounded-[14px] py-[16px] px-[16px] flex items-center text-sm md:text-base justify-between w-full">
+                    <span>{{ faq.question }}</span>
+                    <img src="https://medplusnig.com/public/assets/front-end/img/arrow_down_circle.svg" alt="arrow" />
 
-
-
+                </button>
+                <div class="accordion-content hidden py-4 px-2">{{ faq.answer }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if extra_faqs %}
+        <div class="flex justify-center mt-4">
+            <button id="toggleFaqBtn" class=" bg-purple btn-purple h-10 text-white transition duration-500 px-[10px] md:px-5 flex items-center justify-cente font-medium tracking-[0.18px] font-poppins rounded-md">Show More</button>
+        </div>
+    {% endif %}
+</section>
+        
     <!-- Back To Top Button-->
     <a class="btn-scroll-top btn-purple" href="#top" data-scroll>
         <span class="btn-scroll-top-tooltip text-muted font-size-sm mr-2">Top</span>
@@ -337,43 +388,69 @@ End CSS
   });
 
 
-  </script>
-    
-  <script>
-    $(document).ready(function(){
-      $('.category-slider').owlCarousel({
-        loop: true,
-        margin: 20,
-        nav: true,
-        navText: [
-          "<i class='fa fa-chevron-left'></i>",
-          "<i class='fa fa-chevron-right'></i>"
-        ],
-        autoplay: true,
-        autoplayHoverPause: true,
-        responsive: {
-          0: {
-            items: 1
-          },
-          600: {
-            items: 2
-          },
-          1000: {
-            items: 3      }
-     }
-      });
-    
-      // Apply custom styles to the navigation buttons
-      $('.owl-prev, .owl-next').css({
-        'background-color': '#800080',
-        'color': 'white',
-        'border-radius': '50%',
-        'padding': '10px',
-        'font-size':'20px'
-      });
+</script>
+  
+<script>
+  $(document).ready(function(){
+    $('.category-slider').owlCarousel({
+      loop: true,
+      margin: 20,
+      nav: true,
+      navText: [
+        "<i class='fa fa-chevron-left'></i>",
+        "<i class='fa fa-chevron-right'></i>"
+      ],
+      autoplay: true,
+      autoplayHoverPause: true,
+      responsive: {
+        0: {
+          items: 1
+        },
+        600: {
+          items: 2
+        },
+        1000: {
+          items: 3      }
+    }
     });
-    </script>
+  
+    // Apply custom styles to the navigation buttons
+    $('.owl-prev, .owl-next').css({
+      'background-color': '#800080',
+      'color': 'white',
+      'border-radius': '50%',
+      'padding': '10px',
+      'font-size':'20px'
+    });
+  });
+
+
+
+  $(document).ready(function(){
+    $(".partner-slider").owlCarousel({
+        loop: true,
+        margin: 30,
+        nav: false,
+        responsive:{
+            0:{
+                items: 1
+            },
+            600:{
+                items: 2
+            },
+            1000:{
+                items: 3
+            }
+        },
+        autoplay: true,
+        autoplayTimeout: 3000,
+        autoplayHoverPause: true
+    });
+});
+
+</script>
 {% endblock %}
-  <!-- ================================
-  End Content
-  ================================= -->
+
+<!-- ================================
+End Content
+================================= -->

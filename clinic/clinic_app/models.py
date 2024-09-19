@@ -27,9 +27,9 @@ def update_profile_signal(sender, instance, created, **kwargs):
 
 
 class PaymentSettings(models.Model):
-    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.05'))  # 5% tax by default
-    shipping_rate = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('1000.00'))  # Flat shipping rate
-    discount_rate = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))  # Discount rate default
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.05'))
+    shipping_rate = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('1000.00'))
+    discount_rate = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
 
     def __str__(self):
         return "Payment Settings"
@@ -53,6 +53,7 @@ class Category(models.Model):
     name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
     url = models.URLField(max_length=500, blank=True, null=True)
+    image = models.ImageField(upload_to='category_images/', blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Categories'

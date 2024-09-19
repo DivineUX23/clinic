@@ -20,7 +20,7 @@ class FAQAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'url']
     prepopulated_fields = {'slug': ('name',)}
-    fields = ['name', 'slug', 'url']
+    #fields = ['name', 'slug', 'url']
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -119,7 +119,7 @@ class NewsletterAdmin(admin.ModelAdmin):
     list_display = ['email', 'subscribed_at']
     search_fields = ['email']
 """
-# If you want to customize the admin site header and title
+# Customize the admin site header and title
 admin.site.site_header = 'JollyLife Health E-commerce Admin'
 admin.site.site_title = 'JollyLife Health E-commerce Admin Portal'
 admin.site.index_title = 'Welcome to JollyLife Health E-commerce Portal'

@@ -16,8 +16,7 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Redirect to sign up page
-                        window.location.href = "{% url 'signup' %}";  // Replace 'signup' with your actual signup URL name
+                        window.location.href = "{% url 'signup' %}";
                     }
                 });
             {% else %}

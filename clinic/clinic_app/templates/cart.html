@@ -21,36 +21,6 @@ End CSS
   Start Content
   ================================= -->
 
-  <!-- ================================
-  End Content
-  ================================= -->
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const deliveryLocationInput = document.getElementById('delivery_location');
-    const nameInput = document.getElementById('name');
-    const phoneNumberInput = document.getElementById('phone_number');
-
-    const hiddenDeliveryLocation = document.querySelector('input[name="delivery_location"]');
-    const hiddenName = document.querySelector('input[name="name"]');
-    const hiddenPhoneNumber = document.querySelector('input[name="phone_number"]');
-
-    function updateHiddenFields() {
-        hiddenDeliveryLocation.value = deliveryLocationInput.value;
-        hiddenName.value = nameInput.value;
-        hiddenPhoneNumber.value = phoneNumberInput.value;
-    }
-
-    // Update hidden fields on page load
-    updateHiddenFields();
-
-    // Update hidden fields when visible fields change
-    deliveryLocationInput.addEventListener('input', updateHiddenFields);
-    nameInput.addEventListener('input', updateHiddenFields);
-    phoneNumberInput.addEventListener('input', updateHiddenFields);
-
-    // ... rest of your existing code ...
-});
-
 {% block content %}
 <!-- Body-->
 <!-- Page Content +-->
@@ -382,3 +352,6 @@ End CSS
 {% endblock %}
 
 
+<!-- ================================
+End Content
+================================= -->

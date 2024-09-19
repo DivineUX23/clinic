@@ -6,7 +6,6 @@ from django.db.models import F
 from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
 from decimal import Decimal
-import datetime
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.views.generic import ListView
@@ -18,7 +17,14 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from decimal import Decimal
 import re
+import uuid
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Profile
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .forms import SignUpForm
+
 
 
 #API IMPORTS
@@ -122,11 +128,6 @@ def add_to_cart(request):
 
 
 
-
-from django.contrib.auth.decorators import login_required
-from .models import Profile
-
-
 def cart_view(request):
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in to view your cart.")
@@ -136,22 +137,6 @@ def cart_view(request):
         
     cart_items = []
     subtotal = Decimal('0.00')
-    """
-    if cart:    
-        for item in cart.items.all():
-            product = Product.objects.get(id=item.product.id)
-            quantity = item.quantity
-            total_price = product.price * quantity
-            subtotal += total_price
-            cart_items.append({
-                'product': product,
-                'quantity': quantity,
-                'total_price': total_price,
-            })
-        item_count = cart.items.count()
-    else:
-        item_count = 0
-    """
     item_count = 0
     
     if cart:
@@ -178,8 +163,6 @@ def cart_view(request):
     total = subtotal + tax + shipping - discount
 
     categories = Category.objects.all()
-
-    # Get user profile data
 
     #user_profile = request.user.profile
     user_profile, created = Profile.objects.get_or_create(user=request.user)
@@ -328,12 +311,8 @@ def initialize_payment(request):
     if request.method == 'POST':
 
         delivery_location = request.POST.get('delivery_location', '').strip()
-        print(f"-------------{delivery_location}")
         name = request.POST.get('name', '').strip()
-        print(f"-------------{name}")
-
         phone_number = request.POST.get('phone_number', '').strip()
-        print(f"-------------{phone_number}")
 
         # Ensure all required fields are provided
         if not all([delivery_location, name, phone_number]):
@@ -356,16 +335,17 @@ def initialize_payment(request):
 
         order_note = request.POST.get('order_note')
 
-        # Create the order (unpaid at this point)
+        # Generate a random payment reference
+        payment_reference = f"ORDER-{uuid.uuid4().hex[:8].upper()}"
+
         order = Order.objects.create(
-            #session_key=request.session.session_key,
             user=request.user,
             delivery_location=delivery_location,
             name=name,
             phone_number=phone_number,
             order_note=order_note,
             total_amount=total_amount,
-            payment_reference=f"cart_{request.session.session_key}___{total_amount}",
+            payment_reference=payment_reference,
             status='pending'
         )
 
@@ -436,7 +416,6 @@ def payment_callback(request):
 
 
 def verify_payment(reference):
-    # Verify the payment with Paystack
     headers = {
         "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
     }
@@ -468,6 +447,51 @@ def calculate_total(cart):
     discount = settings.discount_rate
 
     return subtotal + tax + shipping - discount
+
+
+
+
+# User Auth
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()
+            user.profile.email = form.cleaned_data.get('email')
+            user.profile.phone_number = form.cleaned_data.get('phone_number')
+            user.profile.delivery_location = form.cleaned_data.get('delivery_location')
+
+            user.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            messages.success(request, "You have successfully signed up!")
+            return redirect('home')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
+
+def signin_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, "You have successfully signed in!")
+            return redirect('home')
+        else:
+            messages.error(request, "Invalid username or password. Please try again.")
+    else:
+        form = AuthenticationForm()
+    return render(request, 'signin.html', {'form': form})
 
 
 
@@ -516,7 +540,6 @@ class OrderDetail(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         
-        # Only allow updating the status field
         if 'status' in serializer.validated_data:
             instance.status = serializer.validated_data['status']
             instance.save()
@@ -542,54 +565,60 @@ class OrderDetail(generics.RetrieveUpdateAPIView):
 
 
 
-# In your app's views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib import messages
 
 
-from django.contrib.auth import login, authenticate
-from django.contrib import messages
-from .forms import SignUpForm
-
-def signup_view(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            user.refresh_from_db()
-            user.profile.email = form.cleaned_data.get('email')
-            user.profile.phone_number = form.cleaned_data.get('phone_number')
-            user.profile.delivery_location = form.cleaned_data.get('delivery_location')
-
-            user.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            messages.success(request, "You have successfully signed up!")
-            return redirect('home')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field.capitalize()}: {error}")
-    else:
-        form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
 
 
-def signin_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            messages.success(request, "You have successfully signed in!")
-            return redirect('home')
-        else:
-            messages.error(request, "Invalid username or password. Please try again.")
-    else:
-        form = AuthenticationForm()
-    return render(request, 'signin.html', {'form': form})
 
+
+
+
+
+
+
+
+
+
+#--------------------
+"""
+def test_api(request):
+    return render(request, 'app.html')
+
+
+import requests
+from django.http import HttpResponse
+from django.views.decorators.http import require_http_methods
+import logging
+
+logger = logging.getLogger(__name__)
+
+@require_http_methods(["GET", "POST"])
+def proxy_view(request, path):
+    base_url = 'https://no1logsmarketplace.com/api/v1/'
+    url = f'{base_url}{path}'
+    
+    headers = {
+        'Authorization': f'Bearer NO1LOGS_YFxGbP33RHzC21waRJ',
+        'Accept': 'application/json'
+    }
+
+    try:
+        if request.method == 'GET':
+            response = requests.get(url, headers=headers)
+        elif request.method == 'POST':
+            response = requests.post(url, json=request.POST, headers=headers)
+
+        # Log the response for debugging
+        logger.info(f"API Response: Status {response.status_code}, Content: {response.text}")
+
+        # Return the raw response
+        return HttpResponse(
+            content=response.content,
+            status=response.status_code,
+            content_type=response.headers.get('Content-Type', 'text/plain')
+        )
+
+    except requests.RequestException as e:
+        logger.error(f"Request Exception: {str(e)}")
+        return HttpResponse(f"API request failed: {str(e)}", status=500)
+"""
