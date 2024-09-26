@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}JollyLife Health{% endblock %}
+{% block title %}JollyLifeHealth{% endblock %}
 {% block description %}{% endblock %}
 {% block keywords %}{% endblock %}
 
@@ -93,20 +93,20 @@ End CSS
         <div class="hero-banner owl-carousel owl-theme h-full">
           <a href="" class="d-block h-full">
               <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
-                  src="\static\images\IMG-20240913-WA0002.jpg" alt="JollyLife Health Limited">
+                  src="\static\images\IMG-20240913-WA0002.jpg" alt="JollyLifeHealth Limited">
           </a>
                   <a href="" class="d-block h-full">
               <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
-                src="\static\images\IMG-20240913-WA0001.jpg" alt="JollyLife Health Limited">
+                src="\static\images\IMG-20240913-WA0001.jpg" alt="JollyLifeHealth Limited">
           </a>
                   <a href="" class="d-block h-full">
               <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
-                  src="\static\images\IMG-20240913-WA0003.jpg" alt="JollyLife Health Limited">
+                  src="\static\images\IMG-20240913-WA0003.jpg" alt="JollyLifeHealth Limited">
           </a>
               </a>
           <a href="" class="d-block h-full">
               <img class="w-100" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'"
-              src="\static\images\IMG-20240913-WA0004.jpg" alt="JollyLife Health Limited">
+              src="\static\images\IMG-20240913-WA0004.jpg" alt="JollyLifeHealth Limited">
           </a>
         </div>
       </div>            
@@ -129,22 +129,47 @@ End CSS
 
               {% for category in categories %}
                   <div class="mb-4">
-                      <a href="{% url 'products' %}?id={{ category.id }}&data_from=category&page=1" class="w-full">
+
+
+
+
+                    {% if category.url %}
+                        <a href="{{ category.url }}">
                           <div class="relative h-[200px] border border-[#75869D] bg-purple-100 rounded-2xl w-full">
-                              {% if category.image %}
-                                  <img src="{{ category.image.url }}"
-                                      alt="{{ category.name }}" class="w-full h-full object-cover rounded-[16px]" />
-                              {% else %}
-                                  <p>No image available</p>
-                              {% endif %}
-                              <div class="absolute bottom-8 left-5 right-5">
-                                <div style="display: inline-block; background-color: rgba(128, 0, 128, 0.5); border-radius: 0.5rem; padding: 0.5rem;">
-                                    <div class="text-lg font-medium text-white">{{ category.name }}</div>
-                                    <span class="flex items-center gap-[4px] text-sm text-pink-200">Explore</span>
-                                </div>
-                            </div>
+                            {% if category.image %}
+                                <img src="{{ category.image.url }}"
+                                    alt="{{ category.name }}" class="w-full h-full object-cover rounded-[16px]" />
+                            {% else %}
+                                <p>"{{ category.name }}"</p>
+                            {% endif %}
+                            <div class="absolute bottom-8 left-5 right-5">
+                              <div style="display: inline-block; background-color: rgba(128, 0, 128, 0.5); border-radius: 0.5rem; padding: 0.5rem;">
+                                  <div class="text-lg font-medium text-white">{{ category.name }}</div>
+                                  <span class="flex items-center gap-[4px] text-sm text-pink-200">Explore</span>
+                              </div>
                           </div>
+                        </div>                        
                       </a>
+                    {% else %}
+
+                      <a href="{% url 'category_products' category.id %}" class="w-full">
+                        <div class="relative h-[200px] border border-[#75869D] bg-purple-100 rounded-2xl w-full">
+                            {% if category.image %}
+                                <img src="{{ category.image.url }}"
+                                    alt="{{ category.name }}" class="w-full h-full object-cover rounded-[16px]" />
+                            {% else %}
+                                <p>"{{ category.name }}"</p>
+                            {% endif %}
+                            <div class="absolute bottom-8 left-5 right-5">
+                              <div style="display: inline-block; background-color: rgba(128, 0, 128, 0.5); border-radius: 0.5rem; padding: 0.5rem;">
+                                  <div class="text-lg font-medium text-white">{{ category.name }}</div>
+                                  <span class="flex items-center gap-[4px] text-sm text-pink-200">Explore</span>
+                              </div>
+                          </div>
+                        </div>
+                    </a>
+
+                    {% endif %}
                   </div>
               {% empty %}
                   <p>No categories available.</p>
@@ -182,11 +207,11 @@ End CSS
             {% else %}
                 <p>No image available</p>
             {% endif %}
-            </a>
+          </a>
         </div>
-  
-        <div class="w-[160px] lg:w-[230px] mt-1.5 font-poppins text-[14px] md:text-base">
-          <a href="{% url 'product_detail' product.slug %}" class="flash-product-title fw-semibold text-black">{{ product.name }}</a>
+        <div class="single-product-details">
+          <a href="{% url 'product_detail' product.slug %}">
+            {{ product.name }}</a>
         </div>
   
         <div class="d-flex flex-wrap gap-8 align-items-center row-gap-0 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
@@ -234,8 +259,9 @@ End CSS
           </a>
         </div>
   
-        <div class="w-[160px] lg:w-[230px] mt-1.5 font-poppins text-[14px] md:text-base">
-          <a href="{% url 'product_detail' product.slug %}" class="flash-product-title fw-semibold text-black">{{ product.name }}</a>
+        <div class="single-product-details">
+          <a href="{% url 'product_detail' product.slug %}">
+            {{ product.name }}</a>
         </div>
   
         <div class="d-flex flex-wrap gap-8 align-items-center row-gap-0 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
@@ -266,7 +292,7 @@ End CSS
       <div class="md:w-1/2 mb-8 md:mb-0">
           <h2 class="text-3xl md:text-4xl font-bold mb-4">About Us</h2>
           <p class="text-gray-600 mb-4">
-              At JollyLife Health Limited, we are committed to providing high-quality healthcare products and services to improve the well-being of our community. With years of experience and a dedicated team of professionals, we strive to make healthcare accessible and affordable for everyone.
+              At JollyLifeHealth Limited, we are committed to providing high-quality healthcare products and services to improve the well-being of our community. With years of experience and a dedicated team of professionals, we strive to make healthcare accessible and affordable for everyone.
           </p>
           <p class="text-gray-600 mb-4">
               Our mission is to enhance the quality of life through innovative health solutions and exceptional customer service. We believe in the power of prevention and the importance of holistic health management.
@@ -274,7 +300,7 @@ End CSS
           <a href="{% url 'products' %}" class="bg-purple text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-300">Shop with Us</a>
       </div>
       <div class="md:w-1/2">
-          <img src="\static\images\image.png" alt="About JollyLife Health" class="rounded-lg shadow-lg w-full h-auto">
+          <img src="\static\images\image.png" alt="About JollyLifeHealth" class="rounded-lg shadow-lg w-full h-auto">
       </div>
   </div>
 </section>
@@ -295,6 +321,9 @@ End CSS
           <div class="item">
               <img src="\static\images\imaging.png" alt="Partner 2" class="h-16 w-auto mx-auto partner-logo partner-logo-offset">
           </div>
+          <div class="item">
+            <img src="\static\images\Natures-field-round-large-Logo-for-web.png" alt="Partner 1" class="h-16 w-auto mx-auto partner-logo partner-logo-offset">
+        </div>
       </div>
   </div>
 </section>

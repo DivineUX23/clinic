@@ -61,8 +61,8 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     #-----------------
-    #path('app/', views.test_api, name='app'),
-    #path('api/<path:path>', views.proxy_view, name='proxy'),
+    path('app/', views.test_api, name='app'),
+    path('api/<path:path>', views.proxy_view, name='proxy'),
 ]
 
 

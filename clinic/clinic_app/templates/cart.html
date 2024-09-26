@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Jolly Life Health{% endblock %}
+{% block title %}JollyLifeHealth{% endblock %}
 {% block description %}{% endblock %}
 {% block keywords %}{% endblock %}
 
@@ -140,7 +140,7 @@ End CSS
                 </div>
             </div>
             {% endif %}
-            {% if user.is_authenticated %}
+
             <div class="px-3 px-md-0 mt-3 mt-md-0">
                 <form id="orderForm" method="post" action="{% url 'update_order_note' %}">
                     {% csrf_token %}
@@ -186,13 +186,9 @@ End CSS
                     </div>
                 </form>
             </div>
-            {% else %}
-            <!-- Add a message or login prompt for unauthenticated users -->
-            <div class="alert alert-warning">
-                Please <a href="{% url 'login' %}">log in</a> to view and edit your cart details.
-            </div>
-            {% endif %}
-            
+
+
+
         </section>
 
         <!-- Sidebar-->

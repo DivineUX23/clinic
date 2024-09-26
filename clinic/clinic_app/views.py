@@ -39,20 +39,37 @@ from rest_framework.response import Response
 from .models import FAQ
 
 
+def get_or_create_guest_cart(request):
+    cart_id = request.session.get('cart_id')
+    if cart_id:
+        cart = Cart.objects.filter(id=cart_id, user__isnull=True).first()
+        if cart:
+            return cart
+    
+    cart = Cart.objects.create()
+    request.session['cart_id'] = cart.id
+    return cart
 
-
+def get_cart_item_count(request):
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+    else:
+        cart = get_or_create_guest_cart(request)
+    return cart.items.count() if cart else 0
+"""
 def get_cart_item_count(user):
     if user.is_authenticated:
         cart = Cart.objects.filter(user=user).first()
         return cart.items.count() if cart else 0
     return 0
+"""
 
 def home(request):
     new_arrivals = Product.objects.filter(section='new_arrival')
     most_popular = Product.objects.filter(section='most_popular')
     categories = Category.objects.all()
         
-    item_count = get_cart_item_count(request.user)
+    item_count = get_cart_item_count(request)
 
             
     faqs = FAQ.objects.filter(is_visible=True)
@@ -83,7 +100,7 @@ def product_detail(request, slug):
     more_products = Product.objects.all().exclude(id=product.id)[:5]
     categories = Category.objects.all()
     
-    item_count = get_cart_item_count(request.user)
+    item_count = get_cart_item_count(request)
             
     context = {
         'quantity': item_count,
@@ -93,7 +110,7 @@ def product_detail(request, slug):
         'more_products': more_products,
     }
     return render(request, 'product.html', context)
-
+"""
 def get_or_create_cart(request):
     if request.user.is_authenticated:
         try:
@@ -105,8 +122,21 @@ def get_or_create_cart(request):
     else:
         messages.warning(request, "Sign up to add to cart.")
         return None
+"""
 
 
+def get_or_create_cart(request):
+    if request.user.is_authenticated:
+        try:
+            cart, created = Cart.objects.get_or_create(user=request.user)
+            return cart
+        except Exception as e:
+            messages.error(request, f"Error creating cart: {str(e)}")
+            return None
+    else:
+        return get_or_create_guest_cart(request)
+
+"""
 def add_to_cart(request):
 
     if request.method == 'POST':
@@ -124,10 +154,28 @@ def add_to_cart(request):
         return JsonResponse({'success': True, 'cart_quantity': cart.items.count()})
 
     return JsonResponse({'success': False}, status=400)
+"""
 
 
 
+def add_to_cart(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        quantity = int(request.POST.get('quantity', 1))
+        product = get_object_or_404(Product, id=product_id)            
+        cart = get_or_create_cart(request)
+        
+        if cart:
+            cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+            if not created:
+                cart_item.quantity = F('quantity') + quantity
+            cart_item.save()
 
+            return JsonResponse({'success': True, 'cart_quantity': cart.items.count()})
+
+    return JsonResponse({'success': False}, status=400)
+
+"""
 def cart_view(request):
     if not request.user.is_authenticated:
         messages.warning(request, "Please log in to view your cart.")
@@ -187,8 +235,73 @@ def cart_view(request):
         'profile_data': profile_data,
     }
     return render(request, 'cart.html', context)
+"""
 
 
+
+
+
+def cart_view(request):
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+    else:
+        cart = get_or_create_guest_cart(request)
+    
+    cart_items = []
+    subtotal = Decimal('0.00')
+    item_count = 0
+    
+    if cart:
+        for item in cart.items.select_related('product').all():
+            product = item.product
+            quantity = item.quantity
+            total_price = product.price * quantity
+            subtotal += total_price
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'total_price': total_price,
+            })
+        item_count = len(cart_items)
+    
+    settings = PaymentSettings.objects.first()  
+    if not settings:
+        settings = PaymentSettings.objects.create()
+
+    tax = subtotal * settings.tax_rate
+    shipping = settings.shipping_rate
+    discount = settings.discount_rate
+
+    total = subtotal + tax + shipping - discount
+
+    categories = Category.objects.all()
+
+    profile_data = {}
+    if request.user.is_authenticated:
+        user_profile, created = Profile.objects.get_or_create(user=request.user)
+        profile_data = {
+            'delivery_location': user_profile.delivery_location or '',
+            'name': request.user.get_full_name() or request.user.username,
+            'phone_number': user_profile.phone_number or '',
+        }
+
+    context = {
+        'categories': categories,
+        'quantity': item_count,
+        'cart_items': cart_items,
+        'subtotal': subtotal,
+        'tax': tax,
+        'shipping': shipping,
+        'discount': discount,
+        'total': total,
+        'order_note': request.session.get('order_note', ''),
+        'profile_data': profile_data,
+    }
+    return render(request, 'cart.html', context)
+
+
+
+"""
 @require_POST
 def update_cart(request):
     cart = get_or_create_cart(request)
@@ -209,7 +322,41 @@ def update_cart(request):
     
     cart_item.save()
     return redirect('cart')
+"""
 
+
+@require_POST
+def update_cart(request):
+    product_id = request.POST.get('product_id')
+    action = request.POST.get('action')
+
+    if request.user.is_authenticated:
+        cart = get_or_create_cart(request)
+        product = get_object_or_404(Product, id=product_id)
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        
+        if action == 'increase':
+            cart_item.quantity = F('quantity') + 1
+        elif action == 'decrease':
+            if cart_item.quantity > 1:
+                cart_item.quantity = F('quantity') - 1
+            else:
+                cart_item.delete()
+        
+        cart_item.save()
+    else:
+        session_cart = request.session.get('cart', {})
+        if action == 'increase':
+            session_cart[product_id] = session_cart.get(product_id, 0) + 1
+        elif action == 'decrease':
+            if session_cart.get(product_id, 0) > 1:
+                session_cart[product_id] -= 1
+            else:
+                session_cart.pop(product_id, None)
+        request.session['cart'] = session_cart
+        request.session.modified = True
+
+    return redirect('cart')
 
 
 
@@ -222,7 +369,7 @@ def update_order_note(request):
     cart.save()
     return redirect('cart')
 
-
+"""
 @require_POST
 def remove_from_cart(request):
     cart = Cart.objects.filter(user=request.user).first()
@@ -239,7 +386,28 @@ def remove_from_cart(request):
     cart.save()
     
     return redirect('cart')
+"""
 
+
+@require_POST
+def remove_from_cart(request):
+    product_id = request.POST.get('product_id')
+    
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+        if cart:
+            cart_item = CartItem.objects.filter(cart=cart, product_id=product_id).first()
+            if cart_item:
+                cart_item.delete()
+            if not cart.items.exists():
+                cart.delete()
+    else:
+        session_cart = request.session.get('cart', {})
+        session_cart.pop(str(product_id), None)
+        request.session['cart'] = session_cart
+        request.session.modified = True
+    
+    return redirect('cart')
 
 
 
@@ -269,7 +437,7 @@ def product_list(request, category_id=None):
     paginator = Paginator(products, 20)
     page = request.GET.get('page')
     products = paginator.get_page(page)
-    item_count = get_cart_item_count(request.user)
+    item_count = get_cart_item_count(request)
 
 
     context = {
@@ -305,8 +473,8 @@ def search_products(request):
 
 #PAYMENT:
 
-@login_required
-@require_POST
+#@login_required
+#@require_POST
 def initialize_payment(request):
     if request.method == 'POST':
 
@@ -329,7 +497,13 @@ def initialize_payment(request):
             messages.error(request, "Please enter a valid phone number (10-14 digits).")
             return redirect('cart')
 
-        cart = get_object_or_404(Cart, user=request.user)
+        #cart = get_object_or_404(Cart, user=request.user)
+        
+        if request.user.is_authenticated:
+            cart = get_object_or_404(Cart, user=request.user)
+        else:
+            cart = get_or_create_guest_cart(request)
+
         total_amount = calculate_total(cart)
         amount_in_kobo = int(total_amount * 100)
 
@@ -339,7 +513,9 @@ def initialize_payment(request):
         payment_reference = f"ORDER-{uuid.uuid4().hex[:8].upper()}"
 
         order = Order.objects.create(
-            user=request.user,
+            
+            user=request.user if request.user.is_authenticated else None,
+            session_key=request.session.session_key if not request.user.is_authenticated else None,
             delivery_location=delivery_location,
             name=name,
             phone_number=phone_number,
@@ -408,7 +584,16 @@ def payment_callback(request):
         order.status = 'processing'
         order.save()
 
-        Cart.objects.filter(user=request.user).delete()
+        #Cart.objects.filter(user=request.user).delete()
+
+        
+        if request.user.is_authenticated:
+            Cart.objects.filter(user=request.user).delete()
+        else:
+            if 'cart_id' in request.session:
+                Cart.objects.filter(id=request.session['cart_id']).delete()
+                del request.session['cart_id']
+
 
         return redirect('home')
     else:
@@ -580,7 +765,7 @@ class OrderDetail(generics.RetrieveUpdateAPIView):
 
 
 #--------------------
-"""
+
 def test_api(request):
     return render(request, 'app.html')
 
@@ -621,4 +806,3 @@ def proxy_view(request, path):
     except requests.RequestException as e:
         logger.error(f"Request Exception: {str(e)}")
         return HttpResponse(f"API request failed: {str(e)}", status=500)
-"""

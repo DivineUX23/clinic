@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Jolly Life Health{% endblock %}
+{% block title %}JollyLifeHealth{% endblock %}
 {% block description %}{% endblock %}
 {% block keywords %}{% endblock %}
 
@@ -153,7 +153,7 @@ Start Content
                 <div class="row" id="products-container">
                     {% for product in products %}
                         <div class="col-lg-3 col-md-4 col-sm-4 col-6 p-2">
-                                <form class="product-single-hover style--card mb-3.5" id="form-{{ product.id }}">
+                            <form class="product-single-hover style--card mb-3.5" id="form-{{ product.id }}">
                                 {% csrf_token %}
                                 <input type="hidden" name="product_id" value="{{ product.id }}">
                                 <input type="hidden" name="quantity" value="1" min="1" max="{{ product.stock }}">
@@ -169,6 +169,7 @@ Start Content
                                             <a class="btn-circle stopPropagation" href="javascript:" onclick="quickView('{{ product.id }}')"></a>
                                         </div>
                                     </div>
+                                    
                                     <div class="single-product-details">
                                         <div>
                                             <a href="{% url 'product_detail' product.slug %}">
@@ -182,14 +183,12 @@ Start Content
                                                 </span>
                                             </div>
                                         </div>
-                                        <div class="flex items-center text-[10px] md:text-base 2xl:text-xl whitespace-nowrap">
-                                            <div class="flex items-center flex-wrap gap-1 md:gap-2">
-                                                                                
-                                                <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">View
-                                                </a>
-                                                
-                                                
+                                        <div class="flex items-center text-sm md:text-base 2xl:text-xl whitespace-nowrap">
 
+                                            <div class="flex items-center gap-1 md:gap-2">
+                                                <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">
+                                                    View
+                                                  </a>
                                                 <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
 
                                             </div>

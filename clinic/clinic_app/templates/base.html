@@ -23,12 +23,12 @@
     <link rel="stylesheet" href="\static\css\master.css" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <meta property="og:description" content="JollyLife Health is a wholesale, retail, and dispensing healthcare platform established for the distribution and retailing of locally manufactured and imported drugs, b">
+    <meta property="og:description" content="JollyLifeHealth is a wholesale, retail, and dispensing healthcare platform established for the distribution and retailing of locally manufactured and imported drugs, b">
 
     <meta property="twitter:card" content="\static\images\IMG-20240913-WA0000.jpg"/>
-    <meta property="twitter:title" content="Welcome To Jolly Life Health Limited Home"/>
+    <meta property="twitter:title" content="Welcome To JollyLifeHealth Limited Home"/>
     <meta property="twitter:url" content="">
-    <meta property="twitter:description" content="JollyLife Health is a wholesale, retail, and dispensing healthcare platform established for the distribution and retailing of locally manufactured and imported drugs, b">
+    <meta property="twitter:description" content="JollyLifeHealth is a wholesale, retail, and dispensing healthcare platform established for the distribution and retailing of locally manufactured and imported drugs, b">
 
     <link rel="stylesheet" href="\static\css\home.css"/>
     <style>
@@ -420,7 +420,7 @@
         function addTobeBought(productId) {
             console.log('Function called with productId:', productId);
             
-            const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+            /*const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
             
             if (!isAuthenticated) {
                 Swal.fire({
@@ -443,7 +443,7 @@
                     }
                 });
                 return;
-            }
+            }*/
             
             const form = document.getElementById(`form-${productId}`);
             console.log('Form found:', form);
