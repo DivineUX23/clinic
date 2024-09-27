@@ -1,0 +1,262 @@
+/* dark-mode.css */
+
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+.dark-mode .navbar,
+.dark-mode .footer,
+.dark-mode .card,
+.dark-mode .modal-content {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+.dark-mode .bg-white,
+.dark-mode .bg-light {
+    background-color: #2a2a2a !important;
+}
+
+.dark-mode .text-dark,
+.dark-mode .text-body {
+    color: #e0e0e0 !important;
+}
+
+.dark-mode .border,
+.dark-mode .border-top,
+.dark-mode .border-bottom,
+.dark-mode .border-left,
+.dark-mode .border-right {
+    border-color: #444 !important;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+.dark-mode .btn-outline-secondary {
+    color: #e0e0e0;
+    border-color: #e0e0e0;
+}
+
+.dark-mode .btn-outline-secondary:hover {
+    background-color: #e0e0e0;
+    color: #2a2a2a;
+}
+
+.dark-mode a {
+    color: #9fa8da;
+}
+
+.dark-mode a:hover {
+    color: #c5cae9;
+}
+
+.dark-mode .table {
+    color: #e0e0e0;
+}
+
+.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .form-control {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+.dark-mode .form-control:focus {
+    background-color: #444;
+    color: #e0e0e0;
+}
+
+.dark-mode .dropdown-menu {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+.dark-mode .dropdown-item {
+    color: #e0e0e0;
+}
+
+.dark-mode .dropdown-item:hover,
+.dark-mode .dropdown-item:focus {
+    background-color: #333;
+}
+
+/* Add styles for your custom classes and elements */
+.dark-mode .product-single-hover,
+.dark-mode .style--card {
+    background-color: #2a2a2a;
+}
+
+.dark-mode .single-product-details {
+    background-color: #333;
+}
+
+.dark-mode .flash-deal-text,
+.dark-mode .product-price {
+    color: #9fa8da !important;
+}
+
+/* Adjust purple color for better visibility in dark mode */
+.dark-mode .text-purple,
+.dark-mode .btn-purple,
+.dark-mode .bg-purple {
+    color: #d8bfd8 !important;
+    background-color: #660066 !important;
+    border-color: #660066 !important;
+}
+
+.dark-mode .btn-purple:hover {
+    background-color: #800080 !important;
+    border-color: #800080 !important;
+}
+
+/* dark-mode.css */
+
+/* ... (previous styles) ... */
+
+.dark-mode .bg-[#F9F5F5] {
+    background-color: #2a2a2a !important;
+}
+
+.dark-mode .text-[28px],
+.dark-mode .text-[36px] {
+    color: #e0e0e0;
+}
+
+.dark-mode .border-[#75869D] {
+    border-color: #4a4a4a;
+}
+
+.dark-mode .bg-purple-100 {
+    background-color: #4a0e4a;
+}
+
+.dark-mode .text-pink-200 {
+    color: #ff80ab;
+}
+
+/* dark-mode.css */
+
+/* ... (previous styles) ... */
+
+.dark-mode .dark-mode-bg {
+    background-color: #2a2a2a !important;
+}
+
+.dark-mode .dark-mode-text {
+    color: #e0e0e0 !important;
+}
+
+.dark-mode .dark-mode-border {
+    border-color: #4a4a4a !important;
+}
+
+.dark-mode .dark-mode-bg-purple {
+    background-color: #4a0e4a !important;
+}
+
+.dark-mode .dark-mode-text-pink {
+    color: #ff80ab !important;
+}
+
+/* dark-mode.css */
+
+/* ... (previous styles) ... */
+
+/* General icon styling for dark mode */
+.dark-mode .fa,
+.dark-mode .fas,
+.dark-mode .far,
+.dark-mode .fal,
+.dark-mode .fab {
+    color: #e0e0e0;
+}
+
+/* Specific icon styling if needed */
+.dark-mode .navbar-tool-icon-box .fa,
+.dark-mode .navbar-tool-icon-box .fas,
+.dark-mode .navbar-tool-icon-box .far,
+.dark-mode .navbar-tool-icon-box .fal,
+.dark-mode .navbar-tool-icon-box .fab {
+    color: #9fa8da;
+}
+
+/* If you're using SVG icons, you might need something like this */
+.dark-mode svg {
+    fill: #e0e0e0;
+}
+
+/* For icons that should remain a specific color regardless of mode */
+.dark-mode .icon-no-change {
+    color: inherit !important;
+}
+
+/* If you have any icons that use background images */
+.dark-mode .icon-bg {
+    filter: invert(1) hue-rotate(180deg);
+}
+.dark-mode .specific-icon-class {
+    color: #e0e0e0 !important;
+}
+
+/* dark-mode.css */
+
+/* ... (previous styles) ... */
+
+.dark-mode .dark-mode-bg {
+    background-color: #2a2a2a;
+}
+
+.dark-mode .dark-mode-card {
+    background-color: #333;
+    border-color: #444;
+}
+
+.dark-mode .dark-mode-text {
+    color: #e0e0e0;
+}
+
+.dark-mode .dark-mode-border {
+    border-color: #444;
+}
+
+.dark-mode .shipping-details-bottom-border {
+    border-color: #444;
+}
+
+.dark-mode .flash_deal_product {
+    background-color: #333;
+}
+
+.dark-mode .flash-product-title a {
+    color: #e0e0e0;
+}
+
+.dark-mode .flash-product-price {
+    color: #9fa8da !important;
+}
+
+.dark-mode .btn-outline-secondary {
+    color: #e0e0e0;
+    border-color: #e0e0e0;
+}
+
+.dark-mode .btn-outline-secondary:hover {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+/* Invert colors for specific images if needed */
+.dark-mode .__img-20,
+.dark-mode .flash-deals-background-image img {
+    filter: invert(1) hue-rotate(180deg);
+}

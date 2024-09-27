@@ -67,10 +67,10 @@ Start Content
             
             <div class="form-group d-flex flex-wrap justify-content-between mb-4">
               <div class="rtl">
-                <div class="custom-control custom-checkbox">
-                  {{ form.remember }}
-                  <label class="custom-control-label text-primary ml-2 cursor-pointer" for="{{ form.remember.id_for_label }}">Remember me</label>
-                </div>
+                <label for="{{ form.remember.id_for_label }}" class="text-primary cursor-pointer">
+                  <input type="checkbox" name="{{ form.remember.html_name }}" id="{{ form.remember.id_for_label }}" {% if form.remember.value %}checked{% endif %}>
+                  Remember me
+                </label>
               </div>
               <a class="font-size-sm text-primary text-underline" href="{% url 'password_reset' %}">
                 Forgot password?

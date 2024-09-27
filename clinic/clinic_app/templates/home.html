@@ -119,9 +119,10 @@ End CSS
 
 
 <!--category -->
-<section class="md:py-16 py-[24px] bg-[#F9F5F5]">
-  <div class="container mx-auto bg-[#F9F5F5]">
-      <div class="text-[28px] md:text-[36px]">Shop by category</div>
+<!--category -->
+<section class="md:py-16 py-[24px] bg-[#F9F5F5] dark-mode-bg">
+  <div class="container mx-auto bg-[#F9F5F5] dark-mode-bg">
+      <div class="text-[28px] md:text-[36px] dark-mode-text">Shop by category</div>
       
       <div class="category-carousel-container w-full">
           <div id="categories" class="mt-8 tab-content">
@@ -129,57 +130,35 @@ End CSS
 
               {% for category in categories %}
                   <div class="mb-4">
-
-
-
-
                     {% if category.url %}
                         <a href="{{ category.url }}">
-                          <div class="relative h-[200px] border border-[#75869D] bg-purple-100 rounded-2xl w-full">
+                    {% else %}
+                        <a href="{% url 'category_products' category.id %}" class="w-full">
+                    {% endif %}
+                          <div class="relative h-[200px] border border-[#75869D] bg-purple-100 rounded-2xl w-full dark-mode-border dark-mode-bg-purple">
                             {% if category.image %}
                                 <img src="{{ category.image.url }}"
                                     alt="{{ category.name }}" class="w-full h-full object-cover rounded-[16px]" />
                             {% else %}
-                                <p>"{{ category.name }}"</p>
+                                <p class="dark-mode-text">"{{ category.name }}"</p>
                             {% endif %}
                             <div class="absolute bottom-8 left-5 right-5">
                               <div style="display: inline-block; background-color: rgba(128, 0, 128, 0.5); border-radius: 0.5rem; padding: 0.5rem;">
                                   <div class="text-lg font-medium text-white">{{ category.name }}</div>
-                                  <span class="flex items-center gap-[4px] text-sm text-pink-200">Explore</span>
+                                  <span class="flex items-center gap-[4px] text-sm text-pink-200 dark-mode-text-pink">Explore</span>
                               </div>
                           </div>
                         </div>                        
                       </a>
-                    {% else %}
-
-                      <a href="{% url 'category_products' category.id %}" class="w-full">
-                        <div class="relative h-[200px] border border-[#75869D] bg-purple-100 rounded-2xl w-full">
-                            {% if category.image %}
-                                <img src="{{ category.image.url }}"
-                                    alt="{{ category.name }}" class="w-full h-full object-cover rounded-[16px]" />
-                            {% else %}
-                                <p>"{{ category.name }}"</p>
-                            {% endif %}
-                            <div class="absolute bottom-8 left-5 right-5">
-                              <div style="display: inline-block; background-color: rgba(128, 0, 128, 0.5); border-radius: 0.5rem; padding: 0.5rem;">
-                                  <div class="text-lg font-medium text-white">{{ category.name }}</div>
-                                  <span class="flex items-center gap-[4px] text-sm text-pink-200">Explore</span>
-                              </div>
-                          </div>
-                        </div>
-                    </a>
-
-                    {% endif %}
                   </div>
               {% empty %}
-                  <p>No categories available.</p>
+                  <p class="dark-mode-text">No categories available.</p>
               {% endfor %}
           </div>
         </div>
       </div>
   </div>
 </section>
-
 
 
 
@@ -292,10 +271,11 @@ End CSS
       <div class="md:w-1/2 mb-8 md:mb-0">
           <h2 class="text-3xl md:text-4xl font-bold mb-4">About Us</h2>
           <p class="text-gray-600 mb-4">
-              At JollyLifeHealth Limited, we are committed to providing high-quality healthcare products and services to improve the well-being of our community. With years of experience and a dedicated team of professionals, we strive to make healthcare accessible and affordable for everyone.
+            At JollyLifeHealth, we believe that a happy life starts with good health. As a healthcare and lifestyle brand, we offer trusted wellness products and expert care to help you feel your best every day. 
+            Our mission is to inspire you to live a vibrant, healthy, and happy life, with easy access to everything you need for your well-being. 
           </p>
           <p class="text-gray-600 mb-4">
-              Our mission is to enhance the quality of life through innovative health solutions and exceptional customer service. We believe in the power of prevention and the importance of holistic health management.
+            Shop with us and enjoy a seamless experience that puts your happiness first!
           </p>
           <a href="{% url 'products' %}" class="bg-purple text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-300">Shop with Us</a>
       </div>
@@ -319,10 +299,10 @@ End CSS
               <img src="/static/images/Shipbubble-Logo-Lockup-Horizontalldpi-1.png" alt="Partner 1" class="h-16 w-auto mx-auto partner-logo">
           </div>
           <div class="item">
-              <img src="\static\images\imaging.png" alt="Partner 2" class="h-16 w-auto mx-auto partner-logo partner-logo-offset">
+              <img src="\static\images\imaging.png" alt="Partner 2" class="h-16 w-auto mx-auto partner-logo">
           </div>
           <div class="item">
-            <img src="\static\images\Natures-field-round-large-Logo-for-web.png" alt="Partner 1" class="h-16 w-auto mx-auto partner-logo partner-logo-offset">
+            <img src="\static\images\Natures-field-round-large-Logo-for-web.png" alt="Partner 3" class="h-16 w-auto mx-auto partner-logo">
         </div>
       </div>
   </div>
@@ -337,9 +317,6 @@ End CSS
   }
   .partner-logo:hover {
     transform: scale(1.1);
-  }
-  .partner-logo-offset {
-    margin-top: 20px;
   }
 </style>
 

@@ -54,11 +54,17 @@ urlpatterns = [
     path('signup/', views.signup_view, name='signup'),
     path('signin/', views.signin_view, name='signin'),
     path('logout/', auth.LogoutView.as_view(template_name ='user/index.html'), name ='logout'),
+    path('policy/', views.policy, name='policy'),
+
 
     path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    path('toggle-dark-mode/', views.toggle_dark_mode, name='toggle_dark_mode'),
+
+
 
     #-----------------
     path('app/', views.test_api, name='app'),

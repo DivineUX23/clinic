@@ -19,6 +19,10 @@ Start Navigation Bar
                 </a>
             </div>
 
+            <!--Dark mode
+            <button id="darkModeToggle" class="btn btn-sm btn-outline-secondary">
+                <i class="fa fa-moon-o" aria-hidden="true"></i>
+            </button>-->
             <!-- Desktop Search Bar -->
             <div class="hidden md:block md:w-[300px] xl:w-[480px] h-[46px]">
                 <form id="search-form" class="search_form relative">
@@ -206,7 +210,7 @@ Start Navigation Bar
             <div class="mt-2 px-7 py-3">
                 <p class="text-sm text-gray-500">
                     {% if user.is_authenticated %}
-                        You are currently logged in.
+                        You are logged in as {{ user.username }}.
                     {% else %}
                         Choose an option to continue:
                     {% endif %}

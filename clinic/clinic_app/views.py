@@ -56,17 +56,12 @@ def get_cart_item_count(request):
     else:
         cart = get_or_create_guest_cart(request)
     return cart.items.count() if cart else 0
-"""
-def get_cart_item_count(user):
-    if user.is_authenticated:
-        cart = Cart.objects.filter(user=user).first()
-        return cart.items.count() if cart else 0
-    return 0
-"""
+
+
 
 def home(request):
-    new_arrivals = Product.objects.filter(section='new_arrival')
-    most_popular = Product.objects.filter(section='most_popular')
+    new_arrivals = Product.objects.filter(section='new_arrival')[:10]
+    most_popular = Product.objects.filter(section='most_popular')[:10]
     categories = Category.objects.all()
         
     item_count = get_cart_item_count(request)
@@ -93,13 +88,20 @@ def category(request):
     return render(request, 'category.html', {})
 
 
+def policy(request):
+    return render(request, 'policies.html')
+
+
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
-    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:5]
     more_products = Product.objects.all().exclude(id=product.id)[:5]
     categories = Category.objects.all()
-    
+    product_categories = product.category.all()
+    #related_products = Product.objects.filter(category__in=product_categories).exclude(id=product.id)[:5]
+    related_products = Product.objects.filter(category__in=product_categories).exclude(id=product.id).distinct()[:5]
+
+
     item_count = get_cart_item_count(request)
             
     context = {
@@ -110,19 +112,7 @@ def product_detail(request, slug):
         'more_products': more_products,
     }
     return render(request, 'product.html', context)
-"""
-def get_or_create_cart(request):
-    if request.user.is_authenticated:
-        try:
-            cart, created = Cart.objects.get_or_create(user=request.user)
-            return cart
-        except Exception as e:
-            messages.error(request, f"Error creating cart: {str(e)}")
-            return None
-    else:
-        messages.warning(request, "Sign up to add to cart.")
-        return None
-"""
+
 
 
 def get_or_create_cart(request):
@@ -136,25 +126,8 @@ def get_or_create_cart(request):
     else:
         return get_or_create_guest_cart(request)
 
-"""
-def add_to_cart(request):
 
-    if request.method == 'POST':
-        product_id = request.POST.get('product_id')
-        quantity = int(request.POST.get('quantity', 1))
-        product = get_object_or_404(Product, id=product_id)            
-        cart = get_or_create_cart(request)
-            
-        
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-        if not created:
-            cart_item.quantity = F('quantity') + quantity
-        cart_item.save()
 
-        return JsonResponse({'success': True, 'cart_quantity': cart.items.count()})
-
-    return JsonResponse({'success': False}, status=400)
-"""
 
 
 
@@ -175,67 +148,6 @@ def add_to_cart(request):
 
     return JsonResponse({'success': False}, status=400)
 
-"""
-def cart_view(request):
-    if not request.user.is_authenticated:
-        messages.warning(request, "Please log in to view your cart.")
-        return redirect('home')
-
-    cart = Cart.objects.filter(user=request.user).first()  
-        
-    cart_items = []
-    subtotal = Decimal('0.00')
-    item_count = 0
-    
-    if cart:
-        for item in cart.items.select_related('product').all():
-            product = item.product
-            quantity = item.quantity
-            total_price = product.price * quantity
-            subtotal += total_price
-            cart_items.append({
-                'product': product,
-                'quantity': quantity,
-                'total_price': total_price,
-            })
-        item_count = len(cart_items)
-    
-    settings = PaymentSettings.objects.first()  
-    if not settings:
-        settings = PaymentSettings.objects.create()
-
-    tax = subtotal * settings.tax_rate
-    shipping = settings.shipping_rate
-    discount = settings.discount_rate
-
-    total = subtotal + tax + shipping - discount
-
-    categories = Category.objects.all()
-
-    #user_profile = request.user.profile
-    user_profile, created = Profile.objects.get_or_create(user=request.user)
-
-    profile_data = {
-        'delivery_location': user_profile.delivery_location or '',
-        'name': request.user.get_full_name() or request.user.username,
-        'phone_number': user_profile.phone_number or '',
-    }
-
-
-    context = {
-        'categories': categories,
-        'quantity': item_count,
-        'cart_items': cart_items,
-        'subtotal': subtotal,
-        'tax': tax,
-        'shipping': shipping,
-        'discount': discount,
-        'total': total,
-        'order_note': request.session.get('order_note', ''),
-        'profile_data': profile_data,
-    }
-    return render(request, 'cart.html', context)
-"""
 
 
 
@@ -301,7 +213,6 @@ def cart_view(request):
 
 
 
-"""
 @require_POST
 def update_cart(request):
     cart = get_or_create_cart(request)
@@ -322,41 +233,6 @@ def update_cart(request):
     
     cart_item.save()
     return redirect('cart')
-"""
-
-
-@require_POST
-def update_cart(request):
-    product_id = request.POST.get('product_id')
-    action = request.POST.get('action')
-
-    if request.user.is_authenticated:
-        cart = get_or_create_cart(request)
-        product = get_object_or_404(Product, id=product_id)
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-        
-        if action == 'increase':
-            cart_item.quantity = F('quantity') + 1
-        elif action == 'decrease':
-            if cart_item.quantity > 1:
-                cart_item.quantity = F('quantity') - 1
-            else:
-                cart_item.delete()
-        
-        cart_item.save()
-    else:
-        session_cart = request.session.get('cart', {})
-        if action == 'increase':
-            session_cart[product_id] = session_cart.get(product_id, 0) + 1
-        elif action == 'decrease':
-            if session_cart.get(product_id, 0) > 1:
-                session_cart[product_id] -= 1
-            else:
-                session_cart.pop(product_id, None)
-        request.session['cart'] = session_cart
-        request.session.modified = True
-
-    return redirect('cart')
 
 
 
@@ -369,10 +245,16 @@ def update_order_note(request):
     cart.save()
     return redirect('cart')
 
-"""
+
+
+
 @require_POST
 def remove_from_cart(request):
-    cart = Cart.objects.filter(user=request.user).first()
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+    else:
+        cart = get_or_create_guest_cart(request)
+    
     if not cart:
         messages.error(request, "Cart not found.")
 
@@ -386,28 +268,6 @@ def remove_from_cart(request):
     cart.save()
     
     return redirect('cart')
-"""
-
-
-@require_POST
-def remove_from_cart(request):
-    product_id = request.POST.get('product_id')
-    
-    if request.user.is_authenticated:
-        cart = Cart.objects.filter(user=request.user).first()
-        if cart:
-            cart_item = CartItem.objects.filter(cart=cart, product_id=product_id).first()
-            if cart_item:
-                cart_item.delete()
-            if not cart.items.exists():
-                cart.delete()
-    else:
-        session_cart = request.session.get('cart', {})
-        session_cart.pop(str(product_id), None)
-        request.session['cart'] = session_cart
-        request.session.modified = True
-    
-    return redirect('cart')
 
 
 
@@ -415,9 +275,11 @@ def product_list(request, category_id=None):
 
     if category_id:
         category = Category.objects.get(id=category_id)
-        products = Product.objects.filter(category=category)
+        all_products = Product.objects.filter(category=category)
     else:
-        products = Product.objects.all()
+        all_products = Product.objects.all()
+    
+    products = all_products
 
     categories = Category.objects.all()
     
@@ -434,18 +296,20 @@ def product_list(request, category_id=None):
     else:  # latest
         products = products.order_by('-created_at')
 
-    paginator = Paginator(products, 20)
+    paginator = Paginator(products, 10)
     page = request.GET.get('page')
     products = paginator.get_page(page)
-    item_count = get_cart_item_count(request)
 
+    item_count = get_cart_item_count(request)
 
     context = {
         'quantity': item_count,
         'products': products,
+        'page_obj': products,
+        'is_paginated': products.has_other_pages(),
         'sort': sort,
         'categories': categories,
-        'total': len(products)
+        'total': all_products.count()
     }
     return render(request, 'products.html', context)
 
@@ -677,6 +541,28 @@ def signin_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'signin.html', {'form': form})
+
+
+
+
+
+
+
+
+
+
+
+
+
+def toggle_dark_mode(request):
+    if 'dark_mode' in request.session:
+        request.session['dark_mode'] = not request.session['dark_mode']
+    else:
+        request.session['dark_mode'] = True
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+
 
 
 

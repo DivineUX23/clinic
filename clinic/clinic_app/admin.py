@@ -24,11 +24,15 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'price', 'stock', 'category', 'section', 'available', 'created_at', 'updated_at']
+    list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'created_at', 'updated_at']
+
+    list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'created_at', 'updated_at']
     list_filter = ['available', 'category', 'section', 'created_at', 'updated_at']
-    list_editable = ['price', 'stock', 'available', 'category', 'section']
+    list_editable = ['price', 'stock', 'available', 'section']
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
+
+    filter_horizontal = ('category',)
 
 class CartItemInline(admin.TabularInline):
     model = CartItem

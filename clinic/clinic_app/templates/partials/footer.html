@@ -25,7 +25,9 @@ Start Footer
             <div class="text-lg mb-3.5">Company</div>
             <div class="grid gap-[8px]">
                 <a href="{% url 'home' %}#about-us" class="block text-white">About Us</a>
-                <a href="{% url 'home' %}#about-us" class="block text-white">Policies</a>
+                <a href="{% url 'policy' %}#return-policy" class="block text-white">Our Policies</a>
+                <a href="{% url 'policy' %}#terms-and-conditions" class="block text-white">Terms and condition</a>
+
                 <!--<a href="" class="block text-white">Pharmacy Service</a>-->
             </div>
         </div>
@@ -49,8 +51,8 @@ Start Footer
             <div class="flex items-start gap-[4px]">
                 <img src="https://medplusnig.com/public/assets/front-end/img/email.svg" alt="email" class="mt-[4px]" />
                 <span> 
-                <a href="mailto:jollylifehealthcare@gmail.com" class="text-white underline">
-                jollylifehealthcare@gmail.com
+                <a href="mailto:support@jollylifehealth.com" class="text-white underline">
+                support@jollylifehealth.com
                 </a>  
                 </span>
             </div>
@@ -58,23 +60,19 @@ Start Footer
         </div>
         <div class="text-nowrap mb-4 position-relative">
             <form action="" method="post">
-            <label class="font-bold text-sm capitalize block text-white mb-3"
-                >Subscribe to our newsletter</label
-            >
-                <input type="hidden" name="_token" value="OTQTE4iOouBPrNT2IPv3oyPGLzjibwEo5nixwzhP">                <input type="email" name="subscription_email" class="form-control subscribe-border"
+            <label class="font-bold text-sm capitalize block text-white mb-3">
+                Get latest wellness tips and product offers</label>
+                <input type="hidden" name="_token" value="OTQTE4iOouBPrNT2IPv3oyPGLzjibwEo5nixwzhP">                
+                <input type="email" name="subscription_email" class="form-control subscribe-border"
                     placeholder="Your Email Address" id="subscribe" required style="padding: 11px;text-align: left;">
 
                 <button class="subscribe-button bg-purple btn-purple transition duration-500 px-[10px] md:px-5 w-[121px] inline-flex justify-center items-center h-[47px] text-white rounded-md mt-1" type="submit">
                     Subscribe
                 </button>
-                
-
             </form>
         </div>
         </div>
-        <div
-        class="flex flex-col md:flex-row justify-between md:items-center gap-4 md:gap-0 pt-[40px] md:pt-16 border-t"
-        >
+        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 md:gap-0 pt-[40px] md:pt-16 border-t">
         <div>© 2024 - Jollylifehealth . All right reserved.</div>
         
             <div class="flex items-center gap-[8px]">

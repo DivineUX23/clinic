@@ -14,7 +14,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-
+    <script>
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
     <!-- Main Theme Styles + Bootstrap-->
     <link rel="stylesheet" media="screen" href="\static\css\theme.min.css">
     <link rel="stylesheet" media="screen" href="\static\css\slick.css">
@@ -310,7 +314,7 @@
             color: var(--base) !important;
         }
     </style>
-
+    <link rel="stylesheet" href="{% static 'css/dark-mode.css' %}">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.3/sweetalert2.min.css">
     <style>
@@ -505,6 +509,51 @@
             })
             .catch(error => console.error('Error:', error));
         }
+
+
+
+
+
+
+        // for darkmode
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            const icon = darkModeToggle.querySelector('i');
+        
+            let darkMode = localStorage.getItem('darkMode'); 
+        
+            const enableDarkMode = () => {
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                icon.classList.remove('fa-moon-o');
+                icon.classList.add('fa-sun-o');
+            }
+        
+            const disableDarkMode = () => {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', null);
+                icon.classList.remove('fa-sun-o');
+                icon.classList.add('fa-moon-o');
+            }
+        
+            if (darkMode === 'enabled') {
+                enableDarkMode();
+            }
+        
+            darkModeToggle.addEventListener('click', () => {
+                darkMode = localStorage.getItem('darkMode'); 
+                if (darkMode !== 'enabled') {
+                    enableDarkMode();
+                } else {  
+                    disableDarkMode(); 
+                }
+            });
+        });
+
+
+
+
 
         document.addEventListener('DOMContentLoaded', function () {
             // Get all plus and minus buttons
