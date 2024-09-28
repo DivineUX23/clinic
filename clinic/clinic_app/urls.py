@@ -64,7 +64,7 @@ urlpatterns = [
 
     path('toggle-dark-mode/', views.toggle_dark_mode, name='toggle_dark_mode'),
 
-
+    path('api/products/<str:section>/', views.product_api, name='product_api'),
 
     #-----------------
     path('app/', views.test_api, name='app'),

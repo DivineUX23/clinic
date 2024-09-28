@@ -60,14 +60,15 @@ def get_cart_item_count(request):
 
 from django.utils import timezone
 from datetime import timedelta
+"""
 def home(request):
     
     # Get products created in the last 7 days for new arrivals
     seven_days_ago = timezone.now() - timedelta(days=30)
-    new_arrivals = Product.objects.filter(created_at__gte=seven_days_ago).order_by('-created_at')[:10]
+    new_arrivals = Product.objects.filter(created_at__gte=seven_days_ago).order_by('-created_at')
     
     # Get most viewed products
-    most_popular = Product.objects.order_by('-view_count')[:10]
+    most_popular = Product.objects.order_by('-view_count')
     
     #new_arrivals = Product.objects.filter(section='new_arrival')[:10]
     #most_popular = Product.objects.filter(section='most_popular')[:10]
@@ -90,7 +91,71 @@ def home(request):
         'initial_faqs': initial_faqs,
         'extra_faqs': extra_faqs,
     })
+"""
 
+
+
+
+def home(request):
+    categories = Category.objects.all()
+    item_count = get_cart_item_count(request)
+    
+    faqs = FAQ.objects.filter(is_visible=True)
+    initial_faqs = faqs[:2]
+    extra_faqs = faqs[2:]
+
+    return render(request, 'home.html', {
+        'quantity': item_count,
+        'categories': categories,
+        'initial_faqs': initial_faqs,
+        'extra_faqs': extra_faqs,
+    })
+
+def product_api(request, section):
+    page_number = request.GET.get('page', 1)
+    items_per_page = 2  # Adjust this number as needed
+
+    if section == 'new-arrivals':
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        products = Product.objects.filter(created_at__gte=thirty_days_ago).order_by('-created_at')
+        print(f",,,,,,,,,,,,,,,,,,,,,,{products}")
+
+    elif section == 'most-popular':
+        products = Product.objects.order_by('-view_count')
+        print(f"000000000000000000000,,,,,,,,,,,,,,,,,,,,,,{products}")
+
+    else:
+        return JsonResponse({'error': 'Invalid section'}, status=400)
+
+    paginator = Paginator(products, items_per_page)
+    page_obj = paginator.get_page(page_number)
+
+    product_data = [
+        {
+            'id': product.id,
+            'name': product.name,
+            'price': str(product.price),
+            'image_url': product.image.url if product.image else None,
+            'slug': product.slug,
+            'stock': product.stock,
+            'available': product.available,
+        }
+        for product in page_obj
+    ]
+
+    pagination_data = {
+        'current_page': page_obj.number,
+        'total_pages': paginator.num_pages,
+        'has_previous': page_obj.has_previous(),
+        'has_next': page_obj.has_next(),
+        'previous_page': page_obj.previous_page_number() if page_obj.has_previous() else None,
+        'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+    }
+
+    return JsonResponse({
+        'products': product_data,
+        'pagination': pagination_data,
+    })
 
 
 def category(request):

@@ -160,8 +160,6 @@ End CSS
   </div>
 </section>
 
-
-
     <!-- New Arrival Section -->
 <section class="container mx-auto py-12">
     <div class="flex items-center justify-between mb-4">
@@ -169,49 +167,17 @@ End CSS
       <!--'all_products'View All-->
       <a href="{% url 'products' %}">View All</a>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-1.5 gap-y-5 md:gap-x-3.5 md:gap-y-12">
+    <div id="new-arrivals-container" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-1.5 gap-y-5 md:gap-x-3.5 md:gap-y-12">
       
-    {% for product in new_arrivals %}
-    {% if product.available %}
-      <form class="relative" id="form-{{ product.id }}">
-        {% csrf_token %}
-        <input type="hidden" name="product_id" value="{{ product.id }}">
-        <input type="hidden" name="quantity" value="1" min="1" max="{{ product.stock }}">
-  
-        <div class="border border-[#75869D]/50 bg-white h-[200px] md:h-[230px] w-full flex items-center justify-center p-2.5 md:p-5 rounded-[14px] relative">
-          <a href="{% url 'product_detail' product.slug %}" class="h-full">
 
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'" width="234" height="270" class="w-[234px] h-full object-contain"/>
-            {% else %}
-                <p>No image available</p>
-            {% endif %}
-          </a>
-        </div>
-        <div class="single-product-details">
-          <a href="{% url 'product_detail' product.slug %}">
-            {{ product.name }}</a>
-        </div>
-  
-        <div class="d-flex flex-wrap gap-8 align-items-center row-gap-0 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
-          <span class="flash-product-price text-dark fw-semibold">₦{{ product.price }}</span>
-        </div>
-  
-        <div class="flex items-center text-sm md:text-base 2xl:text-xl whitespace-nowrap">
-          <div class="flex items-center gap-1 md:gap-2">
-
-            
-            <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">
-              View
-            </a>
-
-            <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
-          </div>
-        </div>
-      </form>
-      {% endif %}
-      {% endfor %}
     </div>
+
+    <nav class="d-flex justify-content-center pt-2" aria-label="New Arrivals Pagination">
+      <ul id="new-arrivals-pagination" class="pagination">
+          <ul id="new-arrivals-pagination"></ul>
+
+      </ul>
+    </nav>
 </section>
   
 
@@ -223,43 +189,16 @@ End CSS
       <!--'all_products'View All-->
       <a href="{% url 'products' %}">View All</a>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-1.5 gap-y-5 md:gap-x-3.5 md:gap-y-12">
-      {% for product in most_popular %}
-      {% if product.available %}
 
-        <form class="relative" id="form-{{ product.id }}">
-        {% csrf_token %}
-        <input type="hidden" name="product_id" value="{{ product.id }}">
-        <input type="hidden" name="quantity" value="1" min="1" max="{{ product.stock }}">
-  
-        <div class="border border-[#75869D]/50 bg-white h-[200px] md:h-[230px] w-full flex items-center justify-center p-2.5 md:p-5 rounded-[14px] relative">
-          <a href="{% url 'product_detail' product.slug %}" class="h-full">
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" onerror="this.src='https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'" width="234" height="270" class="w-[234px] h-full object-contain"/>
-          </a>
-        </div>
-  
-        <div class="single-product-details">
-          <a href="{% url 'product_detail' product.slug %}">
-            {{ product.name }}</a>
-        </div>
-  
-        <div class="d-flex flex-wrap gap-8 align-items-center row-gap-0 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
-          <span class="flash-product-price text-dark fw-semibold">₦{{ product.price }}</span>
-        </div>
-  
-        <div class="flex items-center text-sm md:text-base 2xl:text-xl whitespace-nowrap">
-          <div class="flex items-center gap-1 md:gap-2">
-            
-            <a href="{% url 'product_detail' product.slug %}" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">
-              View
-            </a>
-              <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
-          </div>
-        </div>
-      </form>
-      {% endif %}
-      {% endfor %}
+    <div id="most-popular-container" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-1.5 gap-y-5 md:gap-x-3.5 md:gap-y-12">
     </div>
+    
+    <nav class="d-flex justify-content-center pt-2" aria-label="New Arrivals Pagination">
+      <ul id="most-popular-pagination" class="pagination">
+        <ul id="most-popular-pagination"></ul>
+
+      </ul>
+    </nav>
 </section>
   
 
@@ -454,6 +393,124 @@ End CSS
     });
 });
 
+</script>
+
+<script>
+
+// JavaScript code for pagination and AJAX loading
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded');
+  loadProducts('new-arrivals', 1);
+  loadProducts('most-popular', 1);
+});
+
+function loadProducts(section, page) {
+  console.log(`Loading ${section}, page ${page}`);
+  fetch(`/api/products/${section}/?page=${page}`)
+      .then(response => {
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+      })
+      .then(data => {
+          console.log(`Received data for ${section}:`, data);
+          if (data.products && Array.isArray(data.products)) {
+              updateProductList(section, data.products);
+              updatePagination(section, data.pagination);
+          } else {
+              console.error(`Invalid data received for ${section}:`, data);
+          }
+      })
+      .catch(error => console.error(`Error loading ${section}:`, error));
+}
+
+function updateProductList(section, products) {
+  console.log(`Updating product list for ${section}`);
+  const container = document.getElementById(`${section}-container`);
+  if (!container) {
+      console.error(`Container not found for ${section}`);
+      return;
+  }
+  container.innerHTML = '';
+  const csrfToken = getCookie('csrftoken');
+  products.forEach(product => {
+      container.innerHTML += `
+          <form class="relative" id="form-${product.id}">
+              <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+              <input type="hidden" name="product_id" value="${product.id}">
+              <input type="hidden" name="quantity" value="1" min="1" max="${product.stock}">
+
+          <div class="border border-[#75869D]/50 bg-white h-[200px] md:h-[230px] w-full flex items-center justify-center p-2.5 md:p-5 rounded-[14px] relative">
+                  <a href="/product/${product.slug}/" class="h-full">
+                      <img src="${product.image_url || 'https://medplusnig.com/public/assets/front-end/img/image-place-holder.png'}" 
+                           alt="${product.name}" 
+                           width="234" height="270" 
+                           class="w-[234px] h-full object-contain"/>
+                  </a>
+              </div>
+              <div class="single-product-details">
+                  <a href="/product/${product.slug}/">${product.name}</a>
+              </div>
+              <div class="d-flex flex-wrap gap-8 align-items-center row-gap-0 text-black font-bold text-base md:text-xl my-1.5 md:my-2">
+                  <span class="flash-product-price text-dark fw-semibold">₦${product.price}</span>
+              </div>
+              <div class="flex items-center text-sm md:text-base 2xl:text-xl whitespace-nowrap">
+                  <div class="flex items-center gap-1 md:gap-2">
+                      <a href="/product/${product.slug}/" class="h-10 text-[#75869D] border-[1px] border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">
+                          View
+                      </a>
+                      <button onclick="addTobeBought(${product.id}); return false;" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">
+                          Add To Cart
+                      </button>
+                  </div>
+              </div>
+          </form>
+      `;
+  });
+}
+
+function updatePagination(section, paginationData) {
+  console.log(`Updating pagination for ${section}`);
+  const paginationElement = document.getElementById(`${section}-pagination`);
+  if (!paginationElement) {
+      console.error(`Pagination element not found for ${section}`);
+      return;
+  }
+  paginationElement.innerHTML = '';
+  
+  if (paginationData.has_previous) {
+      paginationElement.innerHTML += `
+          <li class="page-item">
+              <a class="page-link" href="#" onclick="loadProducts('${section}', ${paginationData.previous_page}); return false;">
+                  <span aria-hidden="true">&laquo;</span>
+              </a>
+          </li>
+      `;
+  }
+
+  for (let i = 1; i <= paginationData.total_pages; i++) {
+      if (i === paginationData.current_page) {
+          paginationElement.innerHTML += `
+              <li class="page-item active"><a class="page-link" href="#">${i}</a></li>
+          `;
+      } else if (i > paginationData.current_page - 3 && i < paginationData.current_page + 3) {
+          paginationElement.innerHTML += `
+              <li class="page-item"><a class="page-link" href="#" onclick="loadProducts('${section}', ${i}); return false;">${i}</a></li>
+          `;
+      }
+  }
+
+  if (paginationData.has_next) {
+      paginationElement.innerHTML += `
+          <li class="page-item">
+              <a class="page-link" href="#" onclick="loadProducts('${section}', ${paginationData.next_page}); return false;">
+                  <span aria-hidden="true">&raquo;</span>
+              </a>
+          </li>
+      `;
+  }
+}
 </script>
 {% endblock %}
 

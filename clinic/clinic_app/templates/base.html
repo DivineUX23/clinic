@@ -421,33 +421,115 @@
     <script type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.3/sweetalert2.all.min.js"></script>
     <script>
+
+
+
+
+
         function addTobeBought(productId) {
             console.log('Function called with productId:', productId);
             
-            /*const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+            const form = document.getElementById(`form-${productId}`);
+            console.log('Form found:', form);
             
-            if (!isAuthenticated) {
-                Swal.fire({
-                    title: 'Not Logged In',
-                    text: 'You need to be logged in to add items to your cart.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Log In',
-                    cancelButtonText: 'Continue as Guest',
-                    customClass: {
-                        popup: 'swal-custom-popup',
-                        confirmButton: 'swal-custom-confirm-button',
-                        cancelButton: 'swal-custom-cancel-button'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "{% url 'signin' %}?next=" + encodeURIComponent(window.location.pathname);
-                    } else {
-                        console.log('User continued as guest');
-                    }
-                });
+            if (!form) {
+                console.error('Form not found for productId:', productId);
                 return;
-            }*/
+            }
+            
+            const formData = new FormData(form);
+            console.log('FormData created:');
+            
+            // Debugging the contents of FormData
+            for (let pair of formData.entries()) {
+                console.log(`${pair[0]}: ${pair[1]}`);
+            }
+        
+            // Get CSRF token from cookie if not present in form
+            let csrfToken = formData.get("csrfmiddlewaretoken");
+            if (!csrfToken) {
+                csrfToken = getCookie('csrftoken');
+            }
+            
+            if (!csrfToken) {
+                console.error('CSRF token not found');
+                return;
+            }
+            
+        
+            fetch("{% url 'add_to_cart' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": csrfToken
+                }
+            })
+            .then(response => {
+                console.log('Response received:', response);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data received:', data);
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Product added to cart successfully!',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonText: 'Go to Cart',
+                        cancelButtonText: 'Continue Shopping',
+                        customClass: {
+                            popup: 'swal-custom-popup',
+                            confirmButton: 'swal-custom-confirm-button',
+                            cancelButton: 'swal-custom-cancel-button'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "{% url 'cart' %}";
+                        } else {
+                            // User chose to continue shopping, do nothing (stay on the same page)
+                        }
+                    });
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = data.cart_quantity;
+                    }
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to add product to cart.',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            popup: 'swal-custom-popup',
+                            confirmButton: 'swal-custom-confirm-button'
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+        
+        // Add this function to get the CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        /*
+        function addTobeBought(productId) {
+            console.log('Function called with productId:', productId);
+            
             
             const form = document.getElementById(`form-${productId}`);
             console.log('Form found:', form);
@@ -508,7 +590,7 @@
                 }
             })
             .catch(error => console.error('Error:', error));
-        }
+        }*/
 
 
 
@@ -550,7 +632,6 @@
                 }
             });
         });
-
 
 
 
