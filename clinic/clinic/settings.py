@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'channels',
     'clinic_app',
     'widget_tweaks',
+    'ckeditor',
+    'ckeditor_uploader',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -210,3 +212,14 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = 'your-email@example.com'
 # EMAIL_HOST_PASSWORD = 'your-email-password'
+
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': 800,
+    },
+}
+
+CKEDITOR_UPLOAD_PATH = "product_images/"

@@ -1,6 +1,8 @@
 from django.contrib import admin
 from .models import Category, Product, Order, OrderItem, CartItem, Cart, FAQ, SearchedProduct
 from .models import PaymentSettings
+from ckeditor.widgets import CKEditorWidget
+from django import forms
 
 
 
@@ -22,6 +24,8 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     #fields = ['name', 'slug', 'url']
 
+
+""""
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'created_at', 'updated_at']
@@ -33,6 +37,31 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
     filter_horizontal = ('category',)
+"""
+
+
+class ProductAdminForm(forms.ModelForm):
+    description = forms.CharField(widget=CKEditorWidget())
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'price', 'stock', 'available', 'view_count', 'created_at', 'updated_at']
+    list_filter = ['available', 'category', 'created_at', 'updated_at']
+    list_editable = ['price', 'stock', 'available']
+    search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
+    filter_horizontal = ('category',)
+    readonly_fields = ('view_count',)
+
+    def get_ordering(self, request):
+        return ['-created_at']  # Default ordering by creation date, newest first
+
+
+
 
 class CartItemInline(admin.TabularInline):
     model = CartItem

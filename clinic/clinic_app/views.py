@@ -58,10 +58,19 @@ def get_cart_item_count(request):
     return cart.items.count() if cart else 0
 
 
-
+from django.utils import timezone
+from datetime import timedelta
 def home(request):
-    new_arrivals = Product.objects.filter(section='new_arrival')[:10]
-    most_popular = Product.objects.filter(section='most_popular')[:10]
+    
+    # Get products created in the last 7 days for new arrivals
+    seven_days_ago = timezone.now() - timedelta(days=30)
+    new_arrivals = Product.objects.filter(created_at__gte=seven_days_ago).order_by('-created_at')[:10]
+    
+    # Get most viewed products
+    most_popular = Product.objects.order_by('-view_count')[:10]
+    
+    #new_arrivals = Product.objects.filter(section='new_arrival')[:10]
+    #most_popular = Product.objects.filter(section='most_popular')[:10]
     categories = Category.objects.all()
         
     item_count = get_cart_item_count(request)
@@ -95,6 +104,7 @@ def policy(request):
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
+    product.increment_view_count()
     more_products = Product.objects.all().exclude(id=product.id)[:5]
     categories = Category.objects.all()
     product_categories = product.category.all()

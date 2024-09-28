@@ -183,17 +183,20 @@ Start Content
                                                 </span>
                                             </div>
                                         </div>
-                                        <div class="flex items-center text-sm md:text-base 2xl:text-xl whitespace-nowrap">
+
+                                        <div class="flex items-center text-sm xs:text-xs sm:text-sm md:text-base 2xl:text-xl">
 
                                             <div class="flex items-center gap-1 md:gap-2">
-                                                <a href="{% url 'product_detail' product.slug %}" class="text-[#75869D] border-[1px] border-[#75869D] transition duration-500 py-2 px-4 md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md" role="button">
-                                                    View
-                                                </a>
                                                 
-                                                <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">Add To Cart</button>
+                                                <div class="h-10 text-[#75869D] border border-[#75869D] transition duration-500 px-[10px] md:px-5 flex items-center justify-center font-medium tracking-[0.18px] font-poppins rounded-md cursor-pointer" onclick="window.location.href='{% url 'product_detail' product.slug %}'">
+                                                    View
+                                                </div>
+                                                
+                                                <button onclick="addTobeBought({{ product.id }})" type="button" class="h-10 text-white bg-purple btn-purple transition duration-500 px-[10px] md:px-5 flex items-center justify-center hover:text-white font-medium tracking-[0.18px] font-poppins rounded-md">
+                                                    Add To Cart
+                                                </button>
 
                                             </div>
-                                            
                                         </div>
                                     </div>
                                 </div>
