@@ -65,20 +65,18 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    """
+    
     CATEGORY_CHOICES = [
         ('new_arrival', 'New Arrival'),
         ('most_popular', 'Most Popular'),
     ]
-    """
+    
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
-    #description = models.TextField()
     description = RichTextField()
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], db_index=True)
-    #category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     category = models.ManyToManyField(Category, related_name='products', db_index=True)
-    #section = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    section = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     url = models.URLField(max_length=500, blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)
     available = models.BooleanField(default=True)
@@ -87,7 +85,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
 
 
-    view_count = models.PositiveIntegerField(default=0, db_index=True)
+    add_to_cart_count = models.PositiveIntegerField(default=0, db_index=True)
 
 
     def __str__(self):
@@ -97,8 +95,8 @@ class Product(models.Model):
         return reverse('product_detail', args=[self.slug])
 
 
-    def increment_view_count(self):
-        self.view_count += 1
+    def increment_add_count(self):
+        self.add_to_cart_count += 1
         self.save()
 
 

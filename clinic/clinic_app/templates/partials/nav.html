@@ -44,6 +44,7 @@ Start Navigation Bar
                             <!-- Search results will be displayed here -->
                         </div>
                     </div>
+                    
                 </form>
             </div>
 
@@ -173,6 +174,7 @@ Start Navigation Bar
   <!-- Mobile Search Overlay -->
 <div id="mobile-search-overlay" class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 hidden">
     <div class="p-4">
+        
         <form id="mobile-search-form" class="relative">
             <input
                 id="mobile-search-input"
@@ -188,7 +190,19 @@ Start Navigation Bar
         <div id="mobile-search-results" class="mt-4 max-h-64 overflow-y-auto">
             <!-- Search results will be displayed here -->
         </div>
-        <button id="close-mobile-search" class="mt-4 p-2 bg-gray-200 rounded">Close</button>
+        
+
+        <div id="mobile-search-actions" class="mt-4">
+            <button id="mobile-search-loading" class="hidden">
+                <div class="bubble-loader">
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                </div>
+            </button>
+            <button id="close-mobile-search" class="mt-4 p-2 bg-purple text-white rounded">Close</button>
+
+        </div>
     </div>
 </div>
 
@@ -322,8 +336,25 @@ $(document).ready(function() {
     var mobileSearchOverlay = $('#mobile-search-overlay');
     var openMobileSearchBtn = $('#open-mobile-search');
 
-    function performSearch(query, resultsContainer) {
+    var mobileSearchLoading = $('#mobile-search-loading');
+    var closeMobileSearch = $('#close-mobile-search');
+
+    function showLoading() {
+        mobileSearchLoading.removeClass('hidden');
+        closeMobileSearch.addClass('hidden');
+    }
+
+    function hideLoading() {
+        mobileSearchLoading.addClass('hidden');
+        closeMobileSearch.removeClass('hidden');
+    }
+
+
+    function performSearch(query, resultsContainer, loadingIndicatorId) {
         if (query.length > 2) {
+
+            showLoading();
+            resultsContainer.empty();
             $.ajax({
                 url: '{% url "api_search_products" %}',
                 data: { 'q': query },
@@ -347,6 +378,8 @@ $(document).ready(function() {
                         );
                     }
                     resultsContainer.show();
+                    hideLoading();
+
                 }
             });
         } else {
@@ -381,7 +414,7 @@ $(document).ready(function() {
     desktopSearchForm.add(mobileSearchForm).on('submit', function(e) {
         e.preventDefault();
         var query = $(this).find('input[type="search"]').val();
-        
+
         $.ajax({
             url: '{% url "api_search_products" %}',
             data: { 'q': query },

@@ -113,16 +113,17 @@ def home(request):
 
 def product_api(request, section):
     page_number = request.GET.get('page', 1)
-    items_per_page = 2  # Adjust this number as needed
+    items_per_page = 10  # Adjust this number as needed
 
     if section == 'new-arrivals':
-        thirty_days_ago = timezone.now() - timedelta(days=30)
-        products = Product.objects.filter(created_at__gte=thirty_days_ago).order_by('-created_at')
-        print(f",,,,,,,,,,,,,,,,,,,,,,{products}")
+        #thirty_days_ago = timezone.now() - timedelta(days=30)
+        #products = Product.objects.filter(created_at__gte=thirty_days_ago).order_by('-created_at')
+        products = Product.objects.filter(section='new_arrival', available=True)[:50]
 
     elif section == 'most-popular':
-        products = Product.objects.order_by('-view_count')
-        print(f"000000000000000000000,,,,,,,,,,,,,,,,,,,,,,{products}")
+        #products = Product.objects.order_by('-view_count')
+        products = Product.objects.filter(section='most_popular', available=True)[:50]
+
 
     else:
         return JsonResponse({'error': 'Invalid section'}, status=400)
@@ -169,13 +170,15 @@ def policy(request):
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug)
-    product.increment_view_count()
-    more_products = Product.objects.all().exclude(id=product.id)[:5]
+    #product.increment_view_count()
+    #more_products = Product.objects.all().exclude(id=product.id)[:5]
+    more_products = Product.objects.filter(available=True).exclude(id=product.id)[:5]
     categories = Category.objects.all()
     product_categories = product.category.all()
     #related_products = Product.objects.filter(category__in=product_categories).exclude(id=product.id)[:5]
-    related_products = Product.objects.filter(category__in=product_categories).exclude(id=product.id).distinct()[:5]
+    related_products = Product.objects.filter(category__in=product_categories, available=True).exclude(id=product.id).distinct()[:5]
 
+    all_products = Product.objects.filter(available=True)
 
     item_count = get_cart_item_count(request)
             
@@ -185,6 +188,7 @@ def product_detail(request, slug):
         'product': product,
         'related_products': related_products,
         'more_products': more_products,
+        'total_product_count': all_products.count()
     }
     return render(request, 'product.html', context)
 
@@ -210,7 +214,9 @@ def add_to_cart(request):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
         quantity = int(request.POST.get('quantity', 1))
-        product = get_object_or_404(Product, id=product_id)            
+        product = get_object_or_404(Product, id=product_id)
+
+        product.increment_add_count()            
         cart = get_or_create_cart(request)
         
         if cart:
@@ -350,9 +356,9 @@ def product_list(request, category_id=None):
 
     if category_id:
         category = Category.objects.get(id=category_id)
-        all_products = Product.objects.filter(category=category)
+        all_products = Product.objects.filter(category=category, available=True)
     else:
-        all_products = Product.objects.all()
+        all_products = Product.objects.filter(available=True)
     
     products = all_products
 

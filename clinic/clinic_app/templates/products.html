@@ -162,7 +162,15 @@ Start Content
                                     <div class="inline_product clickable d-flex justify-content-center">
                                         <div class="p-10px pb-0 border-[1px] border-[#75869D]/50 rounded-[14px]">
                                             <a href="{% url 'product_detail' product.slug %}" class="w-100">
-                                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+
+
+                                                {% if product.image %}
+                                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                                {% else %}
+                                                    <p class="dark-mode-text">"{{ product.name }}"</p>
+                                                {% endif %}
+
+
                                             </a>
                                         </div>
                                         <div class="quick-view">

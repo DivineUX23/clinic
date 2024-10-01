@@ -320,10 +320,10 @@
     <style>
         .swal-custom-popup {
             background-color: #E6E6FA !important; /* Light purple background */
-            color: #8A2BE2 !important; /* Purple text */
+            color: #7A288A !important; /* Purple text */
         }
         .swal-custom-confirm-button {
-            background-color: #8A2BE2 !important; /* Purple button */
+            background-color: #7A288A !important; /* Purple button */
             color: white !important;
         }
 
@@ -388,6 +388,72 @@
             color: #fff;
             background-color: #6a006a;
             border-color: #600060;
+        }
+
+    </style>
+    
+
+    <style>
+        .loading-indicator {
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-indicator-hidden {
+            display: none;
+        }
+        
+        #full-screen-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .inline-loading {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            right: 0;
+            bottom: 0;
+        }
+        
+        .bubble-loader {
+            display: flex;
+            align-items: center;
+        }
+        
+        .bubble {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #800080;
+            margin: 0 5px;
+            animation: bubble-bounce 0.6s infinite alternate;
+        }
+        
+        .bubble:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .bubble:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bubble-bounce {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-20px);
+            }
         }
     </style>
     
@@ -456,6 +522,9 @@
                 return;
             }
             
+            
+            // Show loading spinner
+            showFullScreenLoading();
         
             fetch("{% url 'add_to_cart' %}", {
                 method: "POST",
@@ -507,7 +576,11 @@
                     });
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Error:', error))
+            .finally(() => {
+                // Hide loading spinner
+                hideFullScreenLoading();
+            });
         }
         
         // Add this function to get the CSRF token from cookies
@@ -592,10 +665,82 @@
             .catch(error => console.error('Error:', error));
         }*/
 
+        // loading indicator
 
+        function showFullScreenLoading() {
+            document.getElementById('full-screen-loading').classList.remove('loading-indicator-hidden');
+        }
 
+        function hideFullScreenLoading() {
+            document.getElementById('full-screen-loading').classList.add('loading-indicator-hidden');
+        }
 
+        function showInlineLoading(containerId) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                const inlineLoading = document.getElementById('inline-loading');
+                container.appendChild(inlineLoading);
+                inlineLoading.classList.remove('loading-indicator-hidden');
+            }
+        }
 
+        function hideInlineLoading() {
+            document.getElementById('inline-loading').classList.add('loading-indicator-hidden');
+        }
+
+        
+
+        // Intercept all fetch requests
+        const originalFetch = window.fetch;
+        window.fetch = function() {
+            // Check if this is a search request
+
+            const isExcludedRequest = arguments[0].includes('/api/search') || 
+                                    arguments[0].includes('api/products/<str:section>');
+
+            if (!isExcludedRequest) {
+                showFullScreenLoading();
+            }
+            
+            if (!isExcludedRequest) {
+                showFullScreenLoading();
+            }
+            
+            return originalFetch.apply(this, arguments).then(function(response) {
+                if (!isExcludedRequest) {
+                    hideFullScreenLoading();
+                }
+                return response;
+            }).catch(function(error) {
+                if (!isExcludedRequest) {
+                    hideFullScreenLoading();
+                }
+                throw error;
+            });
+        };
+
+        // Intercept all XMLHttpRequest
+        (function() {
+            const originalOpen = XMLHttpRequest.prototype.open;
+            XMLHttpRequest.prototype.open = function() {
+                // Check if this is a search request
+                // const isExcludedRequest = arguments[1].includes('/api/search');
+                
+                const isExcludedRequest = arguments[1].includes('/api/search') || 
+                arguments[1].includes('api/products/<str:section>');
+                
+                if (!isExcludedRequest) {
+                    this.addEventListener('loadstart', function() {
+                        showFullScreenLoading();
+                    });
+                    this.addEventListener('loadend', function() {
+                        hideFullScreenLoading();
+                    });
+                }
+                
+                originalOpen.apply(this, arguments);
+            };
+        })();
 
         // for darkmode
         document.addEventListener('DOMContentLoaded', (event) => {

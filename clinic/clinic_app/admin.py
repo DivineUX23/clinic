@@ -31,6 +31,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'created_at', 'updated_at']
 
     list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'created_at', 'updated_at']
+
     list_filter = ['available', 'category', 'section', 'created_at', 'updated_at']
     list_editable = ['price', 'stock', 'available', 'section']
     search_fields = ('name',)
@@ -49,13 +50,17 @@ class ProductAdminForm(forms.ModelForm):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'price', 'stock', 'available', 'view_count', 'created_at', 'updated_at']
-    list_filter = ['available', 'category', 'created_at', 'updated_at']
-    list_editable = ['price', 'stock', 'available']
+    list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'add_to_cart_count', 'created_at', 'updated_at']
+    #list_display = ['name', 'slug', 'price', 'stock', 'available', 'add_to_cart_count', 'created_at', 'updated_at']
+    list_filter = ['available', 'category', 'section', 'created_at', 'updated_at']
+    #list_filter = ['available', 'category', 'created_at', 'updated_at']
+    list_editable = ['price', 'stock', 'available', 'section']
+    #list_editable = ['price', 'stock', 'available']
+
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
     filter_horizontal = ('category',)
-    readonly_fields = ('view_count',)
+    readonly_fields = ('add_to_cart_count',)
 
     def get_ordering(self, request):
         return ['-created_at']  # Default ordering by creation date, newest first
