@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'ckeditor',
     'ckeditor_uploader',
+    'cities_light',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -118,7 +119,7 @@ DATABASES = {
 }
 """
 
-DATABASES["default"] = dj_database_url.parse(config("DATABASES"))
+#DATABASES["default"] = dj_database_url.parse(config("DATABASES"))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -223,3 +224,18 @@ CKEDITOR_CONFIGS = {
 }
 
 CKEDITOR_UPLOAD_PATH = "product_images/"
+
+
+
+# Cities Light configuration
+CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
+CITIES_LIGHT_INCLUDE_COUNTRIES = ['NG', 'GH']  # Nigeria and Ghana
+CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLR', 'PPLS', 'STLMT',]
+
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}

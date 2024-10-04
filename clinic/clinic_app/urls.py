@@ -32,6 +32,10 @@ urlpatterns = [
     path('remove_from_cart/', views.remove_from_cart, name='remove_from_cart'),
 
     path('initialize-payment/', views.initialize_payment, name='initialize_payment'),
+
+
+    path('make-payment/', views.make_payment, name='make_payment'),
+
     path('payment-callback/', views.payment_callback, name='payment_callback'),
 
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),

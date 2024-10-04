@@ -9,7 +9,7 @@ from decimal import Decimal
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.views.generic import ListView
-from .models import Product, SearchedProduct
+from .models import Product, SearchedProduct, SenderAddress
 from django.conf import settings
 from django.urls import reverse
 import requests
@@ -26,6 +26,11 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import SignUpForm
 
 
+import logging
+from datetime import datetime
+from django.core.cache import cache
+
+
 
 #API IMPORTS
 from rest_framework import generics, status
@@ -37,6 +42,10 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from .models import FAQ
+
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_or_create_guest_cart(request):
@@ -60,38 +69,6 @@ def get_cart_item_count(request):
 
 from django.utils import timezone
 from datetime import timedelta
-"""
-def home(request):
-    
-    # Get products created in the last 7 days for new arrivals
-    seven_days_ago = timezone.now() - timedelta(days=30)
-    new_arrivals = Product.objects.filter(created_at__gte=seven_days_ago).order_by('-created_at')
-    
-    # Get most viewed products
-    most_popular = Product.objects.order_by('-view_count')
-    
-    #new_arrivals = Product.objects.filter(section='new_arrival')[:10]
-    #most_popular = Product.objects.filter(section='most_popular')[:10]
-    categories = Category.objects.all()
-        
-    item_count = get_cart_item_count(request)
-
-            
-    faqs = FAQ.objects.filter(is_visible=True)
-    initial_faqs = faqs[:2]
-    extra_faqs = faqs[2:]
-
-    return render(request, 'home.html', {
-        'quantity': item_count,
-        'categories': categories,
-        'new_arrivals': new_arrivals,
-        'most_popular': most_popular,
-
-
-        'initial_faqs': initial_faqs,
-        'extra_faqs': extra_faqs,
-    })
-"""
 
 
 
@@ -272,11 +249,33 @@ def cart_view(request):
     profile_data = {}
     if request.user.is_authenticated:
         user_profile, created = Profile.objects.get_or_create(user=request.user)
-        profile_data = {
-            'delivery_location': user_profile.delivery_location or '',
-            'name': request.user.get_full_name() or request.user.username,
-            'phone_number': user_profile.phone_number or '',
-        }
+        if user_profile.delivery_location:
+            profile_data = {
+                'street_no': user_profile.delivery_location.street_no or '',
+                'street': user_profile.delivery_location.street or '',
+                'country': user_profile.delivery_location.country.id if user_profile.delivery_location.country else '',
+                'state': user_profile.delivery_location.state.id if user_profile.delivery_location.state else '',
+                'city': user_profile.delivery_location.city.id if user_profile.delivery_location.city else '',
+                'postal_code': user_profile.delivery_location.postal_code or '',
+                'name': request.user.get_full_name() or request.user.username,
+                'phone_number': user_profile.phone_number or '',
+            }
+        else:
+            profile_data = {
+                'street_no': '',
+                'street': '',
+                'country': '',
+                'state': '',
+                'city': '',
+                'postal_code': '',
+                'name': request.user.get_full_name() or request.user.username,
+                'phone_number': user_profile.phone_number or '',
+            }
+
+    # Prepare data for dynamic dropdowns
+    countries = list(Country.objects.values('id', 'name'))
+    states = list(Region.objects.values('id', 'name', 'country_id'))
+    cities = list(City.objects.values('id', 'name', 'region_id'))
 
     context = {
         'categories': categories,
@@ -289,8 +288,12 @@ def cart_view(request):
         'total': total,
         'order_note': request.session.get('order_note', ''),
         'profile_data': profile_data,
+        'countries': countries,
+        'states': states,
+        'cities': cities,
     }
     return render(request, 'cart.html', context)
+
 
 
 
@@ -417,171 +420,22 @@ def search_products(request):
 
 
 #PAYMENT:
+"""
+Before initialize payment, choose category id, a pop shows all all the available curiors and ask them to choose 
+and confirm then payment countinues to paystack initialize payments. 
 
-#@login_required
-#@require_POST
-def initialize_payment(request):
-    if request.method == 'POST':
+clcik buy button takes here:::::
 
-        delivery_location = request.POST.get('delivery_location', '').strip()
-        name = request.POST.get('name', '').strip()
-        phone_number = request.POST.get('phone_number', '').strip()
-
-        # Ensure all required fields are provided
-        if not all([delivery_location, name, phone_number]):
-            messages.error(request, "Please fill out all required fields.")
-            return redirect('cart') 
-        
-        # Validate name
-        if not re.match(r'^[a-zA-Z\s]+$', name):
-            messages.error(request, "Name should only contain letters and spaces.")
-            return redirect('cart')
-
-        # Validate phone number
-        if not re.match(r'^\d{10,14}$', phone_number):
-            messages.error(request, "Please enter a valid phone number (10-14 digits).")
-            return redirect('cart')
-
-        #cart = get_object_or_404(Cart, user=request.user)
-        
-        if request.user.is_authenticated:
-            cart = get_object_or_404(Cart, user=request.user)
-        else:
-            cart = get_or_create_guest_cart(request)
-
-        total_amount = calculate_total(cart)
-        amount_in_kobo = int(total_amount * 100)
-
-        order_note = request.POST.get('order_note')
-
-        # Generate a random payment reference
-        payment_reference = f"ORDER-{uuid.uuid4().hex[:8].upper()}"
-
-        order = Order.objects.create(
-            
-            user=request.user if request.user.is_authenticated else None,
-            session_key=request.session.session_key if not request.user.is_authenticated else None,
-            delivery_location=delivery_location,
-            name=name,
-            phone_number=phone_number,
-            order_note=order_note,
-            total_amount=total_amount,
-            payment_reference=payment_reference,
-            status='pending'
-        )
-
-        # Create OrderItems
-        for item in cart.items.all():
-            OrderItem.objects.create(
-                order=order,
-                product=item.product,
-                price=item.product.price,
-                quantity=item.quantity
-            )
-
-        headers = {
-            "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "amount": amount_in_kobo,
-            "email": request.user.email if request.user.is_authenticated else "guest@example.com",
-            "callback_url": request.build_absolute_uri(reverse('payment_callback')),
-            "reference": order.payment_reference,
-        }
-
-        response = requests.post(
-            "https://api.paystack.co/transaction/initialize",
-            headers=headers,
-            json=data
-        )
-        response_data = response.json()
-        if response.status_code == 200:
-            # After creating the order
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                "orders",
-                {
-                    "type": "new_order",
-                    "order_id": order.id
-                }
-            )
-
-            return redirect(response_data['data']['authorization_url'])
-        else:
-            error_message = response_data.get('message', 'Unknown error occurred')
-            order.delete()  # Delete the order if payment initialization fails
-            return JsonResponse({
-                'error': 'Payment initialization failed',
-                'message': error_message,
-                'details': response_data
-            }, status=400)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-
-def payment_callback(request):
-    reference = request.GET.get('reference')
-    if verify_payment(reference):
-        order = get_object_or_404(Order, payment_reference=reference)
-        
-        order.paid = True
-        order.status = 'processing'
-        order.save()
-
-        #Cart.objects.filter(user=request.user).delete()
-
-        
-        if request.user.is_authenticated:
-            Cart.objects.filter(user=request.user).delete()
-        else:
-            if 'cart_id' in request.session:
-                Cart.objects.filter(id=request.session['cart_id']).delete()
-                del request.session['cart_id']
-
-
-        return redirect('home')
-    else:
-        return redirect('cart')
-
-
-def verify_payment(reference):
-    headers = {
-        "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
-    }
-    response = requests.get(
-        f"https://api.paystack.co/transaction/verify/{reference}",
-        headers=headers
-    )
-    if response.status_code == 200:
-        response_data = response.json()
-        return response_data['data']['status'] == 'success'
-    return False
-
-
-def calculate_total(cart):
-
-    subtotal = Decimal('0.00')
-    for item in cart.items.all():
-        product = Product.objects.get(id=item.product.id)
-        quantity = item.quantity
-        total_price = product.price * quantity
-        subtotal += total_price
-
-    settings = PaymentSettings.objects.first()  
-    if not settings:
-        settings = PaymentSettings.objects.create()
-
-    tax = subtotal * settings.tax_rate
-    shipping = settings.shipping_rate
-    discount = settings.discount_rate
-
-    return subtotal + tax + shipping - discount
-
+"""
+from datetime import datetime
 
 
 
 # User Auth
+from .models import Location
+from cities_light.models import Country, Region, City
+import json
+
 
 def signup_view(request):
     if request.method == 'POST':
@@ -591,7 +445,21 @@ def signup_view(request):
             user.refresh_from_db()
             user.profile.email = form.cleaned_data.get('email')
             user.profile.phone_number = form.cleaned_data.get('phone_number')
-            user.profile.delivery_location = form.cleaned_data.get('delivery_location')
+
+
+            # Create and save the Location object
+            location = Location(                
+                street_no=form.cleaned_data.get('street_no'),
+                street=form.cleaned_data.get('street'),
+                country=form.cleaned_data.get('country'),
+                state=form.cleaned_data.get('state'),
+                city=form.cleaned_data.get('city'),
+                postal_code=form.cleaned_data.get('postal_code')
+            )
+            location.save()
+            
+            # Associate the Location with the user's profile
+            user.profile.delivery_location = location
 
             user.save()
             username = form.cleaned_data.get('username')
@@ -606,7 +474,29 @@ def signup_view(request):
                     messages.error(request, f"{field.capitalize()}: {error}")
     else:
         form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+
+
+    # Prepare data for dynamic dropdowns
+    countries = list(Country.objects.values('id', 'name'))
+    states = list(Region.objects.values('id', 'name', 'country_id'))
+    cities = list(City.objects.values('id', 'name', 'region_id'))
+
+    context = {
+        'form': form,
+        'countries_json': json.dumps(countries),
+        'states_json': json.dumps(states),
+        'cities_json': json.dumps(cities),
+    }
+
+    return render(request, 'signup.html', context)
+    #return render(request, 'signup.html', {'form': form})
+
+
+
+
+
+
+
 
 
 def signin_view(request):
@@ -622,6 +512,472 @@ def signin_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'signin.html', {'form': form})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def initialize_payment(request):
+    if request.method == 'POST':
+        # Get form data
+        form_data = {
+            'street_no': request.POST.get('street_no', '').strip(),
+            'street': request.POST.get('street', '').strip(),
+            'country_id': request.POST.get('country'),
+            'state_id': request.POST.get('state'),
+            'city_id': request.POST.get('city'),
+            'postal_code': request.POST.get('postal_code', '').strip(),
+            'name': request.POST.get('name', '').strip(),
+            'phone_number': request.POST.get('phone_number', '').strip(),
+            'email': request.POST.get('email', '').strip(),
+            'category': request.POST.get('category', '').strip(),
+            'order_note': request.POST.get('order_note')
+        }
+
+        # Validate required fields
+        required_fields = ['street', 'country_id', 'state_id', 'city_id', 'name', 'phone_number']
+        if not all(form_data[field] for field in required_fields):
+            messages.error(request, "Please fill out all required fields.")
+            return redirect('cart')
+
+        # Validate name and phone number
+        if not re.match(r'^[a-zA-Z\s]+$', form_data['name']):
+            messages.error(request, "Name should only contain letters and spaces.")
+            return redirect('cart')
+
+        if not re.match(r'^\d{10,14}$', form_data['phone_number']):
+            messages.error(request, "Please enter a valid phone number (10-14 digits).")
+            return redirect('cart')
+
+        # Handle location for authenticated users
+        if request.user.is_authenticated:
+            profile = request.user.profile
+            location = handle_authenticated_user_location(profile, form_data)
+            cart = get_object_or_404(Cart, user=request.user)
+        else:
+            # For non-authenticated users, always create a new location
+            location = Location.objects.create(
+                street_no=form_data['street_no'],
+                street=form_data['street'],
+                country_id=form_data['country_id'],
+                state_id=form_data['state_id'],
+                city_id=form_data['city_id'],
+                postal_code=form_data['postal_code']
+            )
+            cart = get_or_create_guest_cart(request)
+
+        # Calculate total amount
+        total_amount = calculate_total(cart)
+
+        # Generate a random payment reference
+        payment_reference = f"ORDER-{uuid.uuid4().hex[:8].upper()}"
+
+        # Create order
+        order = create_order(request, location, form_data, total_amount, payment_reference)
+
+        # Get shipping rates
+        shipping_rates = get_shipping_rates(order, cart.items.all())
+
+        categories = get_categories()
+
+        context = {
+            'order': order,
+            'shipping_rates': shipping_rates,
+            'categories': categories
+        }
+        return render(request, 'shipping_options.html', context)
+
+    # If not POST, redirect to cart
+    return redirect('cart')
+
+
+
+# PAYMENT:
+def make_payment(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        
+        chosen_rate = request.POST.get('chosen_rate')
+        chosen_category = request.POST.get('chosen_category')
+        
+        if not chosen_rate:
+            messages.error(request, "Please choose a shipping method.")
+            return redirect('shipping_options')
+        
+        # CHANGE: Parse the chosen_rate from JSON string to dictionary
+        import json
+        chosen_rate = json.loads(chosen_rate)
+        
+        order.shipping_method = chosen_rate['service_code']  # CHANGE: Use 'service_code' instead of 'courier_name'
+        order.shipping_cost = Decimal(chosen_rate['total'])
+        order.category = chosen_category
+        order.save()
+
+        amount_in_kobo = int((order.total_amount + order.shipping_cost) * 100)
+
+        # Initialize Paystack payment
+        paystack_data = {
+            "amount": amount_in_kobo,
+            "email": request.user.email if request.user.is_authenticated else order.email,
+            "callback_url": request.build_absolute_uri(reverse('payment_callback')),
+            "reference": order.payment_reference,
+        }
+
+        paystack_response = make_paystack_request("https://api.paystack.co/transaction/initialize", paystack_data)
+
+        if paystack_response.get('status'):
+            # Notify about new order
+            notify_new_order(order.id)
+            return redirect(paystack_response['data']['authorization_url'])
+        else:
+            order.delete()  # Delete the order if payment initialization fails
+            return handle_payment_error(paystack_response)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+
+def payment_callback(request):
+    reference = request.GET.get('reference')
+    if verify_payment(reference):
+        order = get_object_or_404(Order, payment_reference=reference)
+        
+        # Create shipment
+        shipment_created = create_shipment(order)
+
+        if shipment_created:
+            order.paid = True
+            order.status = 'processing'
+            order.save()
+
+            # Clear the cart
+            clear_cart(request)
+
+            return redirect('home')
+        else:
+            # CHANGE: Handle shipment creation failure
+            messages.error(request, "Payment successful, but shipment creation failed. Please contact support.")
+            return redirect('order_issues')
+    else:
+        messages.error(request, "Payment verification failed.")
+        return redirect('cart')
+
+
+def verify_payment(reference):
+    verify_url = f"https://api.paystack.co/transaction/verify/{reference}"
+    response = make_paystack_request(verify_url, method='GET')
+    return response.get('status') and response['data']['status'] == 'success'
+
+
+
+def calculate_total(cart):
+    subtotal = sum(item.product.price * item.quantity for item in cart.items.all())
+    settings = PaymentSettings.objects.first() or PaymentSettings.objects.create()
+    tax = subtotal * settings.tax_rate
+    shipping = settings.shipping_rate
+    discount = settings.discount_rate
+    return subtotal + tax + shipping - discount
+
+
+
+def get_shipping_rates(order, cart_items):
+    url = "https://api.shipbubble.com/v1/shipping/fetch_rates"
+    
+    package_items = [
+        {
+            "name": item.product.name,
+            "description": item.product.description[:100],
+            "unit_weight": 1,
+            "unit_amount": float(item.product.price),
+            "quantity": item.quantity
+        }
+        for item in cart_items
+    ]
+
+    data = {
+        "sender_address_code": get_sender_address_code(),
+        "receiver_address_code": create_or_get_address_code(order),  # CHANGE: Fixed typo in 'receiver'
+        "pickup_date": datetime.now().strftime("%Y-%m-%d"),
+        "category_id": order.category,
+        "package_items": package_items,
+        "package_dimension": {
+            "length": 10,
+            "width": 10,
+            "height": 10
+        },
+        "delivery_instructions": order.order_note
+    }
+
+    response = make_shipbubble_request(url, data)
+    return response.get('data', {})  # CHANGE: Return full data, not just couriers
+
+
+
+def create_shipment(order):
+    url = "https://api.shipbubble.com/v1/shipping/shipments"
+    data = {
+        "sender_address_code": get_sender_address_code(),
+        "receiver_address_code": create_or_get_address_code(order.delivery_location),  # CHANGE: Fixed typo in 'receiver'
+        "service_code": order.shipping_method,  # CHANGE: Use 'service_code' instead of 'courier_id'
+        "package_items": [
+            {
+                "name": item.product.name,
+                "description": item.product.description[:100],
+                "unit_weight": 1,
+                "unit_amount": float(item.price),
+                "quantity": item.quantity
+            }
+            for item in order.items.all()
+        ],
+        "package_dimension": {
+            "length": 10,
+            "width": 10,
+            "height": 10
+        },
+        "delivery_instructions": order.order_note or "Handle with care"
+    }
+
+    response = make_shipbubble_request(url, data)
+    if response.get('status') == 'success':
+        order.tracking_number = response['data']['tracking_number']
+        order.save()
+        return True
+    else:
+        logger.error(f"Shipment creation failed for order {order.id}: {response.get('message')}")
+        return False
+
+
+
+def get_sender_address_code():
+    sender_code = cache.get('sender_address_code')
+    if sender_code:
+        return sender_code
+
+
+
+    # Get the first sender address from the database
+    sender_address = SenderAddress.objects.first()
+    if not sender_address:
+        logger.error("No sender address found in the database")
+        return None
+
+    url = "https://api.shipbubble.com/v1/shipping/address/validate"
+    
+    data = {
+        "phone": sender_address.phone_number,
+        "email": sender_address.email,
+        "name": sender_address.name,
+        "address": sender_address.formatted_address
+    }
+
+    response = make_shipbubble_request(url, data)
+    if response.get('status') == 'success':
+        sender_code = response['data']['address_code']
+        cache.set('sender_address_code', sender_code, 60*60*24)
+        return sender_code
+    else:
+        logger.error(f"Error creating sender address: {response.get('message')}")
+        return None
+
+def create_or_get_address_code(order):
+    cache_key = f"address_code_{order.id}"
+    address_code = cache.get(cache_key)
+    if address_code:
+        return address_code
+
+    url = "https://api.shipbubble.com/v1/shipping/address/validate"
+
+    delivery_address = order.delivery_location
+    """
+    data = {
+        "street_no": delivery_address.street_no,
+        "street": delivery_address.street,
+        "country": delivery_address.country.name,
+        "state": delivery_address.state.name,
+        "city": delivery_address.city.name,
+        "postal_code": delivery_address.postal_code,
+    }
+    """
+    data = {
+        "phone": order.phone_number,
+        "email": order.email,
+        "name": order.name,
+        "address": delivery_address.formatted_address
+    }
+
+    response = make_shipbubble_request(url, data)
+    if response.get('status') == 'success':
+        address_code = response['data']['address_code']
+        cache.set(cache_key, address_code, 60*60)
+        return address_code
+    else:
+        logger.error(f"Error creating address for order {order.id}: {response.get('message')}")
+        return None
+
+
+def get_categories():
+    url = "https://api.shipbubble.com/v1/shipping/labels/categories"
+    response = make_shipbubble_request(url, method='GET')  
+    return response.get('data', [])
+
+
+
+# Helper functions
+
+def handle_authenticated_user_location(profile, form_data):
+    if profile.delivery_location:
+        location = profile.delivery_location
+        if location_needs_update(location, form_data):
+            update_location(location, form_data)
+    else:
+        location = create_location(form_data)
+        profile.delivery_location = location
+
+    update_profile(profile, form_data)
+    return location
+
+def location_needs_update(location, form_data):
+    return any([
+        location.street_no != form_data['street_no'],
+        location.street != form_data['street'],
+        location.country_id != int(form_data['country_id']),
+        location.state_id != int(form_data['state_id']),
+        location.city_id != int(form_data['city_id']),
+        location.postal_code != form_data['postal_code']
+    ])
+
+def update_location(location, form_data):
+    for field in ['street_no', 'street', 'country_id', 'state_id', 'city_id', 'postal_code']:
+        setattr(location, field, form_data[field])
+    location.save()
+
+def create_location(form_data):
+    return Location.objects.create(
+        street_no=form_data['street_no'],
+        street=form_data['street'],
+        country_id=form_data['country_id'],
+        state_id=form_data['state_id'],
+        city_id=form_data['city_id'],
+        postal_code=form_data['postal_code']
+    )
+
+def update_profile(profile, form_data):
+    if profile.phone_number != form_data['phone_number']:
+        profile.phone_number = form_data['phone_number']
+    if profile.email != form_data['email']:
+        profile.email = form_data['email']
+    profile.save()
+
+
+def create_order(request, location, form_data, total_amount, payment_reference):
+    order = Order.objects.create(
+        user=request.user if request.user.is_authenticated else None,
+        session_key=request.session.session_key if not request.user.is_authenticated else None,
+        delivery_location=location,
+        name=form_data['name'],
+        phone_number=form_data['phone_number'],
+        email=form_data['email'],
+        order_note=form_data['order_note'],
+        total_amount=total_amount,
+        payment_reference=payment_reference,
+        status='pending',
+        category=form_data['category']
+    )
+
+    cart = Cart.objects.get(user=request.user) if request.user.is_authenticated else get_or_create_guest_cart(request)
+    for item in cart.items.all():
+        OrderItem.objects.create(
+            order=order,
+            product=item.product,
+            price=item.product.price,
+            quantity=item.quantity
+        )
+
+    return order
+
+def make_shipbubble_request(url, data=None, method='POST'):
+    headers = {
+        "Authorization": f"Bearer {settings.SHIPBUBBLE_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    try:
+        if method == 'GET':
+            response = requests.get(url, headers=headers)
+        else:
+            response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logger.error(f"Shipbubble API error: {str(e)}")
+        return {'status': 'error', 'message': str(e)}
+
+def make_paystack_request(url, data=None, method='POST'):
+    headers = {
+        "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
+        "Content-Type": "application/json",
+    }
+    try:
+        if method == 'GET':
+            response = requests.get(url, headers=headers)
+        else:
+            response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        logger.error(f"Paystack API error: {str(e)}")
+        return {'status': False, 'message': str(e)}
+
+
+
+def notify_new_order(order_id):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "orders",
+        {
+            "type": "new_order",
+            "order_id": order_id
+        }
+    )
+
+
+
+def handle_payment_error(response):
+    error_message = response.get('message', 'Unknown error occurred')
+    logger.error(f"Payment initialization failed: {error_message}")
+    return JsonResponse({
+        'error': 'Payment initialization failed',
+        'message': error_message,
+        'details': response
+    }, status=400)
+
+
+
+
+def clear_cart(request):
+    if request.user.is_authenticated:
+        Cart.objects.filter(user=request.user).delete()
+    else:
+        if 'cart_id' in request.session:
+            Cart.objects.filter(id=request.session['cart_id']).delete()
+            del request.session['cart_id']
+
+
+
+
+
+
+
+
 
 
 

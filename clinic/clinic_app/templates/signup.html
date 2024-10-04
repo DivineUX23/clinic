@@ -93,7 +93,149 @@ Start Content
     </div>
   </div>
 </div>
-{% endblock %}
+
+
+<script>
+  console.log('Countries:', {{ countries_json|safe }});
+  console.log('States:', {{ states_json|safe }});
+  console.log('Cities:', {{ cities_json|safe }});
+</script>
+
+<script>
+  const countries = {{ countries_json|safe }}
+  const states = {{ states_json|safe }}
+  const cities = {{ cities_json|safe }}
+
+  console.log('Parsed Countries:', countries);
+  console.log('Parsed States:', states);
+  console.log('Parsed Cities:', cities);
+
+  const countrySelect = document.getElementById('id_country');
+  const stateSelect = document.getElementById('id_state');
+  const citySelect = document.getElementById('id_city');
+
+  console.log('Country Select:', countrySelect);
+  console.log('State Select:', stateSelect);
+  console.log('City Select:', citySelect);
+
+  function populateStates() {
+    console.log('Populating States');
+    const countryId = countrySelect.value;
+    console.log('Selected Country ID:', countryId);
+    stateSelect.innerHTML = '<option value="">---------</option>';
+    citySelect.innerHTML = '<option value="">---------</option>';
+
+    const filteredStates = states.filter(state => state.country_id == countryId);
+    console.log('Filtered States:', filteredStates);
+    filteredStates.forEach(state => {
+      const option = new Option(state.name, state.id);
+      stateSelect.add(option);
+    });
+  }
+
+  function populateCities() {
+    console.log('Populating Cities');
+    const stateId = stateSelect.value;
+    console.log('Selected State ID:', stateId);
+    citySelect.innerHTML = '<option value="">---------</option>';
+
+    const filteredCities = cities.filter(city => city.region_id == stateId);
+    console.log('Filtered Cities:', filteredCities);
+    filteredCities.forEach(city => {
+      const option = new Option(city.name, city.id);
+      citySelect.add(option);
+      console.log(citySelect);
+
+    });
+  }
+
+  countrySelect.addEventListener('change', populateStates);
+  stateSelect.addEventListener('change', populateCities);
+
+  console.log('Event listeners added');
+</script>
+
+
+
+<!--<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const countrySelect = document.getElementById('country');
+      const stateSelect = document.getElementById('state');
+      const citySelect = document.getElementById('city');
+      const countryCodeInput = document.getElementById('country_code');
+      const stateCodeInput = document.getElementById('state_code');
+      const cityCodeInput = document.getElementById('city_code');
+  
+      // Simplified list of common countries
+      const countries = [
+          {name: 'United States', code: 'US'},
+          {name: 'Canada', code: 'CA'},
+          {name: 'United Kingdom', code: 'GB'},
+          {name: 'Australia', code: 'AU'},
+          // Add more countries as needed
+      ];
+  
+      // Populate Countries
+      countries.forEach(country => {
+          const option = new Option(country.name, country.code);
+          countrySelect.add(option);
+      });
+  
+      countrySelect.addEventListener('change', function() {
+          const selectedCountry = this.value;
+          countryCodeInput.value = selectedCountry;
+          
+          // Clear state and city
+          stateSelect.innerHTML = '<option value="">Select State</option>';
+          citySelect.innerHTML = '<option value="">Select City</option>';
+          stateCodeInput.value = '';
+          cityCodeInput.value = '';
+  
+          // Fetch states for the selected country
+          fetch(`https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`, {
+              headers: {
+                  'X-CSCAPI-KEY': 'YOUR_API_KEY_HERE'
+              }
+          })
+          .then(response => response.json())
+          .then(states => {
+              states.forEach(state => {
+                  const option = new Option(state.name, state.iso2);
+                  stateSelect.add(option);
+              });
+          });
+      });
+  
+      stateSelect.addEventListener('change', function() {
+          const selectedCountry = countrySelect.value;
+          const selectedState = this.value;
+          stateCodeInput.value = selectedState;
+  
+          // Clear city
+          citySelect.innerHTML = '<option value="">Select City</option>';
+          cityCodeInput.value = '';
+  
+          // Fetch cities for the selected state
+          fetch(`https://api.countrystatecity.in/v1/countries/${selectedCountry}/states/${selectedState}/cities`, {
+              headers: {
+                  'X-CSCAPI-KEY': 'YOUR_API_KEY_HERE'
+              }
+          })
+          .then(response => response.json())
+          .then(cities => {
+              cities.forEach(city => {
+                  const option = new Option(city.name, city.name);
+                  citySelect.add(option);
+              });
+          });
+      });
+  
+      citySelect.addEventListener('change', function() {
+          cityCodeInput.value = this.value;
+      });
+  });
+  </script>-->
+  {% endblock %}
 
 <!-- ================================
 End Content

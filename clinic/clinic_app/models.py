@@ -4,26 +4,75 @@ from django.core.validators import MinValueValidator
 from django.urls import reverse
 from decimal import Decimal
 from ckeditor.fields import RichTextField
-
-
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from cities_light.models import Country, Region, City
+
+
+
+
+
+
+class Location(models.Model):
+    street_no = models.CharField(max_length=10, blank=True, null=True)
+    street = models.CharField(max_length=255)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    state = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
+    postal_code = models.CharField(max_length=20, blank=True, null=True)
+    formatted_address = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.formatted_address
+
+    def get_formatted_address(self):
+        components = []
+        if self.street_no:
+            components.append(self.street_no)
+        if self.street:
+            components.append(self.street)
+        if self.city:
+            components.append(self.city.name)
+        if self.state:
+            components.append(self.state.name)
+        if self.postal_code:
+            components.append(self.postal_code)
+        if self.country:
+            components.append(self.country.name)
+        
+        return ", ".join(filter(None, components))
+
+    def save(self, *args, **kwargs):
+        self.formatted_address = self.get_formatted_address()
+        super().save(*args, **kwargs)
+
+
+
 
 class Profile(models.Model):
-    #user = models.OneToOneField(User, on_delete=models.CASCADE)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     email = models.EmailField(max_length=150)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    delivery_location = models.CharField(max_length=255, blank=True, null=True)
+    #delivery_location = models.CharField(max_length=255, blank=True, null=True)
+    delivery_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
+
     def __str__(self):
         return self.user.username
+
+    def get_delivery_address(self):
+        if self.delivery_location:
+            return self.delivery_location.formatted_address
+        return "No delivery address set"
+
 
 @receiver(post_save, sender=User)
 def update_profile_signal(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
     instance.profile.save()
+
+
+
 
 
 
@@ -102,18 +151,21 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-
     session_key = models.CharField(max_length=40, null=True, blank=True)
-    delivery_location = models.CharField(max_length=255)
+    delivery_location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20)
+    email = models.EmailField(max_length=254)  
     order_note = models.TextField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_reference = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     paid = models.BooleanField(default=False)
+
+    shipping_method = models.CharField(max_length=100, null=True, blank=True)  # Made nullable
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Made nullable
+    tracking_number = models.CharField(max_length=100, null=True, blank=True)  # Changed to CharField
         
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -123,7 +175,8 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-
+    category = models.PositiveIntegerField(null=True, blank=True)
+    
     class Meta:
         ordering = ['-created_at']
 
@@ -132,7 +185,16 @@ class Order(models.Model):
 
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
-    
+
+    def get_formatted_delivery_address(self):
+        if self.delivery_location:
+            return self.delivery_location.formatted_address
+        return "No delivery address set"
+
+    def get_total_with_shipping(self):
+        return self.total_amount + (self.shipping_cost or Decimal('0.00'))
+
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
@@ -179,3 +241,45 @@ class SearchedProduct(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+
+class SenderAddress(models.Model):
+    admin = models.OneToOneField(User, on_delete=models.CASCADE, related_name='sender_address')
+    email = models.EmailField(max_length=150)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    street_no = models.CharField(max_length=10)
+    street = models.CharField(max_length=255)
+    country = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    formatted_address = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        verbose_name_plural = "Sender Addresses"
+
+    def __str__(self):
+        return self.formatted_address
+
+    def get_formatted_address(self):
+        components = []
+        if self.street_no:
+            components.append(self.street_no)
+        if self.street:
+            components.append(self.street)
+        if self.city:
+            components.append(self.city.name)
+        if self.state:
+            components.append(self.state.name)
+        if self.postal_code:
+            components.append(self.postal_code)
+        if self.country:
+            components.append(self.country.name)
+        
+        return ", ".join(filter(None, components))
+
+    def save(self, *args, **kwargs):
+        self.formatted_address = self.get_formatted_address()
+        super().save(*args, **kwargs)

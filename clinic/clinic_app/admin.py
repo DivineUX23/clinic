@@ -48,6 +48,20 @@ class ProductAdminForm(forms.ModelForm):
         fields = '__all__'
 
 
+# admin.py
+
+from django.contrib import admin
+from .models import SenderAddress
+
+
+
+@admin.register(SenderAddress)
+class SenderAddressAdmin(admin.ModelAdmin):
+    list_display = ('admin', 'email', 'phone_number', 'formatted_address')
+    search_fields = ('admin__username', 'email', 'phone_number', 'formatted_address')
+
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'add_to_cart_count', 'created_at', 'updated_at']
@@ -121,7 +135,7 @@ class OrderAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
     def has_delete_permission(self, request, obj=None):
-        return False  
+        return True
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
