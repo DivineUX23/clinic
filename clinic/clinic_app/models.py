@@ -15,7 +15,7 @@ from cities_light.models import Country, Region, City
 
 class Location(models.Model):
     street_no = models.CharField(max_length=10, blank=True, null=True)
-    street = models.CharField(max_length=255)
+    street = models.CharField(max_length=255, blank=True, null=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     state = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
