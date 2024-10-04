@@ -440,6 +440,18 @@ import json
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
+
+        
+        # Get the selected country and state from the POST data
+        country_id = request.POST.get('country')
+        state_id = request.POST.get('state')
+        
+        # Populate the state and city querysets based on the selected country and state
+        if country_id:
+            form.fields['state'].queryset = Region.objects.filter(country_id=country_id)
+        if state_id:
+            form.fields['city'].queryset = City.objects.filter(region_id=state_id)
+        
         if form.is_valid():
             user = form.save()
             user.refresh_from_db()
@@ -531,19 +543,20 @@ def initialize_payment(request):
     if request.method == 'POST':
         # Get form data
         form_data = {
-            'street_no': request.POST.get('street_no', '').strip(),
-            'street': request.POST.get('street', '').strip(),
+            'street_no': request.POST.get('street_no',).strip(),
+            'street': request.POST.get('street').strip(),
             'country_id': request.POST.get('country'),
             'state_id': request.POST.get('state'),
             'city_id': request.POST.get('city'),
-            'postal_code': request.POST.get('postal_code', '').strip(),
-            'name': request.POST.get('name', '').strip(),
-            'phone_number': request.POST.get('phone_number', '').strip(),
+            'postal_code': request.POST.get('postal_code').strip(),
+            'name': request.POST.get('name').strip(),
+            'phone_number': request.POST.get('phone_number').strip(),
             'email': request.POST.get('email', '').strip(),
-            'category': request.POST.get('category', '').strip(),
             'order_note': request.POST.get('order_note')
         }
-
+        print("Form Data:")
+        for key, value in form_data.items():
+            print(f"{key}: {value}")
         # Validate required fields
         required_fields = ['street', 'country_id', 'state_id', 'city_id', 'name', 'phone_number']
         if not all(form_data[field] for field in required_fields):
