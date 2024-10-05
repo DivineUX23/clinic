@@ -21,7 +21,7 @@
           
           {% for courier in shipping_rates.couriers %}
           <div class="form-group mb-4 border p-4 rounded-md {% if courier == shipping_rates.cheapest_courier %}border-green-500{% elif courier == shipping_rates.fastest_courier %}border-blue-500{% endif %}">
-            <input type="radio" name="chosen_rate" id="courier_{{ courier.service_code }}" value="{{ courier|json_encode }}" class="mr-2">
+            <input type="radio" name="chosen_rate" id="courier_{{ courier.service_code }}" value="{{ courier }}" class="mr-2">
             <label for="courier_{{ courier.service_code }}" class="font-semibold">{{ courier.courier_name }}</label>
             <div class="mt-2">
               <p>Delivery ETA: {{ courier.delivery_eta }}</p>

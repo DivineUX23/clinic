@@ -142,116 +142,124 @@ End CSS
             {% endif %}
 
             <div class="px-3 px-md-0 mt-3 mt-md-0">
-                <form id="orderForm" method="post" action="{% url 'update_order_note' %}">
-                    {% csrf_token %}
-                    
-            
-                    <!-- Street Number Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="street_no" class="form-label input-label">Street Number</label>
-                                <input type="text" class="form-control w-100 border-aliceblue" id="street_no" name="street_no" placeholder="Enter your street number" value="{{ profile_data.street_no }}">
+
+                <div class="px-3 px-md-0 mt-3 mt-md-0">
+
+                        <!-- Street Number Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="street_no" class="form-label input-label">Street Number</label>
+                                    <input type="text" class="form-control w-100 border-aliceblue" id="street_no" name="street_no" placeholder="Enter your street number" value="{{ form.street_no.value|default:'' }}">
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Street Name Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="street" class="form-label input-label">Street Name</label>
-                                <input type="text" class="form-control w-100 border-aliceblue" id="street" name="street" placeholder="Enter your street name" value="{{ profile_data.street }}" required>
+    
+                        <!-- Street Name Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="street" class="form-label input-label">Street Name</label>
+                                    <input type="text" class="form-control w-100 border-aliceblue" id="street" name="street" placeholder="Enter your street name" value="{{ form.street.value|default:'' }}" required>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Country Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="country" class="form-label input-label">Country</label>
-                                <select class="form-control w-100 border-aliceblue" id="country" name="country" required>
-                                    <option value="">Select Country</option>
-                                    {% for country in countries %}
-                                        <option value="{{ country.id }}" {% if country.id == profile_data.country %}selected{% endif %}>{{ country.name }}</option>
-                                    {% endfor %}
-                                </select>
+    
+                        <!-- Country Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="country" class="form-label input-label">Country</label>
+                                    <select class="form-control w-100 border-aliceblue" id="country" name="country" required>
+                                        <option value="">Select Country</option>
+                                        {% for country in countries %}
+                                            <option value="{{ country.id }}" {% if country.id == form.country.value %}selected{% endif %}>{{ country.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- State Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="state" class="form-label input-label">State</label>
-                                <select class="form-control w-100 border-aliceblue" id="state" name="state" required>
-                                    <option value="">Select State</option>
-                                    <!-- Will be populated dynamically -->
-                                </select>
+    
+                        <!-- State Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="state" class="form-label input-label">State</label>
+                                    <select class="form-control w-100 border-aliceblue" id="state" name="state" required>
+                                        <option value="">Select State</option>
+                                        <!-- Will be populated dynamically -->
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- City Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="city" class="form-label input-label">City</label>
-                                <select class="form-control w-100 border-aliceblue" id="city" name="city" required>
-                                    <option value="">Select City</option>
-                                    <!-- Will be populated dynamically -->
-                                </select>
+    
+                        <!-- City Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="city" class="form-label input-label">City</label>
+                                    <select class="form-control w-100 border-aliceblue" id="city" name="city" required>
+                                        <option value="">Select City</option>
+                                        <!-- Will be populated dynamically -->
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Postal Code Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="postal_code" class="form-label input-label">Postal Code</label>
-                                <input type="text" class="form-control w-100 border-aliceblue" id="postal_code" name="postal_code" placeholder="Enter your postal code" value="{{ profile_data.postal_code }}">
+    
+                        <!-- Postal Code Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="postal_code" class="form-label input-label">Postal Code</label>
+                                    <input type="text" class="form-control w-100 border-aliceblue" id="postal_code" name="postal_code" placeholder="Enter your postal code" value="{{ form.postal_code.value|default:'' }}">
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+    
+                        <!-- Name Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="name" class="form-label input-label">Name</label>
+                                    <input type="text" class="form-control w-100 border-aliceblue" id="name" name="name" placeholder="Enter your full name" value="{{ form.name.value|default:'' }}" required>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <!-- Phone Number Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="phone_number" class="form-label input-label">Phone Number</label>
+                                    <input type="tel" class="form-control w-100 border-aliceblue" id="phone_number" name="phone_number" placeholder="Enter your phone number" value="{{ form.phone_number.value|default:'' }}" required>
+                                </div>
+                            </div>
+                        </div>
                 
 
-
-
-
-                    <!-- Name Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="name" class="form-label input-label">Name</label>
-                                <input type="text" class="form-control w-100 border-aliceblue" id="name" name="name" placeholder="Enter your full name" value="{{ profile_data.name }}">
+                        <!-- Email Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="email" class="form-label input-label">Email</label>
+                                    <input type="email" class="form-control w-100 border-aliceblue" id="email" name="email" placeholder="Enter your Email" value="{{ form.email.value|default:'' }}" required>
+                                </div>
                             </div>
                         </div>
-                    </div>
-            
-                    <!-- Phone Number Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="phone_number" class="form-label input-label">Phone Number</label>
-                                <input type="tel" class="form-control w-100 border-aliceblue" id="phone_number" name="phone_number" placeholder="Enter your phone number" value="{{ profile_data.phone_number }}">
+                
+
+                        <!-- Order Note Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="order_note" class="form-label input-label">Order note <span class="input-label-secondary">(Optional)</span></label>
+                                    <textarea class="form-control w-100 border-aliceblue" id="order_note" name="order_note">{{ form.order_note.value|default:'' }}</textarea>
+                                </div>
                             </div>
                         </div>
-                    </div>
-            
-                    <!-- Order Note Section -->
-                    <div class="mb-lg-3">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="order_note" class="form-label input-label">Order note <span class="input-label-secondary">(Optional)</span></label>
-                                <textarea class="form-control w-100 border-aliceblue" id="order_note" name="order_note">{{ order_note }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+    
+    
+
             </div>
 
 
@@ -295,8 +303,10 @@ End CSS
                         <input type="hidden" name="state" id="hidden_state">
                         <input type="hidden" name="city" id="hidden_city">
                         <input type="hidden" name="postal_code" id="hidden_postal_code">
-                        <input type="hidden" name="name" id="hidden_name">
+                        <input type="hidden" name="name" id="hidden_name" value="{{ profile_data.name }}">
                         <input type="hidden" name="phone_number" id="hidden_phone_number">
+                        <input type="hidden" name="email" id="hidden_email">
+
                         <!--<input type="hidden" name="delivery_location" value="{{ profile_data.delivery_location }}" id="hidden_delivery_location">
                         <input type="hidden" name="name" value="{{ profile_data.name }}" id="hidden_name">
                         <input type="hidden" name="phone_number" value="{{ profile_data.phone_number }}" id="hidden_phone_number">-->
@@ -321,11 +331,11 @@ End CSS
 
 
 
-<script>
+<!--<script>
     
 document.addEventListener('DOMContentLoaded', function() {
         const payWithPaystackBtn = document.getElementById('payWithPaystack');
-        const orderForm = document.getElementById('orderForm');
+
         const paymentForm = document.getElementById('paymentForm');
     
         const streetNoInput = document.getElementById('street_no');
@@ -337,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const nameInput = document.getElementById('name');
         const phoneNumberInput = document.getElementById('phone_number');
     
+        console.log(phoneNumberInput)
         const hiddenStreetNo = document.getElementById('hidden_street_no');
         const hiddenStreet = document.getElementById('hidden_street');
         const hiddenCountry = document.getElementById('hidden_country');
@@ -346,12 +357,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const hiddenName = document.getElementById('hidden_name');
         const hiddenPhoneNumber = document.getElementById('hidden_phone_number');
     
+
+
+
+
+
+
+        streetNoInput.dispatchEvent(new Event('input'));
+        streetInput.dispatchEvent(new Event('input'));
+        countrySelect.dispatchEvent(new Event('input'));
+        stateSelect.dispatchEvent(new Event('input'));
+        citySelect.dispatchEvent(new Event('input'));
+        postalCodeInput.dispatchEvent(new Event('input'));
+        nameInput.dispatchEvent(new Event('input'));
+        phoneNumberInput.dispatchEvent(new Event('input'));
+    
+
+
+
+
         // Update hidden fields whenever the visible fields change
         [streetNoInput, streetInput, countrySelect, stateSelect, citySelect, postalCodeInput, nameInput, phoneNumberInput].forEach(input => {
             input.addEventListener('change', function() {
                 const hiddenField = document.getElementById(`hidden_${this.name}`);
                 if (hiddenField) {
                     hiddenField.value = this.value;
+                    console.log(hiddenField.value)
+
                 }
             });
         });
@@ -435,23 +467,8 @@ document.addEventListener('DOMContentLoaded', function() {
             paymentForm.submit();
         });
     
-        // Prevent default form submission of the order form
-        orderForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // You can add AJAX submission here if needed
-            Swal.fire({
-                title: 'Success!',
-                text: 'Order information updated successfully!',
-                icon: 'success',
-                confirmButtonText: 'OK',
-                customClass: {
-                    popup: 'swal-custom-popup',
-                    confirmButton: 'swal-custom-confirm-button'
-                }
-            });
-        });
     });
-</script>
+</script>-->
 <!--<script>
     document.addEventListener('DOMContentLoaded', function() {
         const payWithPaystackBtn = document.getElementById('payWithPaystack');
@@ -556,7 +573,145 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-</script>    -->
+</script>    nameInput-->
+
+<script> 
+document.addEventListener('DOMContentLoaded', function() {
+    const payWithPaystackBtn = document.getElementById('payWithPaystack');
+    const paymentForm = document.getElementById('paymentForm');
+
+    const inputFields = {
+        street_no: document.getElementById('street_no'),
+        street: document.getElementById('street'),
+        country: document.getElementById('country'),
+        state: document.getElementById('state'),
+        city: document.getElementById('city'),
+        postal_code: document.getElementById('postal_code'),
+        name: document.getElementById('name'),
+        phone_number: document.getElementById('phone_number'),
+        email: document.getElementById('email')
+
+    };
+
+    const hiddenFields = {};
+    Object.keys(inputFields).forEach(key => {
+        hiddenFields[key] = document.getElementById(`hidden_${key}`);
+    });
+
+    // Function to update hidden field
+    function updateHiddenField(inputName, value) {
+        if (hiddenFields[inputName]) {
+            hiddenFields[inputName].value = value;
+            console.log(`Updated hidden ${inputName}: ${value}`);
+        }
+    }
+
+    // Update hidden fields based on initial values
+    Object.entries(inputFields).forEach(([name, input]) => {
+        if (input.value) {
+            updateHiddenField(name, input.value);
+        }
+    });
+
+    // Add event listeners for future changes
+    Object.entries(inputFields).forEach(([name, input]) => {
+        input.addEventListener('change', function() {
+            updateHiddenField(name, this.value);
+        });
+    });
+
+    // Special handling for select elements
+    ['country', 'state', 'city'].forEach(selectName => {
+        inputFields[selectName].addEventListener('change', function() {
+            updateHiddenField(selectName, this.options[this.selectedIndex].value);
+        });
+    });
+
+    // Populate states based on selected country
+    inputFields.country.addEventListener('change', function() {
+        // Your existing code for populating states
+        const countryId = this.value;
+        const states = {{ states|safe }};
+        const filteredStates = states.filter(state => state.country_id == countryId);
+        
+        inputFields.state.innerHTML = '<option value="">Select State</option>';
+        filteredStates.forEach(state => {
+            inputFields.state.innerHTML += `<option value="${state.id}">${state.name}</option>`;
+        });
+        
+        inputFields.city.innerHTML = '<option value="">Select City</option>';
+    
+    });
+
+    // Populate cities based on selected state
+    inputFields.state.addEventListener('change', function() {
+        // Your existing code for populating cities
+        const stateId = this.value;
+        const cities = {{ cities|safe }};
+        const filteredCities = cities.filter(city => city.region_id == stateId);
+        
+        inputFields.city.innerHTML = '<option value="">Select City</option>';
+        filteredCities.forEach(city => {
+            inputFields.city.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+        });
+    });
+
+
+    
+    function validateForm() {
+        let isValid = true;
+        let errorMessage = '';
+
+        // Validate required fields
+        ['street', 'country', 'state', 'city', 'name', 'phone_number'].forEach(field => {
+            const input = document.getElementById(field);
+            if (!input.value.trim()) {
+                isValid = false;
+                errorMessage += `${field.charAt(0).toUpperCase() + field.slice(1)} is required.\n`;
+            }
+        });
+
+        // Validate name
+        const nameValue = inputFields.name.value.trim();
+        if (nameValue && !/^[a-zA-Z\s]+$/.test(nameValue)) {
+            isValid = false;
+            errorMessage += 'Name should only contain letters and spaces.\n';
+        }
+
+        // Validate phone number
+        const phoneValue = inputFields.phone_number.value.trim();
+        if (phoneValue && !/^\d{10,14}$/.test(phoneValue)) {
+            isValid = false;
+            errorMessage += 'Please enter a valid phone number (10-14 digits).\n';
+        }
+
+        return { isValid, errorMessage };
+    }
+
+    payWithPaystackBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const { isValid, errorMessage } = validateForm();
+
+        if (!isValid) {
+            Swal.fire({
+                title: 'Error!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    confirmButton: 'swal-custom-confirm-button'
+                }
+            });
+            return;
+        }
+
+        // If all required fields are filled and valid, submit the payment form
+        paymentForm.submit();
+    });
+
+});</script> 
 {% endblock %}
 
 

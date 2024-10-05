@@ -23,9 +23,9 @@ from django.contrib.auth.decorators import login_required
 from .models import Profile
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import SignUpForm
+from .forms import SignUpForm, OrderForm
 
-
+import json
 import logging
 from datetime import datetime
 from django.core.cache import cache
@@ -246,31 +246,22 @@ def cart_view(request):
 
     categories = Category.objects.all()
 
-    profile_data = {}
+    initial_data = {}
     if request.user.is_authenticated:
-        user_profile, created = Profile.objects.get_or_create(user=request.user)
+        user_profile, _ = Profile.objects.get_or_create(user=request.user)
         if user_profile.delivery_location:
-            profile_data = {
-                'street_no': user_profile.delivery_location.street_no or '',
-                'street': user_profile.delivery_location.street or '',
-                'country': user_profile.delivery_location.country.id if user_profile.delivery_location.country else '',
-                'state': user_profile.delivery_location.state.id if user_profile.delivery_location.state else '',
-                'city': user_profile.delivery_location.city.id if user_profile.delivery_location.city else '',
-                'postal_code': user_profile.delivery_location.postal_code or '',
+            initial_data = {
+                'street_no': user_profile.delivery_location.street_no,
+                'street': user_profile.delivery_location.street,
+                'country': user_profile.delivery_location.country,
+                'state': user_profile.delivery_location.state,
+                'city': user_profile.delivery_location.city,
+                'postal_code': user_profile.delivery_location.postal_code,
                 'name': request.user.get_full_name() or request.user.username,
-                'phone_number': user_profile.phone_number or '',
+                'phone_number': user_profile.phone_number,
             }
-        else:
-            profile_data = {
-                'street_no': '',
-                'street': '',
-                'country': '',
-                'state': '',
-                'city': '',
-                'postal_code': '',
-                'name': request.user.get_full_name() or request.user.username,
-                'phone_number': user_profile.phone_number or '',
-            }
+
+    form = OrderForm(initial=initial_data)
 
     # Prepare data for dynamic dropdowns
     countries = list(Country.objects.values('id', 'name'))
@@ -278,19 +269,19 @@ def cart_view(request):
     cities = list(City.objects.values('id', 'name', 'region_id'))
 
     context = {
-        'categories': categories,
-        'quantity': item_count,
         'cart_items': cart_items,
         'subtotal': subtotal,
         'tax': tax,
         'shipping': shipping,
         'discount': discount,
         'total': total,
-        'order_note': request.session.get('order_note', ''),
-        'profile_data': profile_data,
+        'form': form,
         'countries': countries,
         'states': states,
         'cities': cities,
+        
+        'categories': categories,
+        'quantity': item_count,
     }
     return render(request, 'cart.html', context)
 
@@ -541,75 +532,73 @@ def signin_view(request):
 
 def initialize_payment(request):
     if request.method == 'POST':
-        # Get form data
-        form_data = {
-            'street_no': request.POST.get('street_no',).strip(),
-            'street': request.POST.get('street').strip(),
-            'country_id': request.POST.get('country'),
-            'state_id': request.POST.get('state'),
-            'city_id': request.POST.get('city'),
-            'postal_code': request.POST.get('postal_code').strip(),
-            'name': request.POST.get('name').strip(),
-            'phone_number': request.POST.get('phone_number').strip(),
-            'email': request.POST.get('email', '').strip(),
-            'order_note': request.POST.get('order_note')
-        }
-        print("Form Data:")
-        for key, value in form_data.items():
-            print(f"{key}: {value}")
-        # Validate required fields
-        required_fields = ['street', 'country_id', 'state_id', 'city_id', 'name', 'phone_number']
-        if not all(form_data[field] for field in required_fields):
-            messages.error(request, "Please fill out all required fields.")
-            return redirect('cart')
 
-        # Validate name and phone number
-        if not re.match(r'^[a-zA-Z\s]+$', form_data['name']):
-            messages.error(request, "Name should only contain letters and spaces.")
-            return redirect('cart')
+        form = OrderForm(request.POST)
 
-        if not re.match(r'^\d{10,14}$', form_data['phone_number']):
-            messages.error(request, "Please enter a valid phone number (10-14 digits).")
-            return redirect('cart')
+        # Print raw POST data
+        print("Raw POST data:")
+        print(json.dumps(request.POST, indent=2))
 
-        # Handle location for authenticated users
-        if request.user.is_authenticated:
-            profile = request.user.profile
-            location = handle_authenticated_user_location(profile, form_data)
-            cart = get_object_or_404(Cart, user=request.user)
+        form = OrderForm(request.POST)
+        print("Form instance:")
+        if form.is_valid():
+            # Process the form data
+            street_no = form.cleaned_data['street_no']
+            street = form.cleaned_data['street']
+            country = form.cleaned_data['country']
+            state = form.cleaned_data['state']
+            city = form.cleaned_data['city']
+            postal_code = form.cleaned_data['postal_code']
+            name = form.cleaned_data['name']
+            phone_number = form.cleaned_data['phone_number']
+            email = form.cleaned_data.get('email', '')
+            order_note = form.cleaned_data.get('order_note', '')
+
+
+            # Handle location for authenticated users
+            if request.user.is_authenticated:
+                profile = request.user.profile
+                location = handle_authenticated_user_location(profile, form.cleaned_data)
+                cart = get_object_or_404(Cart, user=request.user)
+            else:
+                # For non-authenticated users, always create a new location
+                location = Location.objects.create(
+                    street_no=street_no,
+                    street=street,
+                    country=country,
+                    state=state,
+                    city=city,
+                    postal_code=postal_code
+                )
+                cart = get_or_create_guest_cart(request)
+
+            # Calculate total amount
+            total_amount = calculate_total(cart)
+
+            # Generate a random payment reference
+            payment_reference = f"ORDER-{uuid.uuid4().hex[:8].upper()}"
+
+            # Create order
+            order = create_order(request, location, form.cleaned_data, total_amount, payment_reference)
+
+            # Get shipping rates
+            shipping_rates = get_shipping_rates(order, cart.items.all())
+
+
+            categories = get_categories()
+
+            context = {
+                'order': order,
+                'shipping_rates': shipping_rates,
+                'categories': categories
+            }
+            return render(request, 'shipping_options.html', context)
+
         else:
-            # For non-authenticated users, always create a new location
-            location = Location.objects.create(
-                street_no=form_data['street_no'],
-                street=form_data['street'],
-                country_id=form_data['country_id'],
-                state_id=form_data['state_id'],
-                city_id=form_data['city_id'],
-                postal_code=form_data['postal_code']
-            )
-            cart = get_or_create_guest_cart(request)
-
-        # Calculate total amount
-        total_amount = calculate_total(cart)
-
-        # Generate a random payment reference
-        payment_reference = f"ORDER-{uuid.uuid4().hex[:8].upper()}"
-
-        # Create order
-        order = create_order(request, location, form_data, total_amount, payment_reference)
-
-        # Get shipping rates
-        shipping_rates = get_shipping_rates(order, cart.items.all())
-
-        categories = get_categories()
-
-        context = {
-            'order': order,
-            'shipping_rates': shipping_rates,
-            'categories': categories
-        }
-        return render(request, 'shipping_options.html', context)
-
+            
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
     # If not POST, redirect to cart
     return redirect('cart')
 
@@ -776,8 +765,6 @@ def get_sender_address_code():
     if sender_code:
         return sender_code
 
-
-
     # Get the first sender address from the database
     sender_address = SenderAddress.objects.first()
     if not sender_address:
@@ -789,7 +776,7 @@ def get_sender_address_code():
     data = {
         "phone": sender_address.phone_number,
         "email": sender_address.email,
-        "name": sender_address.name,
+        "name": sender_address.admin.first_name,
         "address": sender_address.formatted_address
     }
 
@@ -800,7 +787,10 @@ def get_sender_address_code():
         return sender_code
     else:
         logger.error(f"Error creating sender address: {response.get('message')}")
+        print(f"Error creating sender address: {response.get('message')}")
+
         return None
+
 
 def create_or_get_address_code(order):
     cache_key = f"address_code_{order.id}"
@@ -822,11 +812,20 @@ def create_or_get_address_code(order):
     }
     """
     data = {
-        "phone": order.phone_number,
-        "email": order.email,
-        "name": order.name,
-        "address": delivery_address.formatted_address
+        "phone": str(order.phone_number),
+        "email": str(order.email),
+        "name": str(order.name),
+        "address": str(delivery_address.formatted_address)
     }
+
+    print(data)
+
+
+
+    json_data = json.dumps(data)
+
+    print("JSON Data:")
+    print(json_data)
 
     response = make_shipbubble_request(url, data)
     if response.get('status') == 'success':
@@ -863,14 +862,14 @@ def location_needs_update(location, form_data):
     return any([
         location.street_no != form_data['street_no'],
         location.street != form_data['street'],
-        location.country_id != int(form_data['country_id']),
-        location.state_id != int(form_data['state_id']),
-        location.city_id != int(form_data['city_id']),
+        location.country != form_data['country'],
+        location.state != form_data['state'],
+        location.city != form_data['city'],
         location.postal_code != form_data['postal_code']
     ])
 
 def update_location(location, form_data):
-    for field in ['street_no', 'street', 'country_id', 'state_id', 'city_id', 'postal_code']:
+    for field in ['street_no', 'street', 'country', 'state', 'city', 'postal_code']:
         setattr(location, field, form_data[field])
     location.save()
 
@@ -878,9 +877,9 @@ def create_location(form_data):
     return Location.objects.create(
         street_no=form_data['street_no'],
         street=form_data['street'],
-        country_id=form_data['country_id'],
-        state_id=form_data['state_id'],
-        city_id=form_data['city_id'],
+        country=form_data['country'],
+        state=form_data['state'],
+        city=form_data['city'],
         postal_code=form_data['postal_code']
     )
 
@@ -904,7 +903,6 @@ def create_order(request, location, form_data, total_amount, payment_reference):
         total_amount=total_amount,
         payment_reference=payment_reference,
         status='pending',
-        category=form_data['category']
     )
 
     cart = Cart.objects.get(user=request.user) if request.user.is_authenticated else get_or_create_guest_cart(request)

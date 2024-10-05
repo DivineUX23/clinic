@@ -34,7 +34,7 @@ urlpatterns = [
     path('initialize-payment/', views.initialize_payment, name='initialize_payment'),
 
 
-    path('make-payment/', views.make_payment, name='make_payment'),
+    path('make-payment/<int:order_id>/', views.make_payment, name='make_payment'),
 
     path('payment-callback/', views.payment_callback, name='payment_callback'),
 
@@ -73,6 +73,7 @@ urlpatterns = [
     #-----------------
     path('app/', views.test_api, name='app'),
     path('api/<path:path>', views.proxy_view, name='proxy'),
+
 ]
 
 
