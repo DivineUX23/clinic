@@ -114,10 +114,13 @@ class OrderForm(forms.Form):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if not name.isalpha():
-            raise forms.ValidationError("Name should only contain letters and spaces.")
+        names = name.split()
+        for n in names:
+            if not n.replace('-', '').replace("'", '').isalpha():
+                raise forms.ValidationError("Name should only contain letters, spaces, hyphens, and apostrophes.")
         return name
 
+        
     def clean_phone_number(self):
         phone_number = self.cleaned_data['phone_number']
         if not phone_number.isdigit() or len(phone_number) < 10 or len(phone_number) > 14:

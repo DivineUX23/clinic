@@ -827,7 +827,7 @@ def create_or_get_address_code(order):
     print("JSON Data:")
     print(json_data)
 
-    response = make_shipbubble_request(url, data)
+    response = make_shipbubble_request(url, json_data)
     if response.get('status') == 'success':
         address_code = response['data']['address_code']
         cache.set(cache_key, address_code, 60*60)
