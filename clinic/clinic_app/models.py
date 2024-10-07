@@ -270,13 +270,13 @@ class SenderAddress(models.Model):
         if self.street:
             components.append(self.street)
         if self.city:
-            components.append(self.city.name)
+            components.append(self.city)
         if self.state:
-            components.append(self.state.name)
+            components.append(self.state)
         if self.postal_code:
             components.append(self.postal_code)
         if self.country:
-            components.append(self.country.name)
+            components.append(self.country)
         
         return ", ".join(filter(None, components))
 

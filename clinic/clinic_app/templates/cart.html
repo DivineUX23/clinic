@@ -258,6 +258,17 @@ End CSS
                             </div>
                         </div>
     
+
+
+                                        
+                        <div class="form-group mb-4">
+                            <label for="order_category" class="form-label font-semibold block mb-2">Package order_category</label>
+                            <select name="order_category" id="order_category" class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            {% for category in order_category %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
     
 
             </div>
@@ -306,6 +317,7 @@ End CSS
                         <input type="hidden" name="name" id="hidden_name" value="{{ profile_data.name }}">
                         <input type="hidden" name="phone_number" id="hidden_phone_number">
                         <input type="hidden" name="email" id="hidden_email">
+                        <input type="hidden" name="order_category" id="hidden_order_category">
 
                         <!--<input type="hidden" name="delivery_location" value="{{ profile_data.delivery_location }}" id="hidden_delivery_location">
                         <input type="hidden" name="name" value="{{ profile_data.name }}" id="hidden_name">
@@ -589,7 +601,9 @@ document.addEventListener('DOMContentLoaded', function() {
         postal_code: document.getElementById('postal_code'),
         name: document.getElementById('name'),
         phone_number: document.getElementById('phone_number'),
-        email: document.getElementById('email')
+        email: document.getElementById('email'),
+
+        order_category: document.getElementById('order_category'),
 
     };
 
@@ -621,7 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Special handling for select elements
-    ['country', 'state', 'city'].forEach(selectName => {
+    ['country', 'state', 'city',].forEach(selectName => {
         inputFields[selectName].addEventListener('change', function() {
             updateHiddenField(selectName, this.options[this.selectedIndex].value);
         });
