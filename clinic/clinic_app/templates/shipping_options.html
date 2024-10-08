@@ -2,56 +2,171 @@
 {% load static %}
 
 {% block content %}
-<div class="md:h-screen">
-  <div class="grid md:grid-cols-[0.8fr_1fr] h-full">
-    <div class="hidden md:block">
-      <img src="{% static 'images/shipping_image.png' %}" class="h-full w-full object-cover" alt="Shipping">
-    </div>
-    <div class="container py-8 px-9" style="text-align: left;">
-      <div class="mx-auto max-w-[600px]">
-        <div class="mb-8">              
-          <a href="{% url 'home' %}" class="md:h-[70px]">
-            <!-- Add your logo here -->
-          </a>
-        </div>
-        <h2 class="mb-4 text-purple text-3xl font-bold text-capitalize fs-18-mobile">Choose Your Shipping Option</h2>
+<div class="min-h-screen bg-gray-100">
+  <div class="container mx-auto py-4 px-4 sm:py-6 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-6 text-center">              
+        <a href="{% url 'home' %}" class="inline-block">
+          <img src="{% static 'your-logo.png' %}" alt="Logo" class="h-12 sm:h-16">
+        </a>
+      </div>
+      <h2 class="mb-4 sm:mb-6 text-purple-700 text-2xl sm:text-3xl font-bold text-center">Choose Your Shipping Option</h2>
+      
+      <form id="shippingForm" method="post" action="{% url 'make_payment' order.id %}" class="space-y-4 sm:space-y-6">
+        {% csrf_token %}
+        <input type="hidden" name="chosen_rate" id="chosenRate">
+        <input type="hidden" name="request_token" id="requestToken" value="{{ shipping_rates.request_token }}">
         
-        <form method="post" action="{% url 'make_payment' order.id %}" class="needs-validation mt-2" autocomplete="off">
-          {% csrf_token %}
-          
+        <div class="grid gap-4 sm:gap-6 md:grid-cols-2">
           {% for courier in shipping_rates.couriers %}
-          <div class="form-group mb-4 border p-4 rounded-md {% if courier == shipping_rates.cheapest_courier %}border-green-500{% elif courier == shipping_rates.fastest_courier %}border-blue-500{% endif %}">
-            <input type="radio" name="chosen_rate" id="courier_{{ courier.service_code }}" value="{{ courier }}" class="mr-2">
-            <label for="courier_{{ courier.service_code }}" class="font-semibold">{{ courier.courier_name }}</label>
-            <div class="mt-2">
-              <p>Delivery ETA: {{ courier.delivery_eta }}</p>
-              <p>Price: {{ courier.currency }} {{ courier.total|floatformat:2 }}</p>
-              {% if courier.discount.percentage > 0 %}
-              <p class="text-green-600">Discount: {{ courier.discount.percentage }}% ({{ courier.currency }} {{ courier.discount.discounted|floatformat:2 }})</p>
-              {% endif %}
-              {% if courier == shipping_rates.cheapest_courier %}
-              <span class="text-green-600 font-bold">Cheapest Option</span>
-              {% elif courier == shipping_rates.fastest_courier %}
-              <span class="text-blue-600 font-bold">Fastest Option</span>
-              {% endif %}
+          <div class="bg-white rounded-lg shadow-md overflow-hidden courier-option cursor-pointer transition-all duration-300 hover:shadow-lg relative" 
+               data-service-code="{{ courier.service_code }}"
+               data-courier-id="{{ courier.courier_id }}"
+               data-total="{{ courier.total }}">
+            <div class="absolute top-2 right-2 hidden check-icon">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="p-4 sm:p-6">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                <div class="flex items-center space-x-4 mb-2 sm:mb-0">
+                  <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {% if courier.courier_image %}
+                      <img src="{{ courier.courier_image }}" alt="{{ courier.courier_name }}" class="w-full h-full object-cover">
+                    {% else %}
+                      <span class="text-xl sm:text-2xl font-bold text-gray-500">{{ courier.courier_name|first }}</span>
+                    {% endif %}
+                  </div>
+                  <div>
+                    <h3 class="text-lg sm:text-xl font-semibold text-gray-900">{{ courier.courier_name }}</h3>
+                    <p class="text-sm text-gray-600">{{ courier.service_type|title }} Service</p>
+                  </div>
+                </div>
+                <div class="flex sm:flex-col items-center sm:items-end mt-2 sm:mt-0">
+                  <p class="text-xl sm:text-2xl font-bold text-purple-700">{{ courier.currency }} {{ courier.total|floatformat:2 }}</p>
+                  {% if courier.discount.percentage > 0 %}
+                  <p class="text-sm text-green-600 ml-2 sm:ml-0">-{{ courier.discount.percentage }}% ({{ courier.currency }} {{ courier.discount.discounted|floatformat:2 }})</p>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-2 sm:gap-4 text-sm mb-4">
+                <div>
+                  <p class="font-semibold">Delivery ETA:</p>
+                  <p>{{ courier.delivery_eta }}</p>
+                </div>
+                <div>
+                  <p class="font-semibold">Pickup ETA:</p>
+                  <p>{{ courier.pickup_eta }}</p>
+                </div>
+                <div>
+                  <p class="font-semibold">Tracking Level:</p>
+                  <p>{{ courier.tracking_level }} / 10</p>
+                </div>
+                <div>
+                  <p class="font-semibold">Rating:</p>
+                  <p>{{ courier.ratings }} / 5 ({{ courier.votes }} votes)</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {% if courier.waybill %}
+                  <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Waybill</span>
+                {% endif %}
+                {% if courier.on_demand %}
+                  <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">On Demand</span>
+                {% endif %}
+                {% if courier.is_cod_available %}
+                  <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">COD Available</span>
+                {% endif %}
+                {% if courier == shipping_rates.cheapest_courier %}
+                  <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Cheapest Option</span>
+                {% elif courier == shipping_rates.fastest_courier %}
+                  <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Fastest Option</span>
+                {% endif %}
+              </div>
             </div>
           </div>
           {% endfor %}
-          
-          
-          <button class="btn btn--primary btn-block btn-shadow w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300" type="submit">Proceed to Payment</button>
-        </form>
-        
-        <div class="mt-6 border-t pt-4">
-          <h3 class="text-xl font-semibold mb-2">Order Summary</h3>
-          <p>From: {{ shipping_rates.checkout_data.ship_from.name }}</p>
-          <p>To: {{ shipping_rates.checkout_data.ship_to.name }}</p>
-          <p>Package Amount: {{ shipping_rates.checkout_data.currency }} {{ shipping_rates.checkout_data.package_amount|floatformat:2 }}</p>
-          <p>Package Weight: {{ shipping_rates.checkout_data.package_weight }} kg</p>
-          <p>Pickup Date: {{ shipping_rates.checkout_data.pickup_date }}</p>
+        </div>
+         <br>
+        <button type="submit" class="btn btn--primary btn-block proceed_to_next_button">
+          Proceed to Payment
+        </button>
+        <br>
+        <br>
+      </form>
+      
+      <!-- Order Summary section remains unchanged -->
+       
+      <!-- Order Summary section remains unchanged -->
+
+      
+      <div class="mt-12 bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-semibold mb-4 text-gray-900">Order Summary</h3>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="font-semibold">From:</p>
+            <p>{{ shipping_rates.checkout_data.ship_from.name }}</p>
+            <p>{{ shipping_rates.checkout_data.ship_from.address }}</p>
+          </div>
+          <div>
+            <p class="font-semibold">To:</p>
+            <p>{{ shipping_rates.checkout_data.ship_to.name }}</p>
+            <p>{{ shipping_rates.checkout_data.ship_to.address }}</p>
+          </div>
+          <div>
+            <p class="font-semibold">Package Amount:</p>
+            <p>{{ shipping_rates.checkout_data.package_amount }}</p>
+          </div>
+          <div>
+            <p class="font-semibold">Package Weight:</p>
+            <p>{{ shipping_rates.checkout_data.package_weight }}</p>
+          </div>
+          <div>
+            <p class="font-semibold">Pickup Time:</p>
+            <dd class="mt-1 text-sm text-gray-900">{{ shipping_rates.checkout_data.pickup_time }}</dd>
+
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .courier-option.selected {
+    @apply ring-2 ring-purple-500 bg-purple-50;
+  }
+  .courier-option.selected .check-icon {
+    display: block;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('shippingForm');
+  const courierOptions = document.querySelectorAll('.courier-option');
+  const chosenRateInput = document.getElementById('chosenRate');
+
+  courierOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      courierOptions.forEach(opt => {
+        opt.classList.remove('selected');
+      });
+      this.classList.add('selected');
+      const chosenRate = {
+        service_code: this.dataset.serviceCode,
+        courier_id: this.dataset.courierId,
+        total: this.dataset.total
+      };
+      chosenRateInput.value = JSON.stringify(chosenRate);
+    });
+  });
+
+  form.addEventListener('submit', function(e) {
+    if (!chosenRateInput.value) {
+      e.preventDefault();
+      alert('Please select a shipping option');
+    }
+  });
+});
+</script>
 {% endblock %}

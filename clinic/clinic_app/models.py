@@ -53,6 +53,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     email = models.EmailField(max_length=150)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
     #delivery_location = models.CharField(max_length=255, blank=True, null=True)
     delivery_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -154,7 +156,8 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     session_key = models.CharField(max_length=40, null=True, blank=True)
     delivery_location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
-    name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20)
     email = models.EmailField(max_length=254)  
     order_note = models.TextField(blank=True, null=True)
@@ -163,7 +166,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     paid = models.BooleanField(default=False)
 
-    shipping_method = models.CharField(max_length=100, null=True, blank=True)  # Made nullable
+    service_code = models.CharField(max_length=100, null=True, blank=True)  # Made nullable
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Made nullable
     tracking_number = models.CharField(max_length=100, null=True, blank=True)  # Changed to CharField
         
@@ -175,8 +178,23 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    category = models.PositiveIntegerField(null=True, blank=True)
+    courier_id = models.CharField(max_length=255, null=True, unique=False)
+    request_token = models.CharField(max_length=255, null=True, unique=False)
+
+
+
     
+    # New fields for shipment information
+    shipment_order_id = models.CharField(max_length=50, blank=True, null=True)
+    courier_name = models.CharField(max_length=100, blank=True, null=True)
+    courier_email = models.EmailField(blank=True, null=True)
+    courier_phone = models.CharField(max_length=20, blank=True, null=True)
+    shipment_status = models.CharField(max_length=20, blank=True, null=True)
+    shipping_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    package_weight = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    tracking_url = models.URLField(blank=True, null=True)
+    shipment_date = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         ordering = ['-created_at']
 
@@ -283,3 +301,7 @@ class SenderAddress(models.Model):
     def save(self, *args, **kwargs):
         self.formatted_address = self.get_formatted_address()
         super().save(*args, **kwargs)
+
+
+
+

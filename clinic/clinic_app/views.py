@@ -257,8 +257,9 @@ def cart_view(request):
                 'country': user_profile.delivery_location.country,
                 'state': user_profile.delivery_location.state,
                 'city': user_profile.delivery_location.city,
-                'postal_code': user_profile.delivery_location.postal_code,
-                'name': request.user.get_full_name() or request.user.username,
+                'postal_code': user_profile.delivery_location.postal_code,                                
+                'first_name': user_profile.first_name if user_profile.first_name else request.user.username or request.user.get_full_name(),
+                'last_name':  user_profile.last_name if user_profile.last_name else None,
                 'phone_number': user_profile.phone_number,
             }
 
@@ -455,6 +456,8 @@ def signup_view(request):
             user.refresh_from_db()
             user.profile.email = form.cleaned_data.get('email')
             user.profile.phone_number = form.cleaned_data.get('phone_number')
+            user.profile.first_name = form.cleaned_data.get('first_name')
+            user.profile.last_name = form.cleaned_data.get('last_name')
 
 
             # Create and save the Location object
@@ -556,7 +559,7 @@ def initialize_payment(request):
             state = form.cleaned_data['state']
             city = form.cleaned_data['city']
             postal_code = form.cleaned_data['postal_code']
-            name = form.cleaned_data['name']
+            name = form.cleaned_data['first_name'] + " " + form.cleaned_data['last_name']
             phone_number = form.cleaned_data['phone_number']
             email = form.cleaned_data.get('email', '')
             order_note = form.cleaned_data.get('order_note', '')
@@ -611,45 +614,59 @@ def initialize_payment(request):
 
 
 # PAYMENT:
+
 def make_payment(request, order_id):
     if request.method == 'POST':
         order = get_object_or_404(Order, id=order_id)
-        print(order)
         chosen_rate = request.POST.get('chosen_rate')
-        
+        request_token = request.POST.get('request_token')
+        print(f"m...............mmmmmmm{chosen_rate}")
+        print(f"mm..............mmmmmm{request_token}")
+
         if not chosen_rate:
             messages.error(request, "Please choose a shipping method.")
-            return redirect('shipping_options')
+            return redirect('make_payment', order_id=order_id)
         
-        # CHANGE: Parse the chosen_rate from JSON string to dictionary
-        import json
-        chosen_rate = json.loads(chosen_rate)
+        try:
+            chosen_rate_data = json.loads(chosen_rate)
+            
+            order.service_code = chosen_rate_data['service_code']
+            order.courier_id = chosen_rate_data['courier_id']
+            order.shipping_cost = Decimal(chosen_rate_data['total'])
+            order.request_token = request_token
+            order.save()
+            
+            amount_in_kobo = int((order.total_amount + order.shipping_cost) * 100)
+            
+            # Initialize Paystack payment
+            paystack_data = {
+                "amount": amount_in_kobo,
+                "email": request.user.email if request.user.is_authenticated else order.email,
+                "callback_url": request.build_absolute_uri(reverse('payment_callback')),
+                "reference": order.payment_reference,
+            }
+            
+            paystack_response = make_paystack_request("https://api.paystack.co/transaction/initialize", paystack_data)
+            
+            if paystack_response.get('status'):
+                # Notify about new order
+                notify_new_order(order.id)
+                return redirect(paystack_response['data']['authorization_url'])
+            else:
+                return handle_payment_error(paystack_response)
         
-        order.shipping_method = chosen_rate['service_code']  # CHANGE: Use 'service_code' instead of 'courier_name'
-        order.shipping_cost = Decimal(chosen_rate['total'])
-        order.save()
+        except json.JSONDecodeError:
+            messages.error(request, "Invalid shipping option data.")
+            return redirect('make_payment', order_id=order_id)
+        except KeyError:
+            messages.error(request, "Incomplete shipping option data.")
+            return redirect('make_payment', order_id=order_id)
+    
+    # If not a POST request, render the shipping options page
+    # You'll need to implement this view to display the shipping options
+    return render(request, 'shipping_options.html', {'order_id': order_id})
 
-        amount_in_kobo = int((order.total_amount + order.shipping_cost) * 100)
-
-        # Initialize Paystack payment
-        paystack_data = {
-            "amount": amount_in_kobo,
-            "email": request.user.email if request.user.is_authenticated else order.email,
-            "callback_url": request.build_absolute_uri(reverse('payment_callback')),
-            "reference": order.payment_reference,
-        }
-
-        paystack_response = make_paystack_request("https://api.paystack.co/transaction/initialize", paystack_data)
-
-        if paystack_response.get('status'):
-            # Notify about new order
-            notify_new_order(order.id)
-            return redirect(paystack_response['data']['authorization_url'])
-        else:
-            order.delete()  # Delete the order if payment initialization fails
-            return handle_payment_error(paystack_response)
-
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+    #return redirect('initialize_payment') + " " +
 
 
 
@@ -660,20 +677,48 @@ def payment_callback(request):
         
         # Create shipment
         shipment_created = create_shipment(order)
+        print(shipment_created)
 
-        if shipment_created:
+
+        if shipment_created.get('status') == 'success':
+            shipment_data = shipment_created['data']
+            
+            # Save important info to ShippingOrder table
+            
+            # Update Order with shipment information
+            order.shipment_order_id = shipment_data['order_id']
+            order.courier_name = shipment_data['courier']['name']
+            order.courier_email = shipment_data['courier']['email']
+            order.courier_phone = shipment_data['courier']['phone']
+            order.shipment_status = shipment_data['status']
+            order.shipping_fee = shipment_data['payment']['shipping_fee']
+            order.package_weight = shipment_data['package_weight']
+            order.tracking_url = shipment_data['tracking_url']
+            order.shipment_date = timezone.now()
             order.paid = True
             order.status = 'processing'
             order.save()
 
-            # Clear the cart
+            # Clear the cart Shipping method
             clear_cart(request)
+  # Store success data in session
 
+            success_message = (
+                f"Payment successful! Your shipment is on its way.\n"
+                f"Tracking Code: {order.tracking_number}\n"
+                f"Courier: {order.courier_name}\n"
+                f"Status: {order.status}\n"
+                f"Tracking URL: {order.tracking_url}"
+            )
+            
+            messages.success(request, success_message)
+            
             return redirect('home')
+        
         else:
             # CHANGE: Handle shipment creation failure
             messages.error(request, "Payment successful, but shipment creation failed. Please contact support.")
-            return redirect('order_issues')
+            return redirect('cart')
     else:
         messages.error(request, "Payment verification failed.")
         return redirect('cart')
@@ -702,7 +747,7 @@ def get_shipping_rates(order, cart_items):
     package_items = [
         {
             "name": item.product.name,
-            "description": "Handle with care",
+            "description": "Handle with care", #item.product.description[:100],
             "unit_weight": 1,
             "unit_amount": float(item.product.price),
             "quantity": item.quantity
@@ -730,15 +775,18 @@ def get_shipping_rates(order, cart_items):
 
 
 def create_shipment(order):
-    url = "https://api.shipbubble.com/v1/shipping/shipments"
+    #url = "https://api.shipbubble.com/v1/shipping/shipments"
+
+    url = "https://api.shipbubble.com/v1/shipping/labels"
+    """
     data = {
-        "sender_address_code": 1045835, #get_sender_address_code(),
+        "sender_address_code": 1045835, #get_sender_address_code(),{{url}}/shipping/labels
         "reciever_address_code": 1045835, #create_or_get_address_code(order.delivery_location),  # CHANGE: Fixed typo in 'receiver'
         "service_code": order.shipping_method,  # CHANGE: Use 'service_code' instead of 'courier_id'
         "package_items": [
             {
                 "name": item.product.name,
-                "description": item.product.description[:100],
+                "description": "Handle with care", #item.product.description[:100],
                 "unit_weight": 1,
                 "unit_amount": float(item.price),
                 "quantity": item.quantity
@@ -752,10 +800,20 @@ def create_shipment(order):
         },
         "delivery_instructions": order.order_note or "Handle with care"
     }
+    order.service_code = 'test_2_courier' #chosen_rate['service_code']   #CHANGE: Use 'service_code' instead of 'courier_name'
+    order.courier_id = 'test_2_courier'
+    """
+    data = {
+        "request_token": order.request_token, #create_or_get_address_code(order.delivery_location),  # CHANGE: Fixed typo in 'receiver'
+        "service_code": order.service_code,
+        "courier_id": order.courier_id  # CHANGE: Use 'service_code' instead of 'courier_id'order.shipping_method
+        }
 
+    print(f"--------------------{data}")
     response = make_shipbubble_request(url, data)
     if response.get('status') == 'success':
-        order.tracking_number = response['data']['tracking_number']
+        order.tracking_number = response['data']['tracking_url']
+        print(order.tracking_number)
         order.save()
         return True
     else:
@@ -932,7 +990,8 @@ def create_order(request, location, form_data, total_amount, payment_reference):
         user=request.user if request.user.is_authenticated else None,
         session_key=request.session.session_key if not request.user.is_authenticated else None,
         delivery_location=location,
-        name=form_data['name'],
+        first_name=form_data['first_name'],
+        last_name=form_data['last_name'],
         phone_number=form_data['phone_number'],
         email=form_data['email'],
         order_note=form_data['order_note'],
@@ -972,6 +1031,20 @@ def make_shipbubble_request(url, data=None, method='POST'):
         return {'status': 'error', 'message': str(e)}
 
 
+{"status":"success",
+ "message":"Your shipment is on its way Richard Express, you will be notified shortly",
+ "data":{"order_id":"SB-E4AA53510EFC","courier":
+         {"name":"Richard Express","email":"test2@getdelivry.com","phone":"+2340000000000"},
+         "status":"pending",
+         "ship_from":
+         {"name":"Mather Osas","phone":"+2347067239473",
+          "email":"Sam@gmail.com","address":"1, Ugbowo, Benin City, Edo State, 4444, Nigeria",
+          "latitude":6.3887708,"longitude":5.6094461},
+          "ship_to":{"name":"Mather Osas","phone":"+2347067239473","email":"Sam@gmail.com","address":"1, Ugbowo, Benin City, Edo State, 4444, Nigeria","latitude":6.3887708,"longitude":5.6094461},
+          "payment":{"shipping_fee":1450.25,"type":"wallet","status":"completed","currency":"NGN"},
+          "items":[{"name":"Data","description":"Handle with care","weight":1,"amount":3000,"quantity":1,"total":3000},
+                   {"name":"Chorf","description":"Handle with care","weight":1,"amount":1000,"quantity":1,"total":1000}],
+                   "package_weight":2,"tracking_url":"https://trackshipment.shipbubble.com/shipment/SB-E4AA53510EFC","date":"2024-10-08 14:09:17"}}
 
 def make_paystack_request(url, data=None, method='POST'):
     headers = {

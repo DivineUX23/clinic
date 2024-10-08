@@ -216,15 +216,28 @@ End CSS
                             </div>
                         </div>
     
-                        <!-- Name Section -->
+                        <!-- first_name Section -->
                         <div class="mb-lg-3">
                             <div class="row">
                                 <div class="col-12">
-                                    <label for="name" class="form-label input-label">Name</label>
-                                    <input type="text" class="form-control w-100 border-aliceblue" id="name" name="name" placeholder="Enter your full name" value="{{ form.name.value|default:'' }}" required>
+                                    <label for="first_name" class="form-label input-label">First Name</label>
+                                    <input type="text" class="form-control w-100 border-aliceblue" id="first_name" name="first_name" placeholder="Enter your first name" value="{{ form.first_name.value|default:'' }}" required>
                                 </div>
                             </div>
                         </div>
+                
+                        
+                        <!-- last_name Section -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="last_name" class="form-label input-label">Last Name</label>
+                                    <input type="text" class="form-control w-100 border-aliceblue" id="last_name" name="last_name" placeholder="Enter your last name" value="{{ form.last_name.value|default:'' }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                
                 
                         <!-- Phone Number Section -->
                         <div class="mb-lg-3">
@@ -314,7 +327,8 @@ End CSS
                         <input type="hidden" name="state" id="hidden_state">
                         <input type="hidden" name="city" id="hidden_city">
                         <input type="hidden" name="postal_code" id="hidden_postal_code">
-                        <input type="hidden" name="name" id="hidden_name" value="{{ profile_data.name }}">
+                        <input type="hidden" name="first_name" id="hidden_first_name" value="{{ profile_data.first_name }}">
+                        <input type="hidden" name="last_name" id="hidden_last_name" value="{{ profile_data.last_name }}">
                         <input type="hidden" name="phone_number" id="hidden_phone_number">
                         <input type="hidden" name="email" id="hidden_email">
                         <input type="hidden" name="order_category" id="hidden_order_category">
@@ -599,7 +613,8 @@ document.addEventListener('DOMContentLoaded', function() {
         state: document.getElementById('state'),
         city: document.getElementById('city'),
         postal_code: document.getElementById('postal_code'),
-        name: document.getElementById('name'),
+        first_name: document.getElementById('first_name'),
+        last_name: document.getElementById('last_name'),
         phone_number: document.getElementById('phone_number'),
         email: document.getElementById('email'),
 
@@ -677,7 +692,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let errorMessage = '';
 
         // Validate required fields
-        ['street', 'country', 'state', 'city', 'name', 'phone_number'].forEach(field => {
+        ['street', 'country', 'state', 'city', 'first_name', 'last_name', 'email', 'phone_number'].forEach(field => {
             const input = document.getElementById(field);
             if (!input.value.trim()) {
                 isValid = false;
@@ -686,7 +701,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Validate name
-        const nameValue = inputFields.name.value.trim();
+        const nameValue = inputFields.first_name.value.trim();
         if (nameValue && !/^[a-zA-Z\s]+$/.test(nameValue)) {
             isValid = false;
             errorMessage += 'Name should only contain letters and spaces.\n';

@@ -42,6 +42,17 @@ from django.contrib.auth.models import User
 from cities_light.models import Country, Region, City
 
 class SignUpForm(UserCreationForm):
+    
+    first_name = forms.CharField(
+        max_length=15, 
+        required=False, 
+        help_text='Optional. Enter your phone number.'
+    )
+    last_name = forms.CharField(
+        max_length=15, 
+        required=False, 
+        help_text='Optional. Enter your phone number.'
+    )
     email = forms.EmailField(
         required=True, 
         help_text='Required. Enter a valid email address.'
@@ -86,7 +97,7 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("username", "email", "phone_number", "street_no", "street", "country", "state", "city", "postal_code", "password1", "password2")
+        fields = ("username", "first_name", "last_name", "email", "phone_number", "street_no", "street", "country", "state", "city", "postal_code", "password1", "password2")
 
 
 
@@ -107,20 +118,31 @@ class OrderForm(forms.Form):
     state = forms.ModelChoiceField(queryset=Region.objects.all())
     city = forms.ModelChoiceField(queryset=City.objects.all())
     postal_code = forms.CharField(max_length=20, required=False)
-    name = forms.CharField(max_length=255)
+    #name = forms.CharField(max_length=255)
+    first_name = forms.CharField(max_length=100)
+    last_name = forms.CharField(max_length=100)
     phone_number = forms.CharField(max_length=14)
     email = forms.EmailField(required=False)
     order_note = forms.CharField(widget=forms.Textarea, required=False)
 
     def clean_name(self):
-        name = self.cleaned_data['name']
-        names = name.split()
-        for n in names:
+        first_name = self.cleaned_data['first_name']
+        first_names = first_name.split()
+        for n in first_names:
             if not n.replace('-', '').replace("'", '').isalpha():
-                raise forms.ValidationError("Name should only contain letters, spaces, hyphens, and apostrophes.")
-        return name
+                raise forms.ValidationError("First Name should only contain letters, spaces, hyphens, and apostrophes.")
+        return first_name
 
+
+    def clean_name(self):
+        last_name = self.cleaned_data['last_name']
+        last_names = last_name.split()
+        for n in last_names:
+            if not n.replace('-', '').replace("'", '').isalpha():
+                raise forms.ValidationError("Last Name should only contain letters, spaces, hyphens, and apostrophes.")
+        return last_name
         
+
     def clean_phone_number(self):
         phone_number = self.cleaned_data['phone_number']
         if not phone_number.isdigit() or len(phone_number) < 10 or len(phone_number) > 14:
