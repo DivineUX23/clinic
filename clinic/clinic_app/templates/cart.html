@@ -187,6 +187,9 @@ End CSS
                                     <label for="state" class="form-label input-label">State</label>
                                     <select class="form-control w-100 border-aliceblue" id="state" name="state" required>
                                         <option value="">Select State</option>
+                                        {% for state in states %}
+                                            <option value="{{ state.id }}" {% if state.id == form.state.value %}selected{% endif %}>{{ state.name }}</option>
+                                        {% endfor %}
                                         <!-- Will be populated dynamically -->
                                     </select>
                                 </div>
@@ -201,6 +204,11 @@ End CSS
                                     <select class="form-control w-100 border-aliceblue" id="city" name="city" required>
                                         <option value="">Select City</option>
                                         <!-- Will be populated dynamically -->
+                                         
+                                        {% for city in cities %}
+                                            <option value="{{ city.id }}" {% if city.id == form.city.value %}selected{% endif %}>{{ city.name }}</option>
+                                        {% endfor %}
+                                         
                                     </select>
                                 </div>
                             </div>
@@ -275,10 +283,10 @@ End CSS
 
                                         
                         <div class="form-group mb-4">
-                            <label for="order_category" class="form-label font-semibold block mb-2">Package order_category</label>
+                            <label for="order_category" class="form-label font-semibold block mb-2">Package Category</label>
                             <select name="order_category" id="order_category" class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             {% for category in order_category %}
-                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                <option value="{{ category.id }}">{{ category.name }}</option>
                             {% endfor %}
                             </select>
                         </div>
@@ -330,7 +338,7 @@ End CSS
                         <input type="hidden" name="first_name" id="hidden_first_name" value="{{ profile_data.first_name }}">
                         <input type="hidden" name="last_name" id="hidden_last_name" value="{{ profile_data.last_name }}">
                         <input type="hidden" name="phone_number" id="hidden_phone_number">
-                        <input type="hidden" name="email" id="hidden_email">
+                        <input type="hidden" name="email" id="hidden_email" value="{{ profile_data.email }}">
                         <input type="hidden" name="order_category" id="hidden_order_category">
 
                         <!--<input type="hidden" name="delivery_location" value="{{ profile_data.delivery_location }}" id="hidden_delivery_location">
@@ -343,6 +351,30 @@ End CSS
                     </form>
 
                 </div>
+
+
+
+                
+        <!-- Recent Orders Section -->
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold mb-3">Recent Orders</h3>
+            {% for order in recent_orders %}
+                <div class="bg-white rounded-lg shadow-sm p-3 mb-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-medium">Order #{{ order.id }}</span>
+                        <span class="text-xs px-2 py-1 rounded {% if order.status == 'processing' %}bg-blue-100 text-blue-800{% elif order.status == 'failed' %}bg-red-100 text-red-800{% endif %}">
+                            {{ order.status|title }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600">{{ order.created_at|date:"M d, Y" }}</p>
+                    <p class="text-sm font-medium">Total: ₦{{ order.total_amount }}</p>
+                </div>
+            {% empty %}
+                <p class="text-sm text-gray-600">No recent orders.</p>
+            {% endfor %}
+            <a href="{% url 'user_orders' %}" class="btn btn-outline-primary btn-sm btn-block mt-3">See All Orders</a>
+        </div>
+
             </div>
         </aside>
     </div>
@@ -351,255 +383,6 @@ End CSS
 
     
 
-
-
-
-
-
-
-<!--<script>
-    
-document.addEventListener('DOMContentLoaded', function() {
-        const payWithPaystackBtn = document.getElementById('payWithPaystack');
-
-        const paymentForm = document.getElementById('paymentForm');
-    
-        const streetNoInput = document.getElementById('street_no');
-        const streetInput = document.getElementById('street');
-        const countrySelect = document.getElementById('country');
-        const stateSelect = document.getElementById('state');
-        const citySelect = document.getElementById('city');
-        const postalCodeInput = document.getElementById('postal_code');
-        const nameInput = document.getElementById('name');
-        const phoneNumberInput = document.getElementById('phone_number');
-    
-        console.log(phoneNumberInput)
-        const hiddenStreetNo = document.getElementById('hidden_street_no');
-        const hiddenStreet = document.getElementById('hidden_street');
-        const hiddenCountry = document.getElementById('hidden_country');
-        const hiddenState = document.getElementById('hidden_state');
-        const hiddenCity = document.getElementById('hidden_city');
-        const hiddenPostalCode = document.getElementById('hidden_postal_code');
-        const hiddenName = document.getElementById('hidden_name');
-        const hiddenPhoneNumber = document.getElementById('hidden_phone_number');
-    
-
-
-
-
-
-
-        streetNoInput.dispatchEvent(new Event('input'));
-        streetInput.dispatchEvent(new Event('input'));
-        countrySelect.dispatchEvent(new Event('input'));
-        stateSelect.dispatchEvent(new Event('input'));
-        citySelect.dispatchEvent(new Event('input'));
-        postalCodeInput.dispatchEvent(new Event('input'));
-        nameInput.dispatchEvent(new Event('input'));
-        phoneNumberInput.dispatchEvent(new Event('input'));
-    
-
-
-
-
-        // Update hidden fields whenever the visible fields change
-        [streetNoInput, streetInput, countrySelect, stateSelect, citySelect, postalCodeInput, nameInput, phoneNumberInput].forEach(input => {
-            input.addEventListener('change', function() {
-                const hiddenField = document.getElementById(`hidden_${this.name}`);
-                if (hiddenField) {
-                    hiddenField.value = this.value;
-                    console.log(hiddenField.value)
-
-                }
-            });
-        });
-    
-        // Populate states based on selected country
-        countrySelect.addEventListener('change', function() {
-            const countryId = this.value;
-            const states = {{ states|safe }};
-            const filteredStates = states.filter(state => state.country_id == countryId);
-            
-            stateSelect.innerHTML = '<option value="">Select State</option>';
-            filteredStates.forEach(state => {
-                stateSelect.innerHTML += `<option value="${state.id}">${state.name}</option>`;
-            });
-            
-            citySelect.innerHTML = '<option value="">Select City</option>';
-        });
-    
-        // Populate cities based on selected state
-        stateSelect.addEventListener('change', function() {
-            const stateId = this.value;
-            const cities = {{ cities|safe }};
-            const filteredCities = cities.filter(city => city.region_id == stateId);
-            
-            citySelect.innerHTML = '<option value="">Select City</option>';
-            filteredCities.forEach(city => {
-                citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`;
-            });
-        });
-    
-        function validateForm() {
-            let isValid = true;
-            let errorMessage = '';
-    
-            // Validate required fields
-            ['street', 'country', 'state', 'city', 'name', 'phone_number'].forEach(field => {
-                const input = document.getElementById(field);
-                if (!input.value.trim()) {
-                    isValid = false;
-                    errorMessage += `${field.charAt(0).toUpperCase() + field.slice(1)} is required.\n`;
-                }
-            });
-    
-            // Validate name
-            const nameValue = nameInput.value.trim();
-            if (nameValue && !/^[a-zA-Z\s]+$/.test(nameValue)) {
-                isValid = false;
-                errorMessage += 'Name should only contain letters and spaces.\n';
-            }
-    
-            // Validate phone number
-            const phoneValue = phoneNumberInput.value.trim();
-            if (phoneValue && !/^\d{10,14}$/.test(phoneValue)) {
-                isValid = false;
-                errorMessage += 'Please enter a valid phone number (10-14 digits).\n';
-            }
-    
-            return { isValid, errorMessage };
-        }
-    
-        payWithPaystackBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-    
-            const { isValid, errorMessage } = validateForm();
-    
-            if (!isValid) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: errorMessage,
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        popup: 'swal-custom-popup',
-                        confirmButton: 'swal-custom-confirm-button'
-                    }
-                });
-                return;
-            }
-    
-            // If all required fields are filled and valid, submit the payment form
-            paymentForm.submit();
-        });
-    
-    });
-</script>-->
-<!--<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const payWithPaystackBtn = document.getElementById('payWithPaystack');
-        const orderForm = document.getElementById('orderForm');
-        const paymentForm = document.getElementById('paymentForm');
-    
-        const deliveryLocationInput = document.getElementById('delivery_location');
-        const nameInput = document.getElementById('name');
-        const phoneNumberInput = document.getElementById('phone_number');
-    
-        const hiddenDeliveryLocation = document.getElementById('hidden_delivery_location');
-        const hiddenName = document.getElementById('hidden_name');
-        const hiddenPhoneNumber = document.getElementById('hidden_phone_number');
-
-        
-        // Trigger input events for pre-filled fields
-        deliveryLocationInput.dispatchEvent(new Event('input'));
-        nameInput.dispatchEvent(new Event('input'));
-        phoneNumberInput.dispatchEvent(new Event('input'));
-
-    
-        // Update hidden fields whenever the visible fields change
-        deliveryLocationInput.addEventListener('input', function() {
-            hiddenDeliveryLocation.value = this.value;
-        });
-        nameInput.addEventListener('input', function() {
-            hiddenName.value = this.value;
-        });
-        phoneNumberInput.addEventListener('input', function() {
-            hiddenPhoneNumber.value = this.value;
-        });
-    
-        function validateForm() {
-            let isValid = true;
-            let errorMessage = '';
-    
-            // Validate delivery location
-            if (!deliveryLocationInput.value.trim()) {
-                isValid = false;
-                errorMessage += 'Delivery location is required.\n';
-            }
-    
-            // Validate name
-            const nameValue = nameInput.value.trim();
-            if (!nameValue) {
-                isValid = false;
-                errorMessage += 'Name is required.\n';
-            } else if (!/^[a-zA-Z\s]+$/.test(nameValue)) {
-                isValid = false;
-                errorMessage += 'Name should only contain letters and spaces.\n';
-            }
-    
-            // Validate phone number
-            const phoneValue = phoneNumberInput.value.trim();
-            if (!phoneValue) {
-                isValid = false;
-                errorMessage += 'Phone number is required.\n';
-            } else if (!/^\d{10,14}$/.test(phoneValue)) {
-                isValid = false;
-                errorMessage += 'Please enter a valid phone number (10-14 digits).\n';
-            }
-    
-            return { isValid, errorMessage };
-        }
-    
-        payWithPaystackBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-    
-            const { isValid, errorMessage } = validateForm();
-    
-            if (!isValid) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: errorMessage,
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        popup: 'swal-custom-popup',
-                        confirmButton: 'swal-custom-confirm-button'
-                    }
-                });
-                return;
-            }
-    
-            // If all required fields are filled and valid, submit the payment form
-            paymentForm.submit();
-        });
-    
-        // Prevent default form submission of the order form
-        orderForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // You can add AJAX submission here if needed
-            Swal.fire({
-                title: 'Success!',
-                text: 'Order information updated successfully!',
-                icon: 'success',
-                confirmButtonText: 'OK',
-                customClass: {
-                    popup: 'swal-custom-popup',
-                    confirmButton: 'swal-custom-confirm-button'
-                }
-            });
-        });
-    });
-</script>    nameInput-->
 
 <script> 
 document.addEventListener('DOMContentLoaded', function() {
@@ -656,6 +439,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    
+
     // Populate states based on selected country
     inputFields.country.addEventListener('change', function() {
         // Your existing code for populating states
@@ -685,6 +470,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Initial population of cities if state is pre-selected
+    if (inputFields.state.value) {
+        inputFields.state.dispatchEvent(new Event('change'));
+    }
 
     
     function validateForm() {

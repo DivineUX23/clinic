@@ -136,6 +136,61 @@ def product_api(request, section):
     })
 
 
+
+
+
+
+
+
+
+
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from .models import Order
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Q
+from .models import Order
+
+@login_required
+def user_orders(request):
+    # Get filter and sort parameters
+    status_filter = request.GET.get('status', 'all')
+    sort_by = request.GET.get('sort', '-created_at')
+
+    # Base queryset
+    orders = Order.objects.filter(user=request.user)
+
+    # Apply status filter
+    if status_filter != 'all':
+        orders = orders.filter(shipment_status=status_filter)
+
+    # Apply sorting
+    orders = orders.order_by(sort_by)
+
+    # Pagination
+    paginator = Paginator(orders, 10)  # create_shipment
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'status_filter': status_filter,
+        'sort_by': sort_by,
+    }
+    return render(request, 'user_orders.html', context)
+
+
+
+
+
+
+
+
+
 def category(request):
     return render(request, 'category.html', {})
 
@@ -267,12 +322,21 @@ def cart_view(request):
 
 
     #get shipbubble categor
-    order_category = get_categories()
+    order_category_raw = get_categories()
+    order_category = [{'id': item['category_id'], 'name': item['category']} for item in order_category_raw]
 
+    print(order_category)
     # Prepare data for dynamic dropdowns
     countries = list(Country.objects.values('id', 'name'))
     states = list(Region.objects.values('id', 'name', 'country_id'))
     cities = list(City.objects.values('id', 'name', 'region_id'))
+
+
+    # Get the 5 most recent processing or failed orders
+    recent_orders = Order.objects.filter(
+        user=request.user,
+        status__in=['processing', 'failed']
+    ).order_by('-created_at')[:5]
 
     context = {
         'cart_items': cart_items,
@@ -286,7 +350,7 @@ def cart_view(request):
         'states': states,
         'cities': cities,
 
-
+        'recent_orders': recent_orders,
         'order_category': order_category,
         'categories': categories,
         'quantity': item_count,
@@ -427,9 +491,6 @@ clcik buy button takes here:::::
 
 """
 from datetime import datetime
-
-
-
 # User Auth
 from .models import Location
 from cities_light.models import Country, Region, City
@@ -564,9 +625,9 @@ def initialize_payment(request):
             email = form.cleaned_data.get('email', '')
             order_note = form.cleaned_data.get('order_note', '')
 
-            order_category = request.POST.get('order_category')
+            order_category = form.cleaned_data.get('order_category')
 
-            # Handle location for authenticated users
+            # Handle location for authenticated users Order.cate
             if request.user.is_authenticated:
                 profile = request.user.profile
                 location = handle_authenticated_user_location(profile, form.cleaned_data)
@@ -583,19 +644,10 @@ def initialize_payment(request):
                 )
                 cart = get_or_create_guest_cart(request)
 
-            # Calculate total amount
             total_amount = calculate_total(cart)
-
-            # Generate a random payment reference
             payment_reference = f"ORDER-{uuid.uuid4().hex[:8].upper()}"
-
-            # Create order
             order = create_order(request, location, form.cleaned_data, total_amount, payment_reference)
-
-            # Get shipping rates
             shipping_rates = get_shipping_rates(order, cart.items.all())
-
-
 
             context = {
                 'order': order,
@@ -608,7 +660,6 @@ def initialize_payment(request):
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field.capitalize()}: {error}")
-    # If not POST, redirect to cart
     return redirect('cart')
 
 
@@ -620,8 +671,6 @@ def make_payment(request, order_id):
         order = get_object_or_404(Order, id=order_id)
         chosen_rate = request.POST.get('chosen_rate')
         request_token = request.POST.get('request_token')
-        print(f"m...............mmmmmmm{chosen_rate}")
-        print(f"mm..............mmmmmm{request_token}")
 
         if not chosen_rate:
             messages.error(request, "Please choose a shipping method.")
@@ -638,7 +687,7 @@ def make_payment(request, order_id):
             
             amount_in_kobo = int((order.total_amount + order.shipping_cost) * 100)
             
-            # Initialize Paystack payment
+
             paystack_data = {
                 "amount": amount_in_kobo,
                 "email": request.user.email if request.user.is_authenticated else order.email,
@@ -661,12 +710,10 @@ def make_payment(request, order_id):
         except KeyError:
             messages.error(request, "Incomplete shipping option data.")
             return redirect('make_payment', order_id=order_id)
-    
-    # If not a POST request, render the shipping options page
-    # You'll need to implement this view to display the shipping options
+
     return render(request, 'shipping_options.html', {'order_id': order_id})
 
-    #return redirect('initialize_payment') + " " +
+
 
 
 
@@ -680,12 +727,9 @@ def payment_callback(request):
         print(shipment_created)
 
 
-        if shipment_created.get('status') == 'success':
+        if shipment_created['status'] == 'success':
             shipment_data = shipment_created['data']
-            
-            # Save important info to ShippingOrder table
-            
-            # Update Order with shipment information
+                        
             order.shipment_order_id = shipment_data['order_id']
             order.courier_name = shipment_data['courier']['name']
             order.courier_email = shipment_data['courier']['email']
@@ -701,7 +745,6 @@ def payment_callback(request):
 
             # Clear the cart Shipping method
             clear_cart(request)
-  # Store success data in session
 
             success_message = (
                 f"Payment successful! Your shipment is on its way.\n"
@@ -711,12 +754,12 @@ def payment_callback(request):
                 f"Tracking URL: {order.tracking_url}"
             )
             
-            messages.success(request, success_message)
-            
+            #messages.success(request, success_message)
+            messages.success(request, "Payment successful! Your shipment is on its way")
+            print("SUCESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
             return redirect('home')
         
         else:
-            # CHANGE: Handle shipment creation failure
             messages.error(request, "Payment successful, but shipment creation failed. Please contact support.")
             return redirect('cart')
     else:
@@ -747,7 +790,7 @@ def get_shipping_rates(order, cart_items):
     package_items = [
         {
             "name": item.product.name,
-            "description": "Handle with care", #item.product.description[:100],
+            "description": item.product.description[:100] if item.product.description else "Health related product from JollyLifeHealth",
             "unit_weight": 1,
             "unit_amount": float(item.product.price),
             "quantity": item.quantity
@@ -756,10 +799,10 @@ def get_shipping_rates(order, cart_items):
     ]
 
     data = {
-        "sender_address_code": 1045835, #get_sender_address_code(),
-        "reciever_address_code": 1045835, #create_or_get_address_code(order.delivery_location), # CHANGE: Fixed typo in 'receiver'
+        "sender_address_code": get_sender_address_code(),
+        "reciever_address_code": create_or_get_address_code(order), # CHANGE: Fixed typo in 'receiver'
         "pickup_date": datetime.now().strftime("%Y-%m-%d"),
-        "category_id": 99652979, #order.category,
+        "category_id": order.order_category if order.order_category else 99652979,
         "package_items": package_items,
         "package_dimension": {
             "length": 10,
@@ -770,55 +813,32 @@ def get_shipping_rates(order, cart_items):
     }
 
     response = make_shipbubble_request(url, data)
-    return response.get('data', {})  # CHANGE: Return full data, not just couriers
+    return response.get('data', {})
 
 
 
 def create_shipment(order):
-    #url = "https://api.shipbubble.com/v1/shipping/shipments"
+
 
     url = "https://api.shipbubble.com/v1/shipping/labels"
-    """
+    
     data = {
-        "sender_address_code": 1045835, #get_sender_address_code(),{{url}}/shipping/labels
-        "reciever_address_code": 1045835, #create_or_get_address_code(order.delivery_location),  # CHANGE: Fixed typo in 'receiver'
-        "service_code": order.shipping_method,  # CHANGE: Use 'service_code' instead of 'courier_id'
-        "package_items": [
-            {
-                "name": item.product.name,
-                "description": "Handle with care", #item.product.description[:100],
-                "unit_weight": 1,
-                "unit_amount": float(item.price),
-                "quantity": item.quantity
-            }
-            for item in order.items.all()
-        ],
-        "package_dimension": {
-            "length": 10,
-            "width": 10,
-            "height": 10
-        },
-        "delivery_instructions": order.order_note or "Handle with care"
-    }
-    order.service_code = 'test_2_courier' #chosen_rate['service_code']   #CHANGE: Use 'service_code' instead of 'courier_name'
-    order.courier_id = 'test_2_courier'
-    """
-    data = {
-        "request_token": order.request_token, #create_or_get_address_code(order.delivery_location),  # CHANGE: Fixed typo in 'receiver'
+        "request_token": order.request_token,
         "service_code": order.service_code,
-        "courier_id": order.courier_id  # CHANGE: Use 'service_code' instead of 'courier_id'order.shipping_method
+        "courier_id": order.courier_id
         }
 
     print(f"--------------------{data}")
     response = make_shipbubble_request(url, data)
     if response.get('status') == 'success':
+
         order.tracking_number = response['data']['tracking_url']
-        print(order.tracking_number)
         order.save()
-        return True
+        return response
     else:
         logger.error(f"Shipment creation failed for order {order.id}: {response.get('message')}")
-        return False
+        return response
+
 
 
 
@@ -827,7 +847,6 @@ def get_sender_address_code():
     if sender_code:
         return sender_code
 
-    # Get the first sender address from the database SenderAddress
     sender_address = SenderAddress.objects.first()
     if not sender_address:
         logger.error("No sender address found in the database")
@@ -835,8 +854,6 @@ def get_sender_address_code():
 
     url = "https://api.shipbubble.com/v1/shipping/address/validate"
     
-    #data = {"phone": "07067239473", "email": "Sam@gmail.com", "name": "Mather Osas", "address": "1, Ugbowo, Benin City, Edo State, 4444, Nigeria"}
-
     
     data = {
         "phone": sender_address.phone_number,
@@ -847,35 +864,6 @@ def get_sender_address_code():
     
     print(data)
 
-
-    """
-    json_data = json.dumps(data)
-
-    print("JSON Data:")
-    print(json_data)
-
-
-    headers = {
-        "Authorization": f"Bearer {settings.SHIPBUBBLE_API_KEY}",
-        "Content-Type": "application/json",
-    }
-    try:
-        response = requests.request("POST", url, headers=headers, json=data)
-        print(f"\n\n response------------------{response.text}\n\n")
-        
-        print(response.text)
-
-
-        response.raise_for_status()
-        return response.json()
-    except requests.RequestException as e:
-        logger.error(f"Paystack API error: {str(e)}")
-        
-
-        return {'status': False, 'message': str(e)}
-
-
-    """
     response = make_shipbubble_request(url, data)
 
     if response.get('status') == 'success':
@@ -883,7 +871,7 @@ def get_sender_address_code():
         print(f"\n\n response------------------{sender_code}\n\n")
 
         cache.set('sender_address_code', sender_code, 60*60*24)
-        print(f"\n\n response------------------{sender_code}\n\n")
+        print(f"\n\n chaced response------------------{sender_code}\n\n")
 
         return sender_code
     else:
@@ -892,30 +880,28 @@ def get_sender_address_code():
 
         return None
 
+
+
 def create_or_get_address_code(order):
     cache_key = f"address_code_{order.id}"
     address_code = cache.get(cache_key)
     if address_code:
+        print(f"\n\n chaced user------------------{address_code}\n\n")
         return address_code
 
     url = "https://api.shipbubble.com/v1/shipping/address/validate"
 
     delivery_address = order.delivery_location
     
-    data = {"phone": "07067239473", "email": "Sam@gmail.com", "name": "Mather Osas", "address": "1, Ugbowo, Benin City, Edo State, 4444, Nigeria"}
-    """
+    #data = {"phone": "07067239473", "email": "Sam@gmail.com", "name": "Mather Osas", "address": "1, Ugbowo, Benin City, Edo State, 4444, Nigeria"}
+    
     data = {
         "phone": str(order.phone_number),
         "email": str(order.email),
-        "name": str(order.name),
+        "name": f"{str(order.first_name)} {str(order.last_name)}",
         "address": str(delivery_address.formatted_address)
     }
-    """
     print(data)
-
-    #json_data = json.dumps(data)
-
-    #print(json_data)
 
     response = make_shipbubble_request(url, data)
     if response.get('status') == 'success':
@@ -998,6 +984,7 @@ def create_order(request, location, form_data, total_amount, payment_reference):
         total_amount=total_amount,
         payment_reference=payment_reference,
         status='pending',
+        order_category=form_data['order_category']
     )
 
     cart = Cart.objects.get(user=request.user) if request.user.is_authenticated else get_or_create_guest_cart(request)
@@ -1028,6 +1015,7 @@ def make_shipbubble_request(url, data=None, method='POST'):
         return response.json()
     except requests.RequestException as e:
         logger.error(f"Shipbubble API error: {str(e)}")
+        messages.error(f"Shipbubble API error: {str(e)}, Please retry")
         return {'status': 'error', 'message': str(e)}
 
 

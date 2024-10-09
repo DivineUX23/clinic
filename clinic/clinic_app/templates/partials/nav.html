@@ -41,7 +41,7 @@ Start Navigation Bar
                     </button>
                     <div id="search-results" class="card search-card __inline-13 shadow" style="display: none;">
                         <div class="card-body search-result-box __h-[16px]00px overflow-x-hidden overflow-y-auto">
-                            <!-- Search results will be displayed here -->
+                            <!-- Search results will be displayed here log out-->
                         </div>
                     </div>
                     
@@ -230,8 +230,14 @@ Start Navigation Bar
                     {% endif %}
                 </p>
             </div>
+
+
+
             <div class="items-center px-4 py-3">
                 {% if user.is_authenticated %}
+                    <a href="{% url 'user_orders' %}" class="block px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 text-center mb-3">
+                        View Orders
+                    </a>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">

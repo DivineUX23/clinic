@@ -33,6 +33,7 @@ urlpatterns = [
 
     path('initialize-payment/', views.initialize_payment, name='initialize_payment'),
 
+    path('my-orders/', views.user_orders, name='user_orders'),
 
     path('make-payment/<int:order_id>/', views.make_payment, name='make_payment'),
 

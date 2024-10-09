@@ -124,7 +124,8 @@ class OrderForm(forms.Form):
     phone_number = forms.CharField(max_length=14)
     email = forms.EmailField(required=False)
     order_note = forms.CharField(widget=forms.Textarea, required=False)
-
+    order_category = forms.CharField(max_length=100)
+    
     def clean_name(self):
         first_name = self.cleaned_data['first_name']
         first_names = first_name.split()

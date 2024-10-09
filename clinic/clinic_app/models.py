@@ -159,7 +159,7 @@ class Order(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20)
-    email = models.EmailField(max_length=254)  
+    email = models.EmailField(max_length=150)
     order_note = models.TextField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_reference = models.CharField(max_length=100, unique=True)
@@ -181,9 +181,9 @@ class Order(models.Model):
     courier_id = models.CharField(max_length=255, null=True, unique=False)
     request_token = models.CharField(max_length=255, null=True, unique=False)
 
+    order_category = models.CharField(max_length=255, null=True, unique=False)
 
 
-    
     # New fields for shipment information
     shipment_order_id = models.CharField(max_length=50, blank=True, null=True)
     courier_name = models.CharField(max_length=100, blank=True, null=True)
