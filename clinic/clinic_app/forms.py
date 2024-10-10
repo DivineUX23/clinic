@@ -110,6 +110,7 @@ class SignUpForm(UserCreationForm):
 
 from django import forms
 from .models import Country, Region, City
+import re
 
 class OrderForm(forms.Form):
     street_no = forms.CharField(max_length=100, required=False)
@@ -124,31 +125,52 @@ class OrderForm(forms.Form):
     phone_number = forms.CharField(max_length=14)
     email = forms.EmailField(required=False)
     order_note = forms.CharField(widget=forms.Textarea, required=False)
-    order_category = forms.CharField(max_length=100)
+    order_category = forms.CharField(max_length=100, required=False)
     
-    def clean_name(self):
-        first_name = self.cleaned_data['first_name']
-        first_names = first_name.split()
-        for n in first_names:
+    def clean_name(self, field):
+        name = self.cleaned_data.get(field, "")
+        names = name.split()
+        for n in names:
             if not n.replace('-', '').replace("'", '').isalpha():
-                raise forms.ValidationError("First Name should only contain letters, spaces, hyphens, and apostrophes.")
-        return first_name
+                raise forms.ValidationError(f"{field.capitalize()} should only contain letters, spaces, hyphens, and apostrophes.")
+        return name
 
+    def clean_first_name(self):
+        return self.clean_name('first_name')
 
-    def clean_name(self):
-        last_name = self.cleaned_data['last_name']
-        last_names = last_name.split()
-        for n in last_names:
-            if not n.replace('-', '').replace("'", '').isalpha():
-                raise forms.ValidationError("Last Name should only contain letters, spaces, hyphens, and apostrophes.")
-        return last_name
-        
+    def clean_last_name(self):
+        return self.clean_name('last_name')
 
+    # Nigerian phone number validation
     def clean_phone_number(self):
         phone_number = self.cleaned_data['phone_number']
-        if not phone_number.isdigit() or len(phone_number) < 10 or len(phone_number) > 14:
-            raise forms.ValidationError("Please enter a valid phone number (10-14 digits).")
+
+        # Check if the number starts with +234 or the Nigerian local format (070, 080, 090, etc.)
+        nigerian_phone_pattern = r"^(\+234|0)[789][01]\d{8}$"
+        if not re.match(nigerian_phone_pattern, phone_number):
+            raise forms.ValidationError("Please enter a valid Nigerian phone number starting with +234 or 0.")
+        
         return phone_number
+
+    # Optional: postal code validation (for Nigeria)
+    def clean_postal_code(self):
+        postal_code = self.cleaned_data['postal_code']
+        if postal_code and not postal_code.isdigit():
+            raise forms.ValidationError("Postal code should contain only digits.")
+        return postal_code
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

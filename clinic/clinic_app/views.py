@@ -145,34 +145,24 @@ def product_api(request, section):
 
 
 
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from .models import Order
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.db.models import Q
-from .models import Order
 
 @login_required
 def user_orders(request):
     # Get filter and sort parameters
     status_filter = request.GET.get('status', 'all')
     sort_by = request.GET.get('sort', '-created_at')
-
-    # Base queryset
     orders = Order.objects.filter(user=request.user)
 
-    # Apply status filter
     if status_filter != 'all':
         orders = orders.filter(shipment_status=status_filter)
 
-    # Apply sorting
     orders = orders.order_by(sort_by)
 
+    categories = Category.objects.all()
+
     # Pagination
-    paginator = Paginator(orders, 10)  # create_shipment
+    paginator = Paginator(orders, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -180,6 +170,8 @@ def user_orders(request):
         'page_obj': page_obj,
         'status_filter': status_filter,
         'sort_by': sort_by,
+        'categories': categories,
+
     }
     return render(request, 'user_orders.html', context)
 
@@ -649,6 +641,21 @@ def initialize_payment(request):
             order = create_order(request, location, form.cleaned_data, total_amount, payment_reference)
             shipping_rates = get_shipping_rates(order, cart.items.all())
 
+
+            #if shipping_rates.get('status') != 'success':
+                #messages.error(request, f"{shipping_rates.get('message')}")
+                #return redirect('cart')
+
+            if shipping_rates.get('status') == 'success':
+                if 'data' in shipping_rates:
+                    shipping_rates = shipping_rates.get('data', {})
+                else:
+                    messages.error(request, f"{shipping_rates.get('message')}")
+                    return redirect('cart')
+            else:
+                messages.error(request, f"{shipping_rates.get('message')}")
+                return redirect('cart')
+            
             context = {
                 'order': order,
                 'shipping_rates': shipping_rates,
@@ -727,7 +734,8 @@ def payment_callback(request):
         print(shipment_created)
 
 
-        if shipment_created['status'] == 'success':
+        if shipment_created.status_code == 200 and shipment_created.get('status') == 'success':
+
             shipment_data = shipment_created['data']
                         
             order.shipment_order_id = shipment_data['order_id']
@@ -797,10 +805,18 @@ def get_shipping_rates(order, cart_items):
         }
         for item in cart_items
     ]
+    
+    sender_address = get_sender_address_code() 
+    users_address = create_or_get_address_code(order)
+    if not isinstance(sender_address, int):
+        return sender_address 
+    
+    if not isinstance(users_address, int):
+        return users_address  
 
     data = {
-        "sender_address_code": get_sender_address_code(),
-        "reciever_address_code": create_or_get_address_code(order), # CHANGE: Fixed typo in 'receiver'
+        "sender_address_code": sender_address,
+        "reciever_address_code": users_address, 
         "pickup_date": datetime.now().strftime("%Y-%m-%d"),
         "category_id": order.order_category if order.order_category else 99652979,
         "package_items": package_items,
@@ -813,7 +829,10 @@ def get_shipping_rates(order, cart_items):
     }
 
     response = make_shipbubble_request(url, data)
-    return response.get('data', {})
+    #return response.get('data', {})
+
+    return response
+
 
 
 
@@ -830,11 +849,16 @@ def create_shipment(order):
 
     print(f"--------------------{data}")
     response = make_shipbubble_request(url, data)
-    if response.get('status') == 'success':
+    #if response.get('status') == 'success': {data['name']}"
 
-        order.tracking_number = response['data']['tracking_url']
-        order.save()
-        return response
+    if response.get('status') == 'success':
+        if 'data' in response and 'tracking_url' in response['data']:
+            order.tracking_number = response['data']['tracking_url']
+            order.save()
+            return response
+        else:
+            logger.error(f"Invalid response structure from Shipbubble API for order {order.id}")
+            return response
     else:
         logger.error(f"Shipment creation failed for order {order.id}: {response.get('message')}")
         return response
@@ -866,19 +890,24 @@ def get_sender_address_code():
 
     response = make_shipbubble_request(url, data)
 
+    #if response.get('status') == 'success':
+  
     if response.get('status') == 'success':
-        sender_code = response['data']['address_code']
-        print(f"\n\n response------------------{sender_code}\n\n")
+        if 'data' in response and 'address_code' in response['data']:
+            sender_code = response['data']['address_code']
+            cache.set('sender_address_code', sender_code, 60*60*24)
+            print(f"\n\n chaced response------------------{sender_code}\n\n")
 
-        cache.set('sender_address_code', sender_code, 60*60*24)
-        print(f"\n\n chaced response------------------{sender_code}\n\n")
-
-        return sender_code
+            return sender_code
+        
+        else:
+            logger.error(f"Invalid response structure from Shipbubble API for order {data['name']}")
+            return response
     else:
         logger.error(f"Error creating sender address: {response.get('message')}")
         print(f"Error creating sender address: {response.get('message')}")
 
-        return None
+        return response
 
 
 
@@ -893,7 +922,7 @@ def create_or_get_address_code(order):
 
     delivery_address = order.delivery_location
     
-    #data = {"phone": "07067239473", "email": "Sam@gmail.com", "name": "Mather Osas", "address": "1, Ugbowo, Benin City, Edo State, 4444, Nigeria"}
+    #data = {"phone": "07067239473", response.sta"email": "Sam@gmail.com", "name": "Mather Osas", "address": "1, Ugbowo, Benin City, Edo State, 4444, Nigeria"}
     
     data = {
         "phone": str(order.phone_number),
@@ -904,13 +933,20 @@ def create_or_get_address_code(order):
     print(data)
 
     response = make_shipbubble_request(url, data)
+
     if response.get('status') == 'success':
-        address_code = response['data']['address_code']
-        cache.set(cache_key, address_code, 60*60)
-        return address_code
+
+        if 'data' in response and 'address_code' in response['data']:
+            address_code = response['data']['address_code']
+            cache.set(cache_key, address_code, 60*60)
+            return address_code
+        
+        else:
+            logger.error(f"Invalid response structure from Shipbubble API for order {data['name']}")
+            return response
     else:
         logger.error(f"Error creating address for order {order.id}: {response.get('message')}")
-        return None
+        return response
 
 
 def get_categories():
@@ -972,29 +1008,35 @@ def update_profile(profile, form_data):
 
 
 def create_order(request, location, form_data, total_amount, payment_reference):
-    order = Order.objects.create(
-        user=request.user if request.user.is_authenticated else None,
-        session_key=request.session.session_key if not request.user.is_authenticated else None,
-        delivery_location=location,
-        first_name=form_data['first_name'],
-        last_name=form_data['last_name'],
-        phone_number=form_data['phone_number'],
-        email=form_data['email'],
-        order_note=form_data['order_note'],
-        total_amount=total_amount,
-        payment_reference=payment_reference,
-        status='pending',
-        order_category=form_data['order_category']
-    )
 
-    cart = Cart.objects.get(user=request.user) if request.user.is_authenticated else get_or_create_guest_cart(request)
-    for item in cart.items.all():
-        OrderItem.objects.create(
-            order=order,
-            product=item.product,
-            price=item.product.price,
-            quantity=item.quantity
+    try:    
+        order = Order.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            session_key=request.session.session_key if not request.user.is_authenticated else None,
+            delivery_location=location,
+            first_name=form_data['first_name'],
+            last_name=form_data['last_name'],
+            phone_number=form_data['phone_number'],
+            email=form_data['email'],
+            order_note=form_data['order_note'],
+            total_amount=total_amount,
+            payment_reference=payment_reference,
+            status='pending',
+            order_category=form_data['order_category']
         )
+
+        cart = Cart.objects.get(user=request.user) if request.user.is_authenticated else get_or_create_guest_cart(request)
+        for item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                price=item.product.price,
+                quantity=item.quantity
+            )
+        
+    except Exception as e:
+        messages.error(request, f"Error creating order: {str(e)}")
+        return redirect('cart')
 
     return order
 
@@ -1010,12 +1052,11 @@ def make_shipbubble_request(url, data=None, method='POST'):
             print(f"\n\n data--------------------------00000000000000000000000-{data}\n\n ")
 
             response = requests.post(url, headers=headers, json=data)
-        print(f"\n\n RESPONSE++++++++++++++++++++------------------{response.text}\n\n")
+
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
         logger.error(f"Shipbubble API error: {str(e)}")
-        messages.error(f"Shipbubble API error: {str(e)}, Please retry")
         return {'status': 'error', 'message': str(e)}
 
 
@@ -1089,6 +1130,49 @@ def clear_cart(request):
 
 
 
+
+
+#WEBHOOK
+import hashlib
+import hmac
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+from django.conf import settings
+
+@csrf_exempt
+def shipbubble_webhook(request):
+    if request.method == 'POST':
+        # Verify the webhook signature
+        signature = request.headers.get('x-ship-signature')
+        if not verify_signature(request.body, signature):
+            return HttpResponse(status=403)
+
+        try:
+            payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return HttpResponse(status=400)
+
+        # Process the webhook
+        order_id = payload.get('order_id')
+        status_code = payload.get('status_code')
+
+        if order_id and status_code:
+            try:
+                order = Order.objects.get(shipment_order_id=order_id)
+                order.status = status_code
+                order.save()
+            except Order.DoesNotExist:
+                pass
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=405)
+
+def verify_signature(payload, signature):
+    secret_key = settings.SHIPBUBBLE_API_KEY 
+    computed_signature = hmac.new(secret_key.encode(), payload, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(computed_signature, signature)
 
 
 

@@ -57,29 +57,42 @@
                     </div>
                     <div class="accordion mt-n1 __cate-side-price" id="shop-categories">
                    
-
-                        <div class="menu--caret-accordion">
-                            <div class="card-header flex-between">
-                                <a href="?status=all{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="px-4 py-2 rounded-md {% if status_filter == 'all' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">All</a>
-                                </div>
-                        </div>
-
-
-                        <div class="menu--caret-accordion">
-                            <div class="card-header flex-between">
-                                <a href="?status=pending{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="px-4 py-2 rounded-md {% if status_filter == 'pending' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">Pending</a>
-                                </div>
-                        </div>
-
-                        <div class="menu--caret-accordion">
-                            <div class="card-header flex-between">
-                                <a href="?status=completed{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="px-4 py-2 rounded-md {% if status_filter == 'completed' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">Completed</a>
+                        <div class="menu--caret-accordion d-flex justify-content-center">
+                            <div class="card-header w-100 text-center">
+                                <a href="?status=all{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                   class="w-100 text-center px-4 py-2 rounded-md {% if status_filter == 'all' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                   All
+                                </a>
                             </div>
                         </div>
+          
+                        <div class="menu--caret-accordion d-flex justify-content-center">
+                            <div class="card-header w-100 text-center">
+                                <a href="?status=pending{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                   class="w-100 text-center px-4 py-2 rounded-md {% if status_filter == 'pending' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                   Pending
+                                </a>
+                            </div>
+                        </div>
+          
 
-                        <div class="menu--caret-accordion">
-                            <div class="card-header flex-between">
-                                <a href="?status=failed{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="px-4 py-2 rounded-md {% if status_filter == 'failed' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">Failed</a>
+                        
+                        <div class="menu--caret-accordion d-flex justify-content-center">
+                            <div class="card-header w-100 text-center">
+                                <a href="?status=completed{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                   class="w-100 text-center px-4 py-2 rounded-md {% if status_filter == 'completed' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                   completed
+                                </a>
+                            </div>
+                        </div>
+          
+
+                        <div class="menu--caret-accordion d-flex justify-content-center">
+                            <div class="card-header w-100 text-center">
+                                <a href="?status=failed{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                   class="w-100 text-center px-4 py-2 rounded-md {% if status_filter == 'failed' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                   failed
+                                </a>
                             </div>
                         </div>
 
@@ -96,32 +109,128 @@
                     {% for order in page_obj %}
                         <div class="bg-white rounded-lg shadow-md overflow-hidden">
                             <div class="p-6">
-                                <h2 class="text-xl font-semibold text-gray-800 mb-2">Order #{{ order.id }}</h2>
-                                <p class="text-sm text-gray-600 mb-4">Placed on: {{ order.created_at|date:"F j, Y" }}</p>
+                                                    
+                                <h2 class="text-xl font-semibold text-gray-800 mb-2 flex items-center">
+                                    <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                    </svg>
+                                    Order #{{ order.id }}
+                                </h2>
+                                <p class="text-sm text-gray-600 mb-4 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    {{ order.created_at|date:"F j, Y" }}
+                                </p>
                                 
-                                <div class="mb-4">
-                                    <p class="text-gray-700"><strong>Total Amount:</strong> ${{ order.total_amount }}</p>
-                                    <p class="text-gray-700"><strong>Status:</strong> {{ order.status|title }}</p>
+                                <table class="w-full mb-4">
+                                    <tr class="hidden md:table-row">
+                                        <td class="font-semibold text-right pr-2">Total Amount:</td>
+                                        
+                                        <span class="text-accent text-dark">
+                                            <td>₦{{ order.total_amount }}</td>
+                                        </span>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="flex items-center">
+                                                <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                <span class="text-accent text-dark">
+                                                    ₦{{ order.total_amount }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     {% if order.shipment_status %}
-                                        <p class="text-gray-700"><strong>Shipment Status:</strong> {{ order.shipment_status|title }}</p>
+                                        <tr class="hidden md:table-row">
+                                            <td class="font-semibold text-right pr-2">Shipment Status:</td>
+                                            <td>{{ order.shipment_status|title }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center">
+                                                    <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    {{ order.shipment_status|title }}
+                                                </div>
+                                            </td>
+                                        </tr>
                                     {% endif %}
-                                </div>
+                                </table>
                                 
                                 {% if order.shipment_order_id %}
-                                    <div class="mb-4">
-                                        <p class="text-gray-700"><strong>Tracking Code:</strong> {{ order.shipment_order_id }}</p>
-                                        <p class="text-gray-700"><strong>Courier:</strong> {{ order.courier_name }}</p>
-                                    </div>
+                                    <table class="w-full mb-4">
+                                        <tr class="hidden md:table-row">
+                                            <td class="font-semibold text-right pr-2">Tracking Code:</td>
+                                            <td>{{ order.shipment_order_id }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center">
+                                                    <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                                    </svg>
+                                                    {{ order.shipment_order_id }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="hidden md:table-row">
+                                            <td class="font-semibold text-right pr-2">Courier:</td>
+                                            <td>{{ order.courier_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center">
+                                                    <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                                                    </svg>
+                                                    {{ order.courier_name }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="hidden md:table-row">
+                                            <td class="font-semibold text-right pr-2">Courier Phone:</td>
+                                            <td>{{ order.courier_phone }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center">
+                                                    <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                                    </svg>
+                                                    {{ order.courier_phone }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="hidden md:table-row">
+                                            <td class="font-semibold text-right pr-2">Courier Email:</td>
+                                            <td>{{ order.courier_email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="flex items-center">
+                                                    <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    {{ order.courier_email }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
                                     
                                     {% if order.tracking_url %}
-                                        <a href="{{ order.tracking_url }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-purple btn-purple text-white rounded-md">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                                            </svg>
-                                            Track Shipment
-                                        </a>
-                                    {% endif %}
+                                    <a href="{{ order.tracking_url }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-purple btn-purple text-white rounded-md">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                        </svg>
+                                        Track Shipment
+                                    </a>
                                 {% endif %}
+                                {% endif %}                           
                             </div>
                         </div>
                     {% endfor %}
@@ -230,32 +339,45 @@
                     <div id="mobile-categories-accordion">
                      
 
-                        <div class="menu--caret-accordion">
-                            <div class="card-header flex-between">
-                                <a href="?status=all{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="px-4 py-2 rounded-md {% if status_filter == 'all' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">All</a>
-                                </div>
-                        </div>
-
-
-                        <div class="menu--caret-accordion">
-                            <div class="card-header flex-between">
-                                <a href="?status=pending{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="px-4 py-2 rounded-md {% if status_filter == 'pending' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">Pending</a>
-                                </div>
-                        </div>
-
-                        <div class="menu--caret-accordion">
-                            <div class="card-header flex-between">
-                                <a href="?status=completed{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="px-4 py-2 rounded-md {% if status_filter == 'completed' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">Completed</a>
+                                           
+                        <div class="menu--caret-accordion d-flex justify-content-center">
+                            <div class="card-header w-100 text-center">
+                                <a href="?status=all{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                   class="w-100 text-center px-4 py-2 rounded-md {% if status_filter == 'all' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                   All
+                                </a>
                             </div>
                         </div>
-
-                        <div class="menu--caret-accordion">
-                            <div class="card-header flex-between">
-                                <a href="?status=failed{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="px-4 py-2 rounded-md {% if status_filter == 'failed' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">Failed</a>
+          
+                        <div class="menu--caret-accordion d-flex justify-content-center">
+                            <div class="card-header w-100 text-center">
+                                <a href="?status=pending{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                   class="w-100 text-center px-4 py-2 rounded-md {% if status_filter == 'pending' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                   Pending
+                                </a>
                             </div>
                         </div>
+          
 
+                        
+                        <div class="menu--caret-accordion d-flex justify-content-center">
+                            <div class="card-header w-100 text-center">
+                                <a href="?status=completed{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                   class="w-100 text-center px-4 py-2 rounded-md {% if status_filter == 'completed' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                   completed
+                                </a>
+                            </div>
+                        </div>
+          
 
+                        <div class="menu--caret-accordion d-flex justify-content-center">
+                            <div class="card-header w-100 text-center">
+                                <a href="?status=failed{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+                                   class="w-100 text-center px-4 py-2 rounded-md {% if status_filter == 'failed' %}bg-purple btn-purple text-white{% else %}bg-gray-200 text-gray-700{% endif %}">
+                                   failed
+                                </a>
+                            </div>
+                        </div>
 
 
 

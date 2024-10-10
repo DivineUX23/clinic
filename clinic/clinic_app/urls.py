@@ -41,6 +41,7 @@ urlpatterns = [
 
     path('product/<slug:slug>/', views.product_detail, name='product_detail'),
 
+    path('webhook/shipbubble/', views.shipbubble_webhook, name='shipbubble_webhook'),
 
     path('products/', views.product_list, name='products'),
     path('product/<int:product_id>/', views.product_detail, name='product_detail'),

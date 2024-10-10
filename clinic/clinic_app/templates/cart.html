@@ -400,7 +400,6 @@ document.addEventListener('DOMContentLoaded', function() {
         last_name: document.getElementById('last_name'),
         phone_number: document.getElementById('phone_number'),
         email: document.getElementById('email'),
-
         order_category: document.getElementById('order_category'),
 
     };
@@ -443,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Populate states based on selected country
     inputFields.country.addEventListener('change', function() {
-        // Your existing code for populating states
+
         const countryId = this.value;
         const states = {{ states|safe }};
         const filteredStates = states.filter(state => state.country_id == countryId);
@@ -459,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Populate cities based on selected state
     inputFields.state.addEventListener('change', function() {
-        // Your existing code for populating cities
+
         const stateId = this.value;
         const cities = {{ cities|safe }};
         const filteredCities = cities.filter(city => city.region_id == stateId);
@@ -496,11 +495,26 @@ document.addEventListener('DOMContentLoaded', function() {
             errorMessage += 'Name should only contain letters and spaces.\n';
         }
 
-        // Validate phone number
-        const phoneValue = inputFields.phone_number.value.trim();
-        if (phoneValue && !/^\d{10,14}$/.test(phoneValue)) {
+        const lastNameValue = inputFields.last_name.value.trim();
+        if (lastNameValue && !/^[a-zA-Z\s'-]+$/.test(lastNameValue)) {
             isValid = false;
-            errorMessage += 'Please enter a valid phone number (10-14 digits).\n';
+            errorMessage += 'Last name should only contain letters, spaces.\n';
+        }
+
+        // Validate Nigerian phone number (+234 or local format)
+        const phoneValue = inputFields.phone_number.value.trim();
+        const nigerianPhonePattern = /^(\+234|0)[789][01]\d{8}$/;
+        if (phoneValue && !nigerianPhonePattern.test(phoneValue)) {
+            isValid = false;
+            errorMessage += 'Please enter a valid Nigerian phone number starting with +234 or 0.\n';
+        }
+
+        // Validate email
+        const emailValue = inputFields.email.value.trim();
+        const emailPattern = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+        if (emailValue && !emailPattern.test(emailValue)) {
+            isValid = false;
+            errorMessage += 'Please enter a valid email address.\n';
         }
 
         return { isValid, errorMessage };
