@@ -646,7 +646,13 @@ def initialize_payment(request):
                 #messages.error(request, f"{shipping_rates.get('message')}")
                 #return redirect('cart')
 
-            if shipping_rates.get('status') == 'success':
+            if shipping_rates is None:
+                messages.error(request, "Failed to retrieve shipping rates.")
+                return redirect('cart')
+
+
+            if 'status' in shipping_rates and shipping_rates.get('status') == 'success':
+
                 if 'data' in shipping_rates:
                     shipping_rates = shipping_rates.get('data', {})
                 else:
@@ -733,8 +739,12 @@ def payment_callback(request):
         shipment_created = create_shipment(order)
         print(shipment_created)
 
+        if shipment_created is None:
+            messages.error(request, "Failed to retrieve shipping rates.")
+            return redirect('cart')
 
-        if shipment_created.status_code == 200 and shipment_created.get('status') == 'success':
+
+        if 'status' in shipment_created and shipment_created.get('status') == 'success':
 
             shipment_data = shipment_created['data']
                         
@@ -851,7 +861,13 @@ def create_shipment(order):
     response = make_shipbubble_request(url, data)
     #if response.get('status') == 'success': {data['name']}"
 
-    if response.get('status') == 'success':
+
+    if response is None:
+        return response
+
+
+    if 'status' in response and response.get('status') == 'success':
+
         if 'data' in response and 'tracking_url' in response['data']:
             order.tracking_number = response['data']['tracking_url']
             order.save()
@@ -890,9 +906,8 @@ def get_sender_address_code():
 
     response = make_shipbubble_request(url, data)
 
-    #if response.get('status') == 'success':
   
-    if response.get('status') == 'success':
+    if 'status' in response and response.get('status') == 'success':
         if 'data' in response and 'address_code' in response['data']:
             sender_code = response['data']['address_code']
             cache.set('sender_address_code', sender_code, 60*60*24)
@@ -933,8 +948,9 @@ def create_or_get_address_code(order):
     print(data)
 
     response = make_shipbubble_request(url, data)
+    if 'status' in response and response.get('status') == 'success':
 
-    if response.get('status') == 'success':
+    #if response.get('status') == 'success':
 
         if 'data' in response and 'address_code' in response['data']:
             address_code = response['data']['address_code']

@@ -46,12 +46,12 @@ class SignUpForm(UserCreationForm):
     first_name = forms.CharField(
         max_length=15, 
         required=False, 
-        help_text='Optional. Enter your phone number.'
+        help_text='Optional. Enter your First name.'
     )
     last_name = forms.CharField(
         max_length=15, 
         required=False, 
-        help_text='Optional. Enter your phone number.'
+        help_text='Optional. Enter your Last name.'
     )
     email = forms.EmailField(
         required=True, 
@@ -123,7 +123,7 @@ class OrderForm(forms.Form):
     first_name = forms.CharField(max_length=100)
     last_name = forms.CharField(max_length=100)
     phone_number = forms.CharField(max_length=14)
-    email = forms.EmailField(required=False)
+    email = forms.EmailField(required=True)
     order_note = forms.CharField(widget=forms.Textarea, required=False)
     order_category = forms.CharField(max_length=100, required=False)
     
