@@ -90,7 +90,7 @@ def home(request):
 
 def product_api(request, section):
     page_number = request.GET.get('page', 1)
-    items_per_page = 10  # Adjust this number as needed
+    items_per_page = 20  # Adjust this number as needed
 
     if section == 'new-arrivals':
         #thirty_days_ago = timezone.now() - timedelta(days=30)
