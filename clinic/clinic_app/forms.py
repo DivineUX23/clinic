@@ -31,7 +31,7 @@ class SignUpForm(UserCreationForm):
         help_text='Optional. Enter your phone number.'
     )
     street_no = forms.CharField(
-        max_length=10, 
+        max_length=255, 
         required=False, 
         help_text='Optional. Enter your street number.'
     )

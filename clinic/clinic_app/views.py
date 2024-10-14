@@ -147,12 +147,16 @@ def product_api(request, section):
 
 from django.contrib.auth.decorators import login_required
 
-@login_required
+#@login_required
 def user_orders(request):
     # Get filter and sort parameters
     status_filter = request.GET.get('status', 'all')
     sort_by = request.GET.get('sort', '-created_at')
-    orders = Order.objects.filter(user=request.user)
+
+    if request.user.is_authenticated:
+        orders = Order.objects.filter(user=request.user)
+    else:
+        orders = Order.objects.filter(session_key=request.session.session_key)
 
     if status_filter != 'all':
         orders = orders.filter(shipment_status=status_filter)
@@ -325,10 +329,25 @@ def cart_view(request):
 
 
     # Get the 5 most recent processing or failed orders
-    recent_orders = Order.objects.filter(
-        user=request.user,
-        status__in=['processing', 'failed']
-    ).order_by('-created_at')[:5]
+    try:
+        if request.user.is_authenticated:
+    
+            recent_orders = Order.objects.filter(
+                user=request.user,
+                status__in=['processing', 'failed']
+            ).order_by('-created_at')[:5]
+
+        else:
+    
+            recent_orders = Order.objects.filter(
+                session_key=request.session.session_key,
+                status__in=['processing', 'failed']
+            ).order_by('-created_at')[:5]
+
+    except Exception as e:
+        print(f"Error fetching recent orders: {e}")
+        messages.error(request, f"Error fetching recent orders: {e}")
+
 
     context = {
         'cart_items': cart_items,
@@ -475,13 +494,7 @@ def search_products(request):
 
 
 #PAYMENT:
-"""
-Before initialize payment, choose category id, a pop shows all all the available curiors and ask them to choose 
-and confirm then payment countinues to paystack initialize payments. 
 
-clcik buy button takes here:::::
-
-"""
 from datetime import datetime
 # User Auth
 from .models import Location
