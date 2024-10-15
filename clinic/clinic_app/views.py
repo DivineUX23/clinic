@@ -507,7 +507,7 @@ def signup_view(request):
         form = SignUpForm(request.POST)
 
         
-        # Get the selected country and state from the POST data
+        # Get the selected country and state from the POST data create_order
         country_id = request.POST.get('country')
         state_id = request.POST.get('state')
         
@@ -604,8 +604,6 @@ def signin_view(request):
 
 
 
-
-
 def initialize_payment(request):
     if request.method == 'POST':
 
@@ -619,12 +617,15 @@ def initialize_payment(request):
         print("Form instance:")
         if form.is_valid():
             # Process the form data
-            street_no = form.cleaned_data['street_no']
-            street = form.cleaned_data['street']
-            country = form.cleaned_data['country']
-            state = form.cleaned_data['state']
-            city = form.cleaned_data['city']
-            postal_code = form.cleaned_data['postal_code']
+            #street_no = form.cleaned_data['street_no']
+            #street = form.cleaned_data['street']
+            #country = form.cleaned_data['country']
+            #state = form.cleaned_data['state']
+            #city = form.cleaned_data['city']
+            #postal_code = form.cleaned_data['postal_code']
+
+            formatted_address = form.cleaned_data['address']
+
             name = form.cleaned_data['first_name'] + " " + form.cleaned_data['last_name']
             phone_number = form.cleaned_data['phone_number']
             email = form.cleaned_data.get('email', '')
@@ -640,12 +641,14 @@ def initialize_payment(request):
             else:
                 # For non-authenticated users, always create a new location
                 location = Location.objects.create(
-                    street_no=street_no,
-                    street=street,
-                    country=country,
-                    state=state,
-                    city=city,
-                    postal_code=postal_code
+                    #street_no=street_no,
+                    #street=street,
+                    #country=country,
+                    #state=state,
+                    #city=city,
+                    #postal_code=postal_code
+
+                    formatted_address=formatted_address
                 )
                 cart = get_or_create_guest_cart(request)
 
@@ -961,6 +964,8 @@ def create_or_get_address_code(order):
     print(data)
 
     response = make_shipbubble_request(url, data)
+    print(f"\n\n bubblw response------------------{response}\n\n")
+
     if 'status' in response and response.get('status') == 'success':
 
     #if response.get('status') == 'success':
@@ -1005,27 +1010,32 @@ def handle_authenticated_user_location(profile, form_data):
 
 def location_needs_update(location, form_data):
     return any([
-        location.street_no != form_data['street_no'],
-        location.street != form_data['street'],
-        location.country != form_data['country'],
-        location.state != form_data['state'],
-        location.city != form_data['city'],
-        location.postal_code != form_data['postal_code']
+        #location.street_no != form_data['street_no'],
+        #location.street != form_data['street'],
+        #location.country != form_data['country'],
+        #location.state != form_data['state'],
+        #location.city != form_data['city'],
+        #location.postal_code != form_data['postal_code']
+        location.formatted_address != form_data['address']
     ])
 
 def update_location(location, form_data):
-    for field in ['street_no', 'street', 'country', 'state', 'city', 'postal_code']:
+    #for field in ['street_no', 'street', 'country', 'state', 'city', 'postal_code']:
+        #setattr(location, field, form_data[field])
+        
+    for field in ['formatted_address']:
         setattr(location, field, form_data[field])
     location.save()
 
 def create_location(form_data):
     return Location.objects.create(
-        street_no=form_data['street_no'],
-        street=form_data['street'],
-        country=form_data['country'],
-        state=form_data['state'],
-        city=form_data['city'],
-        postal_code=form_data['postal_code']
+        #street_no=form_data['street_no'],
+        #street=form_data['street'],
+        #country=form_data['country'],
+        #state=form_data['state'],
+        #city=form_data['city'],
+        #postal_code=form_data['postal_code']
+        formatted_address = form_data['address']
     )
 
 def update_profile(profile, form_data):

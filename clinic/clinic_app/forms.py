@@ -9,64 +9,37 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from cities_light.models import Country, Region, City
 
+
+
 class SignUpForm(UserCreationForm):
-    
     first_name = forms.CharField(
-        max_length=15, 
-        required=False, 
+        max_length=15,
+        required=False,
         help_text='Optional. Enter your first name.'
     )
     last_name = forms.CharField(
-        max_length=15, 
-        required=False, 
+        max_length=15,
+        required=False,
         help_text='Optional. Enter your last name.'
     )
     email = forms.EmailField(
-        required=True, 
+        required=True,
         help_text='Required. Enter a valid email address.'
     )
     phone_number = forms.CharField(
-        max_length=15, 
-        required=False, 
+        max_length=15,
+        required=False,
         help_text='Optional. Enter your phone number.'
     )
-    street_no = forms.CharField(
-        max_length=255, 
-        required=False, 
-        help_text='Optional. Enter your street number.'
-    )
-    street = forms.CharField(
-        max_length=255, 
-        required=False, 
-        help_text='Optional. Enter your street name.'
-    )
-    country = forms.ModelChoiceField(
-        #queryset=Country.objects.all(), 
-        queryset=Country.objects.filter(code2__in=['NG', 'GH']),
-
+    address = forms.CharField(
+        max_length=255,
         required=False,
-        help_text='Optional. Select your country.'
-    )
-    state = forms.ModelChoiceField(
-        queryset=Region.objects.none(), 
-        required=False,
-        help_text='Optional. Select your state/region.'
-    )
-    city = forms.ModelChoiceField(
-        queryset=City.objects.none(),
-        required=False,
-        help_text='Optional. Select your city.'
-    )
-    postal_code = forms.CharField(
-        max_length=20, 
-        required=False, 
-        help_text='Optional. Enter your postal code.'
+        help_text='Optional. Enter your full address.'
     )
 
     class Meta:
         model = User
-        fields = ("username", "first_name", "last_name", "email", "phone_number", "street_no", "street", "country", "state", "city", "postal_code", "password1", "password2")
-
+        fields = ("username", "first_name", "last_name", "email", "phone_number", "address", "password1", "password2")
 
 
 
@@ -81,13 +54,16 @@ from .models import Country, Region, City
 import re
 
 class OrderForm(forms.Form):
-    street_no = forms.CharField(max_length=255, required=False)
-    street = forms.CharField(max_length=255)
-    country = forms.ModelChoiceField(queryset=Country.objects.all())
-    state = forms.ModelChoiceField(queryset=Region.objects.all())
-    city = forms.ModelChoiceField(queryset=City.objects.all())
-    postal_code = forms.CharField(max_length=20, required=False)
+    #street_no = forms.CharField(max_length=255, required=False)
+    #street = forms.CharField(max_length=255)
+    #country = forms.ModelChoiceField(queryset=Country.objects.all())
+    #state = forms.ModelChoiceField(queryset=Region.objects.all())
+    #city = forms.ModelChoiceField(queryset=City.objects.all())
+    #postal_code = forms.CharField(max_length=20, required=False)
     #name = forms.CharField(max_length=255)
+
+
+    address = forms.CharField(max_length=255)
     first_name = forms.CharField(max_length=255)
     last_name = forms.CharField(max_length=255)
     phone_number = forms.CharField(max_length=14)
@@ -118,11 +94,3 @@ class OrderForm(forms.Form):
             raise forms.ValidationError("Please enter a valid Nigerian phone number starting with +234 or 0.")
         
         return phone_number
-
-    # Optional: postal code validation (for Nigeria)
-    def clean_postal_code(self):
-        postal_code = self.cleaned_data['postal_code']
-        if postal_code and not postal_code.isdigit():
-            raise forms.ValidationError("Postal code should contain only digits.")
-        return postal_code
-

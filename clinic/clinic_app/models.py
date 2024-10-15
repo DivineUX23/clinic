@@ -22,9 +22,12 @@ class Location(models.Model):
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     formatted_address = models.CharField(max_length=255, blank=True)
 
+    #latitude = models.FloatField(null=True, blank=True)
+    #longitude = models.FloatField(null=True, blank=True)
+
     def __str__(self):
         return self.formatted_address
-
+    """
     def get_formatted_address(self):
         components = []
         if self.street_no:
@@ -45,7 +48,7 @@ class Location(models.Model):
     def save(self, *args, **kwargs):
         self.formatted_address = self.get_formatted_address()
         super().save(*args, **kwargs)
-
+    """
 
 
 

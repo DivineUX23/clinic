@@ -9,7 +9,34 @@
 <!-- ================================
 Start CSS
 ================================= -->
-{% block extend_header %}{% endblock %}
+{% block extend_header %}
+
+<style>
+    .address-wrapper {
+        position: relative;
+    }
+    .suggestions-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background-color: white;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+    }
+    .suggestion-item {
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+    .suggestion-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
 
 <!-- ================================
 End CSS
@@ -145,7 +172,7 @@ End CSS
 
                 <div class="px-3 px-md-0 mt-3 mt-md-0">
 
-                        <!-- Street Number Section -->
+                        <!-- Street Number Section 
                         <div class="mb-lg-3">
                             <div class="row">
                                 <div class="col-12">
@@ -155,7 +182,7 @@ End CSS
                             </div>
                         </div>
     
-                        <!-- Street Name Section -->
+                        <!-- Street Name Section 
                         <div class="mb-lg-3">
                             <div class="row">
                                 <div class="col-12">
@@ -165,7 +192,7 @@ End CSS
                             </div>
                         </div>
     
-                        <!-- Country Section -->
+                        <!-- Country Section 
                         <div class="mb-lg-3">
                             <div class="row">
                                 <div class="col-12">
@@ -180,7 +207,7 @@ End CSS
                             </div>
                         </div>
     
-                        <!-- State Section -->
+                        <!-- State Section 
                         <div class="mb-lg-3">
                             <div class="row">
                                 <div class="col-12">
@@ -190,20 +217,20 @@ End CSS
                                         {% for state in states %}
                                             <option value="{{ state.id }}" {% if state.id == form.state.value %}selected{% endif %}>{{ state.name }}</option>
                                         {% endfor %}
-                                        <!-- Will be populated dynamically -->
+                                        Will be populated dynamically 
                                     </select>
                                 </div>
                             </div>
                         </div>
     
-                        <!-- City Section -->
+                        <!-- City Section 
                         <div class="mb-lg-3">
                             <div class="row">
                                 <div class="col-12">
                                     <label for="city" class="form-label input-label">City</label>
                                     <select class="form-control w-100 border-aliceblue" id="city" name="city" required>
                                         <option value="">Select City</option>
-                                        <!-- Will be populated dynamically -->
+                                        Will be populated dynamically 
                                          
                                         {% for city in cities %}
                                             <option value="{{ city.id }}" {% if city.id == form.city.value %}selected{% endif %}>{{ city.name }}</option>
@@ -214,7 +241,7 @@ End CSS
                             </div>
                         </div>
     
-                        <!-- Postal Code Section -->
+                        <!-- Postal Code Section 
                         <div class="mb-lg-3">
                             <div class="row">
                                 <div class="col-12">
@@ -223,8 +250,21 @@ End CSS
                                 </div>
                             </div>
                         </div>
-    
-                        <!-- first_name Section -->
+                        <!-- Address Autocomplete Input -->
+                        <div class="mb-lg-3">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="address" class="form-label input-label">Full Address</label>
+                                    <div class="address-wrapper">
+                                        <input type="text" class="form-control w-100 border-aliceblue" id="address" name="address" placeholder="Enter your full address">
+                                        <div id="suggestions" class="suggestions-dropdown"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                
+                
+                        <!-- first_name Section-->
                         <div class="mb-lg-3">
                             <div class="row">
                                 <div class="col-12">
@@ -232,9 +272,8 @@ End CSS
                                     <input type="text" class="form-control w-100 border-aliceblue" id="first_name" name="first_name" placeholder="Enter your first name" value="{{ form.first_name.value|default:'' }}" required>
                                 </div>
                             </div>
-                        </div>
-                
-                        
+                        </div> 
+        
                         <!-- last_name Section -->
                         <div class="mb-lg-3">
                             <div class="row">
@@ -326,15 +365,17 @@ End CSS
                 </div>
                 <div class="mt-4">
                     <!--<a href="" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}">Proceed to Next</a>
-                -->
+               -->
                     <form id="paymentForm" action="{% url 'initialize_payment' %}" method="POST">
                         {% csrf_token %}
-                        <input type="hidden" name="street_no" id="hidden_street_no">
+                        <!--<input type="hidden" name="street_no" id="hidden_street_no">
                         <input type="hidden" name="street" id="hidden_street">
                         <input type="hidden" name="country" id="hidden_country">
                         <input type="hidden" name="state" id="hidden_state">
                         <input type="hidden" name="city" id="hidden_city">
-                        <input type="hidden" name="postal_code" id="hidden_postal_code">
+                        <input type="hidden" name="postal_code" id="hidden_postal_code"> -->
+
+                        <input type="hidden" name="address" id="hidden_address">
                         <input type="hidden" name="first_name" id="hidden_first_name" value="{{ profile_data.first_name }}">
                         <input type="hidden" name="last_name" id="hidden_last_name" value="{{ profile_data.last_name }}">
                         <input type="hidden" name="phone_number" id="hidden_phone_number">
@@ -384,24 +425,30 @@ End CSS
     
 
 
-<script> 
+<!--<script> 
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("444data")
+
     const payWithPaystackBtn = document.getElementById('payWithPaystack');
     const paymentForm = document.getElementById('paymentForm');
+    const addressInput = document.getElementById('address');
+    const hiddenAddress = document.getElementById('hidden_address');
+    const suggestionsDiv = document.getElementById('suggestions');
+
+    if (!payWithPaystackBtn || !paymentForm || !addressInput || !hiddenAddress) {
+        console.error('One or more required elements not found');
+        return;
+    }
 
     const inputFields = {
-        street_no: document.getElementById('street_no'),
-        street: document.getElementById('street'),
-        country: document.getElementById('country'),
-        state: document.getElementById('state'),
-        city: document.getElementById('city'),
-        postal_code: document.getElementById('postal_code'),
         first_name: document.getElementById('first_name'),
         last_name: document.getElementById('last_name'),
         phone_number: document.getElementById('phone_number'),
         email: document.getElementById('email'),
         order_category: document.getElementById('order_category'),
-
     };
 
     const hiddenFields = {};
@@ -409,78 +456,74 @@ document.addEventListener('DOMContentLoaded', function() {
         hiddenFields[key] = document.getElementById(`hidden_${key}`);
     });
 
-    // Function to update hidden field
     function updateHiddenField(inputName, value) {
         if (hiddenFields[inputName]) {
             hiddenFields[inputName].value = value;
-            console.log(`Updated hidden ${inputName}: ${value}`);
         }
     }
 
-    // Update hidden fields based on initial values
     Object.entries(inputFields).forEach(([name, input]) => {
-        if (input.value) {
+        if (input && input.value) {
             updateHiddenField(name, input.value);
         }
+        if (input) {
+            input.addEventListener('change', function() {
+                updateHiddenField(name, this.value);
+            });
+        }
     });
 
-    // Add event listeners for future changes
-    Object.entries(inputFields).forEach(([name, input]) => {
-        input.addEventListener('change', function() {
-            updateHiddenField(name, this.value);
-        });
-    });
+    let debounceTimer;
+    console.log("444data")
 
-    // Special handling for select elements
-    ['country', 'state', 'city',].forEach(selectName => {
-        inputFields[selectName].addEventListener('change', function() {
-            updateHiddenField(selectName, this.options[this.selectedIndex].value);
-        });
+    addressInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            const query = this.value;
+            if (query.length > 2) {
+                suggestionsDiv.innerHTML = '<div>Loading...</div>';
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ng&limit=5`);
+                    const data = await response.json();
+                    suggestionsDiv.innerHTML = '';
+                    data.forEach(suggestion => {
+                        const div = document.createElement('div');
+                        div.textContent = suggestion.display_name;
+                        div.style.cursor = 'pointer';
+                        div.style.padding = '5px';
+                        div.style.borderBottom = '1px solid #eee';
+                        div.addEventListener('click', () => {
+                            addressInput.value = suggestion.display_name;
+                            hiddenAddress.value = suggestion.display_name;
+                            suggestionsDiv.innerHTML = '';
+                        });
+                        suggestionsDiv.appendChild(div);
+                    });
+                } catch (error) {
+                    console.error('Error fetching address suggestions:', error);
+                    suggestionsDiv.innerHTML = '<div>Error fetching suggestions</div>';
+                }
+            } else {
+                suggestionsDiv.innerHTML = '';
+            }
+        }, 300);
+    });
+    console.log("data")
+
+    addressInput.addEventListener('change', function() {
+        hiddenAddress.value = this.value;
+        console.log('Full address updated (manual):', this.value);
     });
 
     
 
-    // Populate states based on selected country
-    inputFields.country.addEventListener('change', function() {
 
-        const countryId = this.value;
-        const states = {{ states|safe }};
-        const filteredStates = states.filter(state => state.country_id == countryId);
-        
-        inputFields.state.innerHTML = '<option value="">Select State</option>';
-        filteredStates.forEach(state => {
-            inputFields.state.innerHTML += `<option value="${state.id}">${state.name}</option>`;
-        });
-        
-        inputFields.city.innerHTML = '<option value="">Select City</option>';
-    
-    });
-
-    // Populate cities based on selected state
-    inputFields.state.addEventListener('change', function() {
-
-        const stateId = this.value;
-        const cities = {{ cities|safe }};
-        const filteredCities = cities.filter(city => city.region_id == stateId);
-        
-        inputFields.city.innerHTML = '<option value="">Select City</option>';
-        filteredCities.forEach(city => {
-            inputFields.city.innerHTML += `<option value="${city.id}">${city.name}</option>`;
-        });
-    });
-
-    // Initial population of cities if state is pre-selected
-    if (inputFields.state.value) {
-        inputFields.state.dispatchEvent(new Event('change'));
-    }
-
-    
     function validateForm() {
         let isValid = true;
         let errorMessage = '';
 
         // Validate required fields
-        ['street', 'country', 'state', 'city', 'first_name', 'last_name', 'email', 'phone_number'].forEach(field => {
+        ['address', 'first_name', 'last_name', 'email', 'phone_number'].forEach(field => {
             const input = document.getElementById(field);
             if (!input.value.trim()) {
                 isValid = false;
@@ -520,11 +563,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return { isValid, errorMessage };
     }
 
+
     payWithPaystackBtn.addEventListener('click', function(e) {
         e.preventDefault();
-
         const { isValid, errorMessage } = validateForm();
-
         if (!isValid) {
             Swal.fire({
                 title: 'Error!',
@@ -538,15 +580,182 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             return;
         }
-
-        // If all required fields are filled and valid, submit the payment form
         paymentForm.submit();
     });
+});
+</script>-->
 
-});</script> 
-{% endblock %}
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+
+
+        
+            const inputFields = {
+                first_name: document.getElementById('first_name'),
+                last_name: document.getElementById('last_name'),
+                phone_number: document.getElementById('phone_number'),
+                email: document.getElementById('email'),
+                order_category: document.getElementById('order_category'),
+            };
+        
+
+            const addressInput = document.getElementById('address');
+
+            const hiddenAddress = document.getElementById('hidden_address');
+            const suggestionsDiv = document.getElementById('suggestions');
+        
+            let debounceTimer;
+        
+            addressInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(async () => {
+                    const query = this.value;
+                    if (query.length > 2) {
+                        suggestionsDiv.innerHTML = '<div class="dropdown-item">Loading...</div>';
+                        suggestionsDiv.style.display = 'block';
+                        try {
+                            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ng&limit=5`);
+                            const data = await response.json();
+                            suggestionsDiv.innerHTML = '';
+                            if (data.length === 0) {
+                                suggestionsDiv.innerHTML = '<div class="dropdown-item">No results found</div>';
+                            } else {
+                                data.forEach(suggestion => {
+                                    const div = document.createElement('div');
+                                    div.className = 'dropdown-item';
+                                    div.textContent = suggestion.display_name;
+                                    div.style.cursor = 'pointer';
+                                    div.addEventListener('click', () => {
+                                        addressInput.value = suggestion.display_name;
+                                        hiddenAddress.value = suggestion.display_name;
+                                        suggestionsDiv.style.display = 'none';
+                                        console.log('Full address updated:', hiddenAddress.value);
+
+                                    });
+                                    suggestionsDiv.appendChild(div);
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error fetching address suggestions:', error);
+                            suggestionsDiv.innerHTML = '<div class="dropdown-item">Error fetching suggestions</div>';
+                        }
+                    } else {
+                        suggestionsDiv.style.display = 'none';
+                    }
+                }, 300);
+            });
+        
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!addressInput.contains(event.target) && !suggestionsDiv.contains(event.target)) {
+                    suggestionsDiv.style.display = 'none';
+                }
+            });
+        
+            addressInput.addEventListener('change', function() {
+                hiddenAddress.value = this.value;
+            });
+        
+            const hiddenFields = {};
+            Object.keys(inputFields).forEach(key => {
+                hiddenFields[key] = document.getElementById(`hidden_${key}`);
+            });
+        
+            function updateHiddenField(inputName, value) {
+                if (hiddenFields[inputName]) {
+                    hiddenFields[inputName].value = value;
+                    console.log(`Updated hidden ${inputName}: ${value}`);
+
+                }
+            }
+        
+            Object.entries(inputFields).forEach(([name, input]) => {
+                if (input && input.value) {
+                    updateHiddenField(name, input.value);
+                }
+                if (input) {
+                    input.addEventListener('change', function() {
+                        updateHiddenField(name, this.value);
+                    });
+                }
+            });
+        
+            
+            function validateForm() {
+                let isValid = true;
+                let errorMessage = '';
+
+                // Validate required fields
+                ['address', 'first_name', 'last_name', 'email', 'phone_number'].forEach(field => {
+                    const input = document.getElementById(field);
+                    if (!input.value) {
+                        isValid = false;
+                        errorMessage += `${field.charAt(0).toUpperCase() + field.slice(1)} is required.\n`;
+                    }
+                });
+
+                // Validate name
+                const nameValue = inputFields.first_name.value.trim();
+                if (nameValue && !/^[a-zA-Z\s]+$/.test(nameValue)) {
+                    isValid = false;
+                    errorMessage += 'Name should only contain letters and spaces.\n';
+                }
+
+                const lastNameValue = inputFields.last_name.value.trim();
+                if (lastNameValue && !/^[a-zA-Z\s'-]+$/.test(lastNameValue)) {
+                    isValid = false;
+                    errorMessage += 'Last name should only contain letters, spaces.\n';
+                }
+
+                // Validate Nigerian phone number (+234 or local format)
+                const phoneValue = inputFields.phone_number.value.trim();
+                const nigerianPhonePattern = /^(\+234|0)[789][01]\d{8}$/;
+                if (phoneValue && !nigerianPhonePattern.test(phoneValue)) {
+                    isValid = false;
+                    errorMessage += 'Please enter a valid Nigerian phone number starting with +234 or 0.\n';
+                }
+
+                // Validate email
+                const emailValue = inputFields.email.value.trim();
+                const emailPattern = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+                if (emailValue && !emailPattern.test(emailValue)) {
+                    isValid = false;
+                    errorMessage += 'Please enter a valid email address.\n';
+                }
+
+                return { isValid, errorMessage };
+            }
+
+
+            const payWithPaystackBtn = document.getElementById('payWithPaystack');
+            const paymentForm = document.getElementById('paymentForm');
+        
+            payWithPaystackBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const { isValid, errorMessage } = validateForm();
+                if (!isValid) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            popup: 'swal-custom-popup',
+                            confirmButton: 'swal-custom-confirm-button'
+                        }
+                    });
+                    return;
+                }
+                paymentForm.submit();
+            });
+        });
+        </script>
+        {% endblock %}
 
 <!-- ================================
 End Content
 ================================= -->
+
