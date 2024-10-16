@@ -59,6 +59,13 @@ Start Content
                         <span class="sr-only">Show password</span>
                       </label>
                     </div>
+
+                    {% elif field.name == 'address' %}
+                      <div class="relative">
+                        {% render_field field class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="address" %}
+                        <div id="suggestions" class="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto z-50 hidden"></div>
+                      </div>
+   
                   {% else %}
                     {% render_field field class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %}
                   {% endif %}
@@ -95,147 +102,60 @@ Start Content
 </div>
 
 
-<script>
-  console.log('Countries:', {{ countries_json|safe }});
-  console.log('States:', {{ states_json|safe }});
-  console.log('Cities:', {{ cities_json|safe }});
-</script>
+
 
 <script>
-  const countries = {{ countries_json|safe }}
-  const states = {{ states_json|safe }}
-  const cities = {{ cities_json|safe }}
-
-  console.log('Parsed Countries:', countries);
-  console.log('Parsed States:', states);
-  console.log('Parsed Cities:', cities);
-
-  const countrySelect = document.getElementById('id_country');
-  const stateSelect = document.getElementById('id_state');
-  const citySelect = document.getElementById('id_city');
-
-  console.log('Country Select:', countrySelect);
-  console.log('State Select:', stateSelect);
-  console.log('City Select:', citySelect);
-
-  function populateStates() {
-    console.log('Populating States');
-    const countryId = countrySelect.value;
-    console.log('Selected Country ID:', countryId);
-    stateSelect.innerHTML = '<option value="">---------</option>';
-    citySelect.innerHTML = '<option value="">---------</option>';
-
-    const filteredStates = states.filter(state => state.country_id == countryId);
-    console.log('Filtered States:', filteredStates);
-    filteredStates.forEach(state => {
-      const option = new Option(state.name, state.id);
-      stateSelect.add(option);
-    });
-  }
-
-  function populateCities() {
-    console.log('Populating Cities');
-    const stateId = stateSelect.value;
-    console.log('Selected State ID:', stateId);
-    citySelect.innerHTML = '<option value="">---------</option>';
-
-    const filteredCities = cities.filter(city => city.region_id == stateId);
-    console.log('Filtered Cities:', filteredCities);
-    filteredCities.forEach(city => {
-      const option = new Option(city.name, city.id);
-      citySelect.add(option);
-      console.log(citySelect);
-
-    });
-  }
-
-  countrySelect.addEventListener('change', populateStates);
-  stateSelect.addEventListener('change', populateCities);
-
-  console.log('Event listeners added');
-</script>
-
-
-
-<!--<script>
   document.addEventListener('DOMContentLoaded', function() {
-      const countrySelect = document.getElementById('country');
-      const stateSelect = document.getElementById('state');
-      const citySelect = document.getElementById('city');
-      const countryCodeInput = document.getElementById('country_code');
-      const stateCodeInput = document.getElementById('state_code');
-      const cityCodeInput = document.getElementById('city_code');
+      const addressInput = document.getElementById('address');
+      const suggestionsDiv = document.getElementById('suggestions');
   
-      // Simplified list of common countries
-      const countries = [
-          {name: 'United States', code: 'US'},
-          {name: 'Canada', code: 'CA'},
-          {name: 'United Kingdom', code: 'GB'},
-          {name: 'Australia', code: 'AU'},
-          // Add more countries as needed
-      ];
+      let debounceTimer;
   
-      // Populate Countries
-      countries.forEach(country => {
-          const option = new Option(country.name, country.code);
-          countrySelect.add(option);
-      });
-  
-      countrySelect.addEventListener('change', function() {
-          const selectedCountry = this.value;
-          countryCodeInput.value = selectedCountry;
-          
-          // Clear state and city
-          stateSelect.innerHTML = '<option value="">Select State</option>';
-          citySelect.innerHTML = '<option value="">Select City</option>';
-          stateCodeInput.value = '';
-          cityCodeInput.value = '';
-  
-          // Fetch states for the selected country
-          fetch(`https://api.countrystatecity.in/v1/countries/${selectedCountry}/states`, {
-              headers: {
-                  'X-CSCAPI-KEY': 'YOUR_API_KEY_HERE'
+      addressInput.addEventListener('input', function() {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(async () => {
+              const query = this.value;
+              if (query.length > 2) {
+                  suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">Loading...</div>';
+                  suggestionsDiv.classList.remove('hidden');
+                  try {
+                      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ng&limit=5`);
+                      const data = await response.json();
+                      suggestionsDiv.innerHTML = '';
+                      if (data.length === 0) {
+                          suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">No results found</div>';
+                      } else {
+                          data.forEach(suggestion => {
+                              const div = document.createElement('div');
+                              div.className = 'p-2 cursor-pointer hover:bg-gray-100';
+                              div.textContent = suggestion.display_name;
+                              div.addEventListener('click', () => {
+                                  addressInput.value = suggestion.display_name;
+                                  suggestionsDiv.classList.add('hidden');
+                              });
+                              suggestionsDiv.appendChild(div);
+                          });
+                      }
+                  } catch (error) {
+                      console.error('Error fetching address suggestions:', error);
+                      suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">Error fetching suggestions</div>';
+                  }
+              } else {
+                  suggestionsDiv.classList.add('hidden');
               }
-          })
-          .then(response => response.json())
-          .then(states => {
-              states.forEach(state => {
-                  const option = new Option(state.name, state.iso2);
-                  stateSelect.add(option);
-              });
-          });
+          }, 300);
       });
   
-      stateSelect.addEventListener('change', function() {
-          const selectedCountry = countrySelect.value;
-          const selectedState = this.value;
-          stateCodeInput.value = selectedState;
-  
-          // Clear city
-          citySelect.innerHTML = '<option value="">Select City</option>';
-          cityCodeInput.value = '';
-  
-          // Fetch cities for the selected state
-          fetch(`https://api.countrystatecity.in/v1/countries/${selectedCountry}/states/${selectedState}/cities`, {
-              headers: {
-                  'X-CSCAPI-KEY': 'YOUR_API_KEY_HERE'
-              }
-          })
-          .then(response => response.json())
-          .then(cities => {
-              cities.forEach(city => {
-                  const option = new Option(city.name, city.name);
-                  citySelect.add(option);
-              });
-          });
-      });
-  
-      citySelect.addEventListener('change', function() {
-          cityCodeInput.value = this.value;
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', function(event) {
+          if (!addressInput.contains(event.target) && !suggestionsDiv.contains(event.target)) {
+              suggestionsDiv.classList.add('hidden');
+          }
       });
   });
-  </script>-->
-  {% endblock %}
+  </script>
+  
+{% endblock %}
 
 <!-- ================================
 End Content

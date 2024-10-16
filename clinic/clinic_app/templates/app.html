@@ -321,138 +321,120 @@
 
 
 
+{% extends 'base.html' %}
+{% load static %}
 
+{% block title %}JollyLifeHealth{% endblock %}
+{% block description %}{% endblock %}
+{% block keywords %}{% endblock %}
 
-<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-  {% for order in page_obj %}
-      <div class="bg-white rounded-lg shadow-md overflow-hidden">
-          <div class="p-4 sm:p-6">
-              <h2 class="text-xl font-semibold text-gray-800 mb-2 flex items-center">
-                  <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                  </svg>
-                  Order #{{ order.id }}
-              </h2>
-              <p class="text-sm text-gray-600 mb-4 flex items-center">
-                  <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                  {{ order.created_at|date:"F j, Y" }}
-              </p>
-              
-              <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                      <span class="text-gray-600 hidden sm:inline">Total Amount:</span>
-                      <span class="flex items-center">
-                          <svg class="w-5 h-5 mr-2 text-gray-500 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                          ${{ order.total_amount }}
-                      </span>
-                  </div>
-                  
-                  {% if order.shipment_status %}
-                  <div class="flex items-center justify-between">
-                      <span class="text-gray-600 hidden sm:inline">Shipment Status:</span>
-                      <span class="flex items-center">
-                          <svg class="w-5 h-5 mr-2 text-gray-500 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                          {{ order.shipment_status|title }}
-                      </span>
-                  </div>
-                  {% endif %}
-                  
-                  {% if order.shipment_order_id %}
-                  <div class="flex items-center justify-between">
-                      <span class="text-gray-600 hidden sm:inline">Tracking Code:</span>
-                      <span class="flex items-center">
-                          <svg class="w-5 h-5 mr-2 text-gray-500 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                          </svg>
-                          {{ order.shipment_order_id }}
-                      </span>
-                  </div>
-                  
-                  <div class="flex items-center justify-between">
-                      <span class="text-gray-600 hidden sm:inline">Courier:</span>
-                      <span class="flex items-center">
-                          <svg class="w-5 h-5 mr-2 text-gray-500 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
-                          </svg>
-                          {{ order.courier_name }}
-                      </span>
-                  </div>
-                  
-                  <div class="flex items-center justify-between">
-                      <span class="text-gray-600 hidden sm:inline">Courier Phone:</span>
-                      <span class="flex items-center">
-                          <svg class="w-5 h-5 mr-2 text-gray-500 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                          </svg>
-                          {{ order.courier_phone }}
-                      </span>
-                  </div>
-                  
-                  <div class="flex items-center justify-between">
-                      <span class="text-gray-600 hidden sm:inline">Courier Email:</span>
-                      <span class="flex items-center">
-                          <svg class="w-5 h-5 mr-2 text-gray-500 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                          </svg>
-                          {{ order.courier_email }}
-                      </span>
-                  </div>
-                  {% endif %}
-              </div>
-              
-              {% if order.tracking_url %}
-                  <a href="{{ order.tracking_url }}" target="_blank" class="mt-4 inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition duration-300">
-                      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                      </svg>
-                      Track Shipment
-                  </a>
-              {% endif %}
-          </div>
-      </div>
-  {% endfor %}
+{% block extend_header %}
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Body-->
+<!-- Page Content -->
+<div class="container mt-3 rtl px-0 px-md-3" style="text-align: left;" id="cart-summary">
+    <h3 class="mt-4 mb-3 text-center text-lg-left mobile-fs-20">Shopping cart</h3>
+
+    <!-- ... (previous cart items code remains unchanged) ... -->
+
+    <div class="px-3 px-md-0 mt-3 mt-md-0">
+        <!-- Address Autocomplete Input -->
+        <div class="mb-lg-3">
+            <div class="row">
+                <div class="col-12">
+                    <label for="address" class="form-label input-label">Full Address</label>
+                    <input type="text" class="form-control w-100 border-aliceblue" id="address" name="address" placeholder="Enter your full address">
+                </div>
+            </div>
+        </div>
+
+        <!-- ... (other form fields remain unchanged) ... -->
+    </div>
+
+    <!-- ... (sidebar and payment form remain unchanged) ... -->
+
+    <form id="paymentForm" action="{% url 'initialize_payment' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="address" id="hidden_address">
+        <!-- ... (other hidden fields remain unchanged) ... -->
+        <button type="button" id="payWithPaystack" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}" {% if not cart_items %}disabled{% endif %}>
+            Pay with Paystack
+        </button>
+    </form>
 </div>
+{% endblock %}
 
+{% block extend_footer %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addressInput = document.getElementById('address');
+    const hiddenAddress = document.getElementById('hidden_address');
+    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+        types: ['address'],
+        componentRestrictions: { country: 'NG' }  // Restrict to Nigeria
+    });
 
+    autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        hiddenAddress.value = addressInput.value;
+        console.log('Full address updated:', addressInput.value);
+    });
 
+    // Update hidden address field on manual input as well
+    addressInput.addEventListener('change', function() {
+        hiddenAddress.value = this.value;
+        console.log('Full address updated (manual):', this.value);
+    });
 
+    const payWithPaystackBtn = document.getElementById('payWithPaystack');
+    const paymentForm = document.getElementById('paymentForm');
 
+    function validateForm() {
+        let isValid = true;
+        let errorMessage = '';
 
+        // Validate required fields
+        ['address', 'first_name', 'last_name', 'email', 'phone_number'].forEach(field => {
+            const input = document.getElementById(field);
+            if (!input.value.trim()) {
+                isValid = false;
+                errorMessage += `${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} is required.\n`;
+            }
+        });
 
+        // ... (other validations remain unchanged) ...
 
+        return { isValid, errorMessage };
+    }
 
+    payWithPaystackBtn.addEventListener('click', function(e) {
+        e.preventDefault();
 
+        const { isValid, errorMessage } = validateForm();
 
+        if (!isValid) {
+            Swal.fire({
+                title: 'Error!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    confirmButton: 'swal-custom-confirm-button'
+                }
+            });
+            return;
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        // If all required fields are filled and valid, submit the payment form
+        paymentForm.submit();
+    });
+});
+</script>
+{% endblock %}
 
 
 
@@ -490,4 +472,641 @@
                   </div>
               </div>
 
-              <div class="menu--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              <script> 
+                document.addEventListener('DOMContentLoaded', function() {
+                    const payWithPaystackBtn = document.getElementById('payWithPaystack');
+                    const paymentForm = document.getElementById('paymentForm');
+                
+                    const inputFields = {
+                        //street_no: document.getElementById('street_no'),
+                        //street: document.getElementById('street'),
+                        //country: document.getElementById('country'),
+                        //state: document.getElementById('state'),
+                        //city: document.getElementById('city'),
+                        //postal_code: document.getElementById('postal_code'),
+                        
+                        first_name: document.getElementById('first_name'),
+                        last_name: document.getElementById('last_name'),
+                        phone_number: document.getElementById('phone_number'),
+                        email: document.getElementById('email'),
+                        order_category: document.getElementById('order_category'),
+                
+                    };
+                
+                    const hiddenFields = {};
+                    Object.keys(inputFields).forEach(key => {
+                        hiddenFields[key] = document.getElementById(`hidden_${key}`);
+                    });
+                
+                    // Function to update hidden field
+                    function updateHiddenField(inputName, value) {
+                        if (hiddenFields[inputName]) {
+                            hiddenFields[inputName].value = value;
+                            console.log(`Updated hidden ${inputName}: ${value}`);
+                        }
+                    }
+                
+                    // Update hidden fields based on initial values
+                    Object.entries(inputFields).forEach(([name, input]) => {
+                        if (input.value) {
+                            updateHiddenField(name, input.value);
+                        }
+                    });
+                
+                    // Add event listeners for future changes
+                    Object.entries(inputFields).forEach(([name, input]) => {
+                        input.addEventListener('change', function() {
+                            updateHiddenField(name, this.value);
+                        });
+                    });
+                
+                
+                
+                    const addressInput = document.getElementById('address');
+                    const hiddenAddress = document.getElementById('hidden_address');
+                    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                        types: ['address'],
+                        componentRestrictions: { country: 'NG' }  // Restrict to Nigeria
+                    });
+                
+                    autocomplete.addListener('place_changed', function() {
+                        const place = autocomplete.getPlace();
+                        hiddenAddress.value = addressInput.value;
+                        console.log('Full address updated:', addressInput.value);
+                    });
+                
+                    // Update hidden address field on manual input as well
+                    addressInput.addEventListener('change', function() {
+                        hiddenAddress.value = this.value;
+                        console.log('Full address updated (manual):', this.value);
+                    });
+                
+                
+                
+                    // Initial population of cities if state is pre-selected
+                    if (inputFields.state.value) {
+                        inputFields.state.dispatchEvent(new Event('change'));
+                    }
+                
+                    
+                    function validateForm() {
+                        let isValid = true;
+                        let errorMessage = '';
+                
+                        // Validate required fields
+                        ['address', 'first_name', 'last_name', 'email', 'phone_number'].forEach(field => {
+                            const input = document.getElementById(field);
+                            if (!input.value.trim()) {
+                                isValid = false;
+                                errorMessage += `${field.charAt(0).toUpperCase() + field.slice(1)} is required.\n`;
+                            }
+                        });
+                
+                        // Validate name
+                        const nameValue = inputFields.first_name.value.trim();
+                        if (nameValue && !/^[a-zA-Z\s]+$/.test(nameValue)) {
+                            isValid = false;
+                            errorMessage += 'Name should only contain letters and spaces.\n';
+                        }
+                
+                        const lastNameValue = inputFields.last_name.value.trim();
+                        if (lastNameValue && !/^[a-zA-Z\s'-]+$/.test(lastNameValue)) {
+                            isValid = false;
+                            errorMessage += 'Last name should only contain letters, spaces.\n';
+                        }
+                
+                        // Validate Nigerian phone number (+234 or local format)
+                        const phoneValue = inputFields.phone_number.value.trim();
+                        const nigerianPhonePattern = /^(\+234|0)[789][01]\d{8}$/;
+                        if (phoneValue && !nigerianPhonePattern.test(phoneValue)) {
+                            isValid = false;
+                            errorMessage += 'Please enter a valid Nigerian phone number starting with +234 or 0.\n';
+                        }
+                
+                        // Validate email
+                        const emailValue = inputFields.email.value.trim();
+                        const emailPattern = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+                        if (emailValue && !emailPattern.test(emailValue)) {
+                            isValid = false;
+                            errorMessage += 'Please enter a valid email address.\n';
+                        }
+                
+                        return { isValid, errorMessage };
+                    }
+                
+                    payWithPaystackBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                
+                        const { isValid, errorMessage } = validateForm();
+                
+                        if (!isValid) {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: errorMessage,
+                                icon: 'error',
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    popup: 'swal-custom-popup',
+                                    confirmButton: 'swal-custom-confirm-button'
+                                }
+                            });
+                            return;
+                        }
+                
+                        // If all required fields are filled and valid, submit the payment form
+                        paymentForm.submit();
+                    });
+                
+                });</script> 
+                {% endblock %}
+                
+                
+
+
+
+
+
+
+
+
+
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}JollyLifeHealth{% endblock %}
+{% block description %}{% endblock %}
+{% block keywords %}{% endblock %}
+
+{% block extend_header %}
+<!-- No need for Google Maps API script -->
+{% endblock %}
+
+{% block content %}
+<!-- Body-->
+<!-- Page Content -->
+<div class="container mt-3 rtl px-0 px-md-3" style="text-align: left;" id="cart-summary">
+    <h3 class="mt-4 mb-3 text-center text-lg-left mobile-fs-20">Shopping cart</h3>
+
+    <!-- ... (previous cart items code remains unchanged) ... -->
+
+    <div class="px-3 px-md-0 mt-3 mt-md-0">
+        <!-- Address Autocomplete Input -->
+        <div class="mb-lg-3">
+            <div class="row">
+                <div class="col-12">
+                    <label for="address" class="form-label input-label">Full Address</label>
+                    <input type="text" class="form-control w-100 border-aliceblue" id="address" name="address" placeholder="Enter your full address">
+                    <div id="suggestions" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ... (other form fields remain unchanged) ... -->
+    </div>
+
+    <!-- ... (sidebar and payment form remain unchanged) ... -->
+
+    <form id="paymentForm" action="{% url 'initialize_payment' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="address" id="hidden_address">
+        <!-- ... (other hidden fields remain unchanged) ... -->
+        <button type="button" id="payWithPaystack" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}" {% if not cart_items %}disabled{% endif %}>
+            Pay with Paystack
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extend_footer %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const addressInput = document.getElementById('address');
+    const hiddenAddress = document.getElementById('hidden_address');
+    const suggestionsDiv = document.getElementById('suggestions');
+
+    let debounceTimer;
+
+    addressInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            const query = this.value;
+            if (query.length > 2) {
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ng&limit=5`);
+                    const data = await response.json();
+                    
+                    suggestionsDiv.innerHTML = '';
+                    data.forEach(suggestion => {
+                        const div = document.createElement('div');
+                        div.textContent = suggestion.display_name;
+                        div.style.cursor = 'pointer';
+                        div.style.padding = '5px';
+                        div.style.borderBottom = '1px solid #eee';
+                        div.addEventListener('click', () => {
+                            addressInput.value = suggestion.display_name;
+                            hiddenAddress.value = suggestion.display_name;
+                            suggestionsDiv.innerHTML = '';
+                            console.log('Full address updated:', suggestion.display_name);
+                        });
+                        suggestionsDiv.appendChild(div);
+                    });
+                } catch (error) {
+                    console.error('Error fetching address suggestions:', error);
+                }
+            } else {
+                suggestionsDiv.innerHTML = '';
+            }
+        }, 300);  // Debounce for 300ms
+    });
+
+    // Update hidden address field on manual input as well
+    addressInput.addEventListener('change', function() {
+        hiddenAddress.value = this.value;
+        console.log('Full address updated (manual):', this.value);
+    });
+
+    const payWithPaystackBtn = document.getElementById('payWithPaystack');
+    const paymentForm = document.getElementById('paymentForm');
+
+    function validateForm() {
+        let isValid = true;
+        let errorMessage = '';
+
+        // Validate required fields
+        ['address', 'first_name', 'last_name', 'email', 'phone_number'].forEach(field => {
+            const input = document.getElementById(field);
+            if (!input.value.trim()) {
+                isValid = false;
+                errorMessage += `${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} is required.\n`;
+            }
+        });
+
+        // ... (other validations remain unchanged) ...
+
+        return { isValid, errorMessage };
+    }
+
+    payWithPaystackBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const { isValid, errorMessage } = validateForm();
+
+        if (!isValid) {
+            Swal.fire({
+                title: 'Error!',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonText: 'OK',
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    confirmButton: 'swal-custom-confirm-button'
+                }
+            });
+            return;
+        }
+
+        // If all required fields are filled and valid, submit the payment form
+        paymentForm.submit();
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block title %}Sign Up{% endblock %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="min-h-screen">
+  <div class="grid md:grid-cols-[0.8fr_1fr] h-full">
+    <div class="hidden md:block">
+      <img src="\static\images\image1.png" class="h-full w-full object-cover" alt="register">
+    </div>
+    <div class="container py-4 px-9 __inline-7" style="text-align: left;">
+      <div class="">
+        <div class="mx-auto max-w-[509px]">
+          <div class="mb-8">
+            <a href="{% url 'home' %}" class="md:h-[70px]">
+              <!--<img src="\static\images\IMG-20240913-WA0000.jpg" alt="JollyLife Limited" class="h-full" />-->
+            </a>
+          </div>
+          
+          <h2 class="mb-4 text-purple text-3xl font-bold text-capitalize fs-18-mobile">Sign Up for an Account</h2>
+          <form method="post" class="needs-validation mt-2" autocomplete="off">
+            {% csrf_token %}
+            {% for field in form %}
+              {% if field.label != "Password-based authentication" %}
+                <div class="form-group mb-4">
+                  <label for="{{ field.id_for_label }}" class="form-label font-semibold block mb-2">{{ field.label }}</label>
+                  {% if field.name == 'password1' or field.name == 'password2' %}
+                    <div class="password-toggle rtl">
+                      {% render_field field class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %}
+                      <label class="password-toggle-btn">
+                        <input class="custom-control-input" type="checkbox">
+                        <i class="tio-hidden password-toggle-indicator"></i>
+                        <span class="sr-only">Show password</span>
+                      </label>
+                    </div>
+                  {% elif field.name == 'address' %}
+                    <div class="relative">
+                      {% render_field field class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="address" %}
+                      <div id="suggestions" class="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto z-50 hidden"></div>
+                    </div>
+                  {% else %}
+                    {% render_field field class="form-control w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %}
+                  {% endif %}
+                  {% if field.help_text %}
+                    <small class="text-gray-600 mt-1 block">{{ field.help_text }}</small>
+                  {% endif %}
+                  {% for error in field.errors %}
+                    <div class="invalid-feedback text-red-500 text-sm mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endfor %}
+            <button class="btn btn--primary btn-block btn-shadow w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300" type="submit">Sign Up</button>
+          </form>
+          
+          <div class="text-center mt-6">
+            <p class="text-gray-600">
+              Already have an account? 
+              <a href="{% url 'signin' %}" class="text-blue-600 hover:text-blue-800 transition-colors duration-300">Sign In</a>
+            </p>
+          </div>
+
+          <div class="text-black-50 text-center mt-3">
+            <small>
+              <a class="text-primary text-underline" href="{% url 'home' %}">
+                Return to Homepage
+              </a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addressInput = document.getElementById('address');
+    const suggestionsDiv = document.getElementById('suggestions');
+
+    let debounceTimer;
+
+    addressInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            const query = this.value;
+            if (query.length > 2) {
+                suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">Loading...</div>';
+                suggestionsDiv.classList.remove('hidden');
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ng&limit=5`);
+                    const data = await response.json();
+                    suggestionsDiv.innerHTML = '';
+                    if (data.length === 0) {
+                        suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">No results found</div>';
+                    } else {
+                        data.forEach(suggestion => {
+                            const div = document.createElement('div');
+                            div.className = 'p-2 cursor-pointer hover:bg-gray-100';
+                            div.textContent = suggestion.display_name;
+                            div.addEventListener('click', () => {
+                                addressInput.value = suggestion.display_name;
+                                suggestionsDiv.classList.add('hidden');
+                            });
+                            suggestionsDiv.appendChild(div);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching address suggestions:', error);
+                    suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">Error fetching suggestions</div>';
+                }
+            } else {
+                suggestionsDiv.classList.add('hidden');
+            }
+        }, 300);
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!addressInput.contains(event.target) && !suggestionsDiv.contains(event.target)) {
+            suggestionsDiv.classList.add('hidden');
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}JollyLifeHealth{% endblock %}
+{% block description %}{% endblock %}
+{% block keywords %}{% endblock %}
+
+{% block content %}
+<div class="container mt-3 rtl px-0 px-md-3 text-left" id="cart-summary">
+    <h3 class="mt-4 mb-3 text-center text-lg-left mobile-fs-20">Shopping cart</h3>
+
+    <!-- ... (previous cart items code remains unchanged) ... -->
+
+    <div class="px-3 px-md-0 mt-3 mt-md-0">
+        <!-- Address Autocomplete Input -->
+        <div class="mb-lg-3">
+            <div class="row">
+                <div class="col-12">
+                    <label for="address" class="form-label input-label">Full Address</label>
+                    <div class="relative">
+                        <input type="text" class="form-control w-full border-aliceblue" id="address" name="address" placeholder="Enter your full address">
+                        <div id="suggestions" class="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto z-50 hidden">
+                            <!-- Suggestions will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ... (other form fields remain unchanged) ... -->
+    </div>
+
+    <form id="paymentForm" action="{% url 'initialize_payment' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="address" id="hidden_address">
+        <!-- ... (other hidden fields remain unchanged) ... -->
+        <button type="button" id="payWithPaystack" class="btn btn--primary btn-block proceed_to_next_button {% if not cart_items %}disabled{% endif %}" {% if not cart_items %}disabled{% endif %}>
+            Pay with Paystack
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extend_footer %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const payWithPaystackBtn = document.getElementById('payWithPaystack');
+    const paymentForm = document.getElementById('paymentForm');
+    const addressInput = document.getElementById('address');
+    const hiddenAddress = document.getElementById('hidden_address');
+    const suggestionsDiv = document.getElementById('suggestions');
+
+    if (!payWithPaystackBtn || !paymentForm || !addressInput || !hiddenAddress || !suggestionsDiv) {
+        console.error('One or more required elements not found');
+        return;
+    }
+
+    let debounceTimer;
+
+    addressInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            const query = this.value;
+            if (query.length > 2) {
+                suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">Loading...</div>';
+                suggestionsDiv.classList.remove('hidden');
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ng&limit=5`);
+                    const data = await response.json();
+                    suggestionsDiv.innerHTML = '';
+                    if (data.length === 0) {
+                        suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">No results found</div>';
+                    } else {
+                        data.forEach(suggestion => {
+                            const div = document.createElement('div');
+                            div.className = 'p-2 cursor-pointer hover:bg-gray-100';
+                            div.textContent = suggestion.display_name;
+                            div.addEventListener('click', () => {
+                                addressInput.value = suggestion.display_name;
+                                hiddenAddress.value = suggestion.display_name;
+                                suggestionsDiv.classList.add('hidden');
+                            });
+                            suggestionsDiv.appendChild(div);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching address suggestions:', error);
+                    suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">Error fetching suggestions</div>';
+                }
+            } else {
+                suggestionsDiv.classList.add('hidden');
+            }
+        }, 300);
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!addressInput.contains(event.target) && !suggestionsDiv.contains(event.target)) {
+            suggestionsDiv.classList.add('hidden');
+        }
+    });
+
+    addressInput.addEventListener('change', function() {
+        hiddenAddress.value = this.value;
+    });
+
+    // ... (rest of your JavaScript code remains unchanged) ...
+});
+</script>
+{% endblock %}

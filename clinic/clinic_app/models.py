@@ -14,42 +14,14 @@ from cities_light.models import Country, Region, City
 
 
 class Location(models.Model):
-    street_no = models.CharField(max_length=10, blank=True, null=True)
-    street = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    state = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
-    postal_code = models.CharField(max_length=20, blank=True, null=True)
     formatted_address = models.CharField(max_length=255, blank=True)
 
-    #latitude = models.FloatField(null=True, blank=True)
-    #longitude = models.FloatField(null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return self.formatted_address
-    """
-    def get_formatted_address(self):
-        components = []
-        if self.street_no:
-            components.append(self.street_no)
-        if self.street:
-            components.append(self.street)
-        if self.city:
-            components.append(self.city.name)
-        if self.state:
-            components.append(self.state.name)
-        if self.postal_code:
-            components.append(self.postal_code)
-        if self.country:
-            components.append(self.country.name)
-        
-        return ", ".join(filter(None, components))
-
-    def save(self, *args, **kwargs):
-        self.formatted_address = self.get_formatted_address()
-        super().save(*args, **kwargs)
-    """
-
+    
 
 
 class Profile(models.Model):
@@ -58,7 +30,6 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    #delivery_location = models.CharField(max_length=255, blank=True, null=True)
     delivery_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
@@ -158,11 +129,15 @@ class Product(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     session_key = models.CharField(max_length=40, null=True, blank=True)
+
     delivery_location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=20)
     email = models.EmailField(max_length=150)
+
+
+    
     order_note = models.TextField(blank=True, null=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_reference = models.CharField(max_length=100, unique=True)
@@ -183,11 +158,10 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     courier_id = models.CharField(max_length=255, null=True, unique=False)
     request_token = models.CharField(max_length=255, null=True, unique=False)
-
     order_category = models.CharField(max_length=255, null=True, unique=False)
 
 
-    # New fields for shipment information
+    # Shipment information from shipbubble
     shipment_order_id = models.CharField(max_length=50, blank=True, null=True)
     courier_name = models.CharField(max_length=100, blank=True, null=True)
     courier_email = models.EmailField(blank=True, null=True)

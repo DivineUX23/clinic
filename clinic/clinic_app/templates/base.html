@@ -696,17 +696,15 @@
         const originalFetch = window.fetch;
         window.fetch = function() {
             // Check if this is a search request
-
-            const isExcludedRequest = arguments[0].includes('/api/search') || 
-                                    arguments[0].includes('api/products/<str:section>');
-
+            const url = arguments[0];
+            const isExcludedRequest = url.includes('/api/search') || 
+                                      url.startsWith('https://nominatim.openstreetmap.org/search');
+        
             if (!isExcludedRequest) {
                 showFullScreenLoading();
             }
             
-            if (!isExcludedRequest) {
-                showFullScreenLoading();
-            }
+            
             
             return originalFetch.apply(this, arguments).then(function(response) {
                 if (!isExcludedRequest) {
@@ -728,8 +726,9 @@
                 // Check if this is a search request
                 // const isExcludedRequest = arguments[1].includes('/api/search');
                 
-                const isExcludedRequest = arguments[1].includes('/api/search') || 
-                arguments[1].includes('api/products/<str:section>');
+                const url = arguments[1];
+                const isExcludedRequest = url.includes('/api/search') || 
+                                        url.startsWith('https://nominatim.openstreetmap.org/search');
                 
                 if (!isExcludedRequest) {
                     this.addEventListener('loadstart', function() {

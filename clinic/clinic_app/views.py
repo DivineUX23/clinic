@@ -302,13 +302,9 @@ def cart_view(request):
     if request.user.is_authenticated:
         user_profile, _ = Profile.objects.get_or_create(user=request.user)
         if user_profile.delivery_location:
-            initial_data = {
-                'street_no': user_profile.delivery_location.street_no,
-                'street': user_profile.delivery_location.street,
-                'country': user_profile.delivery_location.country,
-                'state': user_profile.delivery_location.state,
-                'city': user_profile.delivery_location.city,
-                'postal_code': user_profile.delivery_location.postal_code,                                
+            initial_data = {                
+                'address': user_profile.delivery_location.formatted_address,
+                'email': user_profile.email,
                 'first_name': user_profile.first_name if user_profile.first_name else request.user.username or request.user.get_full_name(),
                 'last_name':  user_profile.last_name if user_profile.last_name else None,
                 'phone_number': user_profile.phone_number,
@@ -323,9 +319,9 @@ def cart_view(request):
 
     print(order_category)
     # Prepare data for dynamic dropdowns
-    countries = list(Country.objects.values('id', 'name'))
-    states = list(Region.objects.values('id', 'name', 'country_id'))
-    cities = list(City.objects.values('id', 'name', 'region_id'))
+    #countries = list(Country.objects.values('id', 'name'))
+    #states = list(Region.objects.values('id', 'name', 'country_id'))
+    #cities = list(City.objects.values('id', 'name', 'region_id'))
 
 
     # Get the 5 most recent processing or failed orders
@@ -357,9 +353,9 @@ def cart_view(request):
         'discount': discount,
         'total': total,
         'form': form,
-        'countries': countries,
-        'states': states,
-        'cities': cities,
+        #'countries': countries,
+        #'states': states,
+        #'cities': cities,
 
         'recent_orders': recent_orders,
         'order_category': order_category,
@@ -506,7 +502,7 @@ def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
 
-        
+        """
         # Get the selected country and state from the POST data create_order
         country_id = request.POST.get('country')
         state_id = request.POST.get('state')
@@ -516,6 +512,7 @@ def signup_view(request):
             form.fields['state'].queryset = Region.objects.filter(country_id=country_id)
         if state_id:
             form.fields['city'].queryset = City.objects.filter(region_id=state_id)
+        """
         
         if form.is_valid():
             user = form.save()
@@ -526,21 +523,13 @@ def signup_view(request):
             user.profile.last_name = form.cleaned_data.get('last_name')
 
 
-            # Create and save the Location object
-            location = Location(                
-                street_no=form.cleaned_data.get('street_no'),
-                street=form.cleaned_data.get('street'),
-                country=form.cleaned_data.get('country'),
-                state=form.cleaned_data.get('state'),
-                city=form.cleaned_data.get('city'),
-                postal_code=form.cleaned_data.get('postal_code')
-            )
+            location = Location.formatted_address=form.cleaned_data.get('address')
             location.save()
             
             # Associate the Location with the user's profile
             user.profile.delivery_location = location
-
             user.save()
+
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
@@ -554,27 +543,12 @@ def signup_view(request):
     else:
         form = SignUpForm()
 
-
-    # Prepare data for dynamic dropdowns
-    countries = list(Country.objects.values('id', 'name'))
-    states = list(Region.objects.values('id', 'name', 'country_id'))
-    cities = list(City.objects.values('id', 'name', 'region_id'))
-
     context = {
         'form': form,
-        'countries_json': json.dumps(countries),
-        'states_json': json.dumps(states),
-        'cities_json': json.dumps(cities),
     }
 
     return render(request, 'signup.html', context)
     #return render(request, 'signup.html', {'form': form})
-
-
-
-
-
-
 
 
 
@@ -608,21 +582,7 @@ def initialize_payment(request):
     if request.method == 'POST':
 
         form = OrderForm(request.POST)
-
-        # Print raw POST data
-        print("Raw POST data:")
-        print(json.dumps(request.POST, indent=2))
-
-        form = OrderForm(request.POST)
-        print("Form instance:")
         if form.is_valid():
-            # Process the form data
-            #street_no = form.cleaned_data['street_no']
-            #street = form.cleaned_data['street']
-            #country = form.cleaned_data['country']
-            #state = form.cleaned_data['state']
-            #city = form.cleaned_data['city']
-            #postal_code = form.cleaned_data['postal_code']
 
             formatted_address = form.cleaned_data['address']
 
@@ -641,13 +601,6 @@ def initialize_payment(request):
             else:
                 # For non-authenticated users, always create a new location
                 location = Location.objects.create(
-                    #street_no=street_no,
-                    #street=street,
-                    #country=country,
-                    #state=state,
-                    #city=city,
-                    #postal_code=postal_code
-
                     formatted_address=formatted_address
                 )
                 cart = get_or_create_guest_cart(request)
@@ -672,10 +625,12 @@ def initialize_payment(request):
                 if 'data' in shipping_rates:
                     shipping_rates = shipping_rates.get('data', {})
                 else:
-                    messages.error(request, f"{shipping_rates.get('message')}")
+                    #messages.error(request, f"{shipping_rates.get('message')}")
+                    messages.error(request, f"Shipbubble Error: Error accessing riders in your location")
                     return redirect('cart')
             else:
-                messages.error(request, f"{shipping_rates.get('message')}")
+                #messages.error(request, f"{shipping_rates.get('message')}")
+                messages.error(request, f"Shipbubble Error: Error accessing riders in your location")
                 return redirect('cart')
             
             context = {
@@ -790,7 +745,6 @@ def payment_callback(request):
             
             #messages.success(request, success_message)
             messages.success(request, "Payment successful! Your shipment is on its way")
-            print("SUCESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
             return redirect('home')
         
         else:
@@ -999,23 +953,23 @@ def get_categories():
 def handle_authenticated_user_location(profile, form_data):
     if profile.delivery_location:
         location = profile.delivery_location
-        if location_needs_update(location, form_data):
-            update_location(location, form_data)
+        #if location_needs_update(location, form_data):
+        if location.formatted_address != form_data['address']:
+            #update_location(location, form_data)
+            location.formatted_address == form_data['address']
     else:
-        location = create_location(form_data)
+        #location = create_location(form_data)
+        location = Location.objects.create(
+            formatted_address = form_data['address']
+        )
         profile.delivery_location = location
 
     update_profile(profile, form_data)
     return location
 
+"""
 def location_needs_update(location, form_data):
     return any([
-        #location.street_no != form_data['street_no'],
-        #location.street != form_data['street'],
-        #location.country != form_data['country'],
-        #location.state != form_data['state'],
-        #location.city != form_data['city'],
-        #location.postal_code != form_data['postal_code']
         location.formatted_address != form_data['address']
     ])
 
@@ -1029,14 +983,9 @@ def update_location(location, form_data):
 
 def create_location(form_data):
     return Location.objects.create(
-        #street_no=form_data['street_no'],
-        #street=form_data['street'],
-        #country=form_data['country'],
-        #state=form_data['state'],
-        #city=form_data['city'],
-        #postal_code=form_data['postal_code']
         formatted_address = form_data['address']
     )
+"""
 
 def update_profile(profile, form_data):
     if profile.phone_number != form_data['phone_number']:
@@ -1088,8 +1037,6 @@ def make_shipbubble_request(url, data=None, method='POST'):
         if method == 'GET':
             response = requests.get(url, headers=headers)
         else:
-            print(f"\n\n data--------------------------00000000000000000000000-{data}\n\n ")
-
             response = requests.post(url, headers=headers, json=data)
 
         response.raise_for_status()

@@ -54,14 +54,6 @@ from .models import Country, Region, City
 import re
 
 class OrderForm(forms.Form):
-    #street_no = forms.CharField(max_length=255, required=False)
-    #street = forms.CharField(max_length=255)
-    #country = forms.ModelChoiceField(queryset=Country.objects.all())
-    #state = forms.ModelChoiceField(queryset=Region.objects.all())
-    #city = forms.ModelChoiceField(queryset=City.objects.all())
-    #postal_code = forms.CharField(max_length=20, required=False)
-    #name = forms.CharField(max_length=255)
-
 
     address = forms.CharField(max_length=255)
     first_name = forms.CharField(max_length=255)
@@ -88,7 +80,6 @@ class OrderForm(forms.Form):
     def clean_phone_number(self):
         phone_number = self.cleaned_data['phone_number']
 
-        # Check if the number starts with +234 or the Nigerian local format (070, 080, 090, etc.)
         nigerian_phone_pattern = r"^(\+234|0)[789][01]\d{8}$"
         if not re.match(nigerian_phone_pattern, phone_number):
             raise forms.ValidationError("Please enter a valid Nigerian phone number starting with +234 or 0.")

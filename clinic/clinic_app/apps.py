@@ -47,3 +47,4 @@ class ClinicAppConfig(AppConfig):
             "checkout_data":{"ship_from":{"name":"Mather Osas","phone":"+2347067239473","email":"Sam@gmail.com","address":"1, Ugbowo, Benin City, Edo State, 4444, Nigeria"},"ship_to":{"name":"Mather Osas","phone":"+2347067239473","email":"Sam@gmail.com","address":"1, Ugbowo, Benin City, Edo State, 4444, Nigeria"},"currency":"NGN","package_amount":4000,"package_weight":2,"pickup_date":"October 8th 2024","is_invoice_required":false}}}
 
 """
+
