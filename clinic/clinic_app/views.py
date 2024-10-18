@@ -25,6 +25,11 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import SignUpForm, OrderForm
 
+
+
+from haversine import haversine, Unit
+
+
 import json
 import logging
 from datetime import datetime
@@ -582,6 +587,7 @@ def initialize_payment(request):
     if request.method == 'POST':
 
         form = OrderForm(request.POST)
+        print(form)
         if form.is_valid():
 
             formatted_address = form.cleaned_data['address']
@@ -609,14 +615,10 @@ def initialize_payment(request):
             payment_reference = f"ORDER-{uuid.uuid4().hex[:8].upper()}"
             order = create_order(request, location, form.cleaned_data, total_amount, payment_reference)
             shipping_rates = get_shipping_rates(order, cart.items.all())
-
-
-            #if shipping_rates.get('status') != 'success':
-                #messages.error(request, f"{shipping_rates.get('message')}")
-                #return redirect('cart')
+            print(f"\n\n shipping_rates user------------------'{shipping_rates}'\n\n")
 
             if shipping_rates is None:
-                messages.error(request, "Failed to retrieve shipping rates.")
+                messages.error(request, f"Shipbubble Error: Error accessing riders in your location, try again")
                 return redirect('cart')
 
 
@@ -626,11 +628,16 @@ def initialize_payment(request):
                     shipping_rates = shipping_rates.get('data', {})
                 else:
                     #messages.error(request, f"{shipping_rates.get('message')}")
-                    messages.error(request, f"Shipbubble Error: Error accessing riders in your location")
+                    messages.error(request, f"Shipbubble Error: {shipping_rates.get('message')}")
                     return redirect('cart')
+            elif 'status' in shipping_rates and shipping_rates.get('status') == 'error':
+
+                #messages.error(request, f"{shipping_rates.get('message')}")
+                messages.error(request, f"Shipbubble Error: {shipping_rates.get('message')}")
+                return redirect('cart')
             else:
                 #messages.error(request, f"{shipping_rates.get('message')}")
-                messages.error(request, f"Shipbubble Error: Error accessing riders in your location")
+                messages.error(request, f"Shipbubble Error: {shipping_rates.get('message')}")
                 return redirect('cart')
             
             context = {
@@ -786,14 +793,29 @@ def get_shipping_rates(order, cart_items):
         for item in cart_items
     ]
     
-    sender_address = get_sender_address_code() 
+
+
     users_address = create_or_get_address_code(order)
+
+    if not isinstance(users_address, tuple) or len(users_address) < 3:
+        return users_address  
+
+
+    ref_location = (users_address[1], users_address[2])
+
+    locations = SenderAddress.objects.all()
+    
+    closest_location = min(
+        locations, 
+        key=lambda loc: haversine(ref_location, (loc.latitude, loc.longitude), unit=Unit.KILOMETERS))
+    
+    print(f"The closest location is: {closest_location}")
+
+    sender_address = get_sender_address_code(closest_location) 
+
     if not isinstance(sender_address, int):
         return sender_address 
     
-    if not isinstance(users_address, int):
-        return users_address  
-
     data = {
         "sender_address_code": sender_address,
         "reciever_address_code": users_address, 
@@ -809,8 +831,12 @@ def get_shipping_rates(order, cart_items):
     }
 
     response = make_shipbubble_request(url, data)
-    #return response.get('data', {})
 
+    if response.get('status') == 'error':
+        if '422' in response["message"]:
+            return {'status': 'error', 'message': f"Error accessing riders in your location, try again"}
+        elif '400' in response["message"]:
+            return {'status': 'error', 'message': f"Error accessing riders in your location."}
     return response
 
 
@@ -829,7 +855,7 @@ def create_shipment(order):
 
     print(f"--------------------{data}")
     response = make_shipbubble_request(url, data)
-    #if response.get('status') == 'success': {data['name']}"
+    #if response.get('status') == get_sender_address_code'success': {data['name']}"
 
 
     if response is None:
@@ -852,47 +878,47 @@ def create_shipment(order):
 
 
 
-def get_sender_address_code():
+def get_sender_address_code(sender):
     sender_code = cache.get('sender_address_code')
     if sender_code:
+        print(f"\n\n chaced response------------------{sender_code}\n\n")
         return sender_code
 
-    sender_address = SenderAddress.objects.first()
+    sender_address = SenderAddress.objects.get(id=sender.id)
+    print(f"..............................................{sender_address.phone_number}")
+    print(f"..............................................{sender_address.email}")
+    print(f"..............................................{sender_address.formatted_address}")
+
     if not sender_address:
         logger.error("No sender address found in the database")
-        return None
+        return {'status': 'error', 'message': f"No sender address found in the database"}
 
     url = "https://api.shipbubble.com/v1/shipping/address/validate"
-    
-    
     data = {
         "phone": sender_address.phone_number,
         "email": sender_address.email,
-        "name": sender_address.admin.first_name  + " " + "David",
+        "name": f"{sender_address.admin.first_name} {sender_address.admin.last_name}",
         "address": sender_address.formatted_address
     }
-    
     print(data)
-
     response = make_shipbubble_request(url, data)
 
-  
     if 'status' in response and response.get('status') == 'success':
         if 'data' in response and 'address_code' in response['data']:
             sender_code = response['data']['address_code']
             cache.set('sender_address_code', sender_code, 60*60*24)
-            print(f"\n\n chaced response------------------{sender_code}\n\n")
-
             return sender_code
-        
         else:
             logger.error(f"Invalid response structure from Shipbubble API for order {data['name']}")
             return response
+    elif response.get('status') == 'error':
+        if '422' in response["message"]:
+            return {'status': 'error', 'message': f"Error Validating senders details, Contact us to resolve issue"}
+        elif '400' in response["message"]:
+            return {'status': 'error', 'message': f"Error Validating senders address, Contact us to resolve issue"}
     else:
         logger.error(f"Error creating sender address: {response.get('message')}")
-        print(f"Error creating sender address: {response.get('message')}")
-
-        return response
+        return {'status': 'error', 'message': f"Error Validating senders data, Contact us to resolve issue"}
 
 
 
@@ -908,7 +934,6 @@ def create_or_get_address_code(order):
     delivery_address = order.delivery_location
     
     #data = {"phone": "07067239473", response.sta"email": "Sam@gmail.com", "name": "Mather Osas", "address": "1, Ugbowo, Benin City, Edo State, 4444, Nigeria"}
-    
     data = {
         "phone": str(order.phone_number),
         "email": str(order.email),
@@ -920,52 +945,83 @@ def create_or_get_address_code(order):
     response = make_shipbubble_request(url, data)
     print(f"\n\n bubblw response------------------{response}\n\n")
 
+
     if 'status' in response and response.get('status') == 'success':
-
-    #if response.get('status') == 'success':
-
         if 'data' in response and 'address_code' in response['data']:
             address_code = response['data']['address_code']
             cache.set(cache_key, address_code, 60*60)
-            return address_code
-        
+            return (address_code, response['data']['latitude'], response['data']['longitude'])
         else:
             logger.error(f"Invalid response structure from Shipbubble API for order {data['name']}")
             return response
+    elif response.get('status') == 'error':
+        error_message = response.get("message", "Unknown error")
+        if '422' in response["message"]:
+            return {'status': 'error', 'message': f"Error Validating your details, ensure your details are correct"}
+        elif '400' in response["message"]:
+            return {'status': 'error', 'message': f"Error Validating your address, ensure your address is correct"}
+        else:
+            return {'status': 'error', 'message': error_message}
+
     else:
-        logger.error(f"Error creating address for order {order.id}: {response.get('message')}")
-        return response
+        logger.error(f"Error creating address for order {data['name']}: {response.get('message')}")
+        return {'status': 'error', 'message': f"Error Validating your data, ensure your details are correct"}
+
+
 
 
 def get_categories():
     url = "https://api.shipbubble.com/v1/shipping/labels/categories"
     response = make_shipbubble_request(url, method='GET')  
-
-
-    print(f"\n\n response------------------{response}\n\n")
-
     return response.get('data', [])
 
 
 
-# Helper functions
 
+# Helper functions 
 def handle_authenticated_user_location(profile, form_data):
     if profile.delivery_location:
         location = profile.delivery_location
-        #if location_needs_update(location, form_data):
         if location.formatted_address != form_data['address']:
-            #update_location(location, form_data)
-            location.formatted_address == form_data['address']
+            location.formatted_address = form_data['address']
+        location.save()
     else:
-        #location = create_location(form_data)
         location = Location.objects.create(
             formatted_address = form_data['address']
         )
         profile.delivery_location = location
+    update_profile(profile, form_data)
+    print(location)
+    return location
+
+
+
+
+def handle_authenticated_user_location(profile, form_data):
+    if profile.delivery_location:
+        location = profile.delivery_location
+        if location.formatted_address != form_data['address']:
+            location.formatted_address = form_data['address']
+            location.save()
+    else:
+        location = Location.objects.create(
+            formatted_address=form_data['address']
+        )
+        profile.delivery_location = location
 
     update_profile(profile, form_data)
+    profile.save()
     return location
+
+
+def update_profile(profile, form_data):
+    if profile.phone_number != form_data['phone_number']:
+        profile.phone_number = form_data['phone_number']
+    if profile.email != form_data['email']:
+        profile.email = form_data['email']
+    profile.save()
+
+
 
 """
 def location_needs_update(location, form_data):
@@ -986,14 +1042,6 @@ def create_location(form_data):
         formatted_address = form_data['address']
     )
 """
-
-def update_profile(profile, form_data):
-    if profile.phone_number != form_data['phone_number']:
-        profile.phone_number = form_data['phone_number']
-    if profile.email != form_data['email']:
-        profile.email = form_data['email']
-    profile.save()
-
 
 def create_order(request, location, form_data, total_amount, payment_reference):
 
@@ -1038,9 +1086,9 @@ def make_shipbubble_request(url, data=None, method='POST'):
             response = requests.get(url, headers=headers)
         else:
             response = requests.post(url, headers=headers, json=data)
-
         response.raise_for_status()
         return response.json()
+    
     except requests.RequestException as e:
         logger.error(f"Shipbubble API error: {str(e)}")
         return {'status': 'error', 'message': str(e)}

@@ -18,9 +18,9 @@
                data-service-code="{{ courier.service_code }}"
                data-courier-id="{{ courier.courier_id }}"
                data-total="{{ courier.total }}">
-            <div class="absolute top-2 right-2 hidden check-icon">
+            <!--<div class="absolute top-2 right-2 hidden check-icon">
               <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            </div>
+            </div>-->
             <div class="p-4 sm:p-6">
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                 <div class="flex items-center space-x-4 mb-2 sm:mb-0">
@@ -128,10 +128,8 @@
 
 <style>
   .courier-option.selected {
-    @apply ring-2 ring-purple-500 bg-purple-50;
-  }
-  .courier-option.selected .check-icon {
-    display: block;
+    border: 2px solid #800080;
+    background-color: rgba(128, 0, 128, 0.05);
   }
 </style>
 

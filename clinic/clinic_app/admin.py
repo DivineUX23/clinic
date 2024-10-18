@@ -57,19 +57,15 @@ from .models import SenderAddress
 
 @admin.register(SenderAddress)
 class SenderAddressAdmin(admin.ModelAdmin):
-    list_display = ('admin', 'email', 'phone_number', 'formatted_address')
-    search_fields = ('admin__username', 'email', 'phone_number', 'formatted_address')
-
+    list_display = ('admin', 'email', 'phone_number', 'address')
+    search_fields = ('admin__username', 'email', 'phone_number', 'address')
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'add_to_cart_count', 'created_at', 'updated_at']
-    #list_display = ['name', 'slug', 'price', 'stock', 'available', 'add_to_cart_count', 'created_at', 'updated_at']
     list_filter = ['available', 'category', 'section', 'created_at', 'updated_at']
-    #list_filter = ['available', 'category', 'created_at', 'updated_at']
     list_editable = ['price', 'stock', 'available', 'section']
-    #list_editable = ['price', 'stock', 'available']
 
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}

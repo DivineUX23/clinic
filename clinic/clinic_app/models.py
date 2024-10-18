@@ -7,6 +7,11 @@ from ckeditor.fields import RichTextField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from cities_light.models import Country, Region, City
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 
@@ -239,7 +244,84 @@ class SearchedProduct(models.Model):
 
 
 
+import requests
+class SenderAddress(models.Model):
+    admin = models.OneToOneField(User, on_delete=models.CASCADE, related_name='sender_address')
+    email = models.EmailField(max_length=150)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True)
+    
+    formatted_address = models.CharField(max_length=255, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural = "Sender Addresses"
+
+    def save(self, *args, **kwargs):
+        validation_result = self.get_delivery_address()
+        if validation_result.get('status') == 'error':
+            #raise ValueError(validation_result.get('message', 'Error validating address.'))
+            return {'status': 'error', 'message': 'No address provided'}
+        super(SenderAddress, self).save(*args, **kwargs)
+    
+    def get_delivery_address(self):
+        print(self.address)
+        if not self.address:
+            return {'status': 'error', 'message': 'No address provided'}
+
+        url = "https://api.shipbubble.com/v1/shipping/address/validate"
+        data = {
+            "phone": self.phone_number,
+            "email": self.email,
+            "name": f"{self.admin.first_name} {self.admin.last_name}",
+            "address": self.address
+        }
+
+        headers = {
+            "Authorization": f"Bearer {settings.SHIPBUBBLE_API_KEY}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            response_data = response.json()
+
+            if response_data.get('status') == 'success' and 'data' in response_data:
+                address_data = response_data['data']
+                if 'address_code' in address_data:
+                    self.formatted_address = address_data.get('formatted_address', '')
+                    self.latitude = address_data.get('latitude')
+                    self.longitude = address_data.get('longitude')
+                    self.save()  # Save the instance with updated fields
+                    return {'status': 'success', 'address': self.formatted_address}
+                else:
+                    logger.warning(f"Unexpected success response structure: {response_data}")
+                    return {'status': 'error', 'message': 'Unexpected response structure'}
+
+            elif response_data.get('status') == 'error':
+                error_message = "Error validating address. Please contact support."
+                if '422' in response_data.get("message", ""):
+                    error_message = "Error validating sender's details. Please contact support."
+                elif '400' in response_data.get("message", ""):
+                    error_message = "Error validating sender's address. Please contact support."
+
+                self.formatted_address = error_message
+                self.save()
+                logger.error(f"ShipBubble API error: {response_data}")
+                return {'status': 'error', 'message': error_message}
+
+            else:
+                logger.error(f"Unexpected response from ShipBubble API: {response_data}")
+                return {'status': 'error', 'message': "Unexpected error. Please try again later."}
+
+        except requests.RequestException as e:
+            logger.error(f"Request to ShipBubble API failed: {str(e)}")
+            return {'status': 'error', 'message': "Could not connect to validation service. Please try again later."}
+
+
+"""
 class SenderAddress(models.Model):
     admin = models.OneToOneField(User, on_delete=models.CASCADE, related_name='sender_address')
     email = models.EmailField(max_length=150)
@@ -279,6 +361,6 @@ class SenderAddress(models.Model):
         self.formatted_address = self.get_formatted_address()
         super().save(*args, **kwargs)
 
-
+"""
 
 

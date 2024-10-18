@@ -152,7 +152,7 @@ End CSS
                                 <div class="col-12">
                                     <label for="address" class="form-label input-label">Full Address</label>
                                     <div class="relative">
-                                        <input type="text" class="form-control w-full border-aliceblue" id="address" name="address" placeholder="Enter your full address" value="{{ form.address.value|default:'' }}">
+                                        <input type="text" class="form-control w-full border-aliceblue" id="address" name="address" placeholder="Enter your full address" value="{{ form.address.value|default:'' }}" required>
                                         <div id="suggestions" class="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto z-50 hidden">
 
                                         <!-- Suggestions will be dynamically added here -->
@@ -326,6 +326,7 @@ End CSS
             phone_number: document.getElementById('phone_number'),
             email: document.getElementById('email'),
             order_category: document.getElementById('order_category'),
+            address: document.getElementById('address'),
         };
     
 
@@ -365,7 +366,7 @@ End CSS
                             });
                         }
                     } catch (error) {
-                        console.error('Error fetching address suggestions:', error);
+                        console.log('Error fetching address suggestions:', error);
                         suggestionsDiv.innerHTML = '<div class="p-2 cursor-pointer hover:bg-gray-100">Error fetching suggestions</div>';
                     }
                 } else {
@@ -383,6 +384,7 @@ End CSS
     
         addressInput.addEventListener('change', function() {
             hiddenAddress.value = this.value;
+            console.log('Full address updated:', hiddenAddress.value);
         });
     
         const hiddenFields = {};
