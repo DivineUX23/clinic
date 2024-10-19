@@ -54,12 +54,10 @@ from django.contrib import admin
 from .models import SenderAddress
 
 
-
 @admin.register(SenderAddress)
 class SenderAddressAdmin(admin.ModelAdmin):
-    list_display = ('admin', 'email', 'phone_number', 'address')
-    search_fields = ('admin__username', 'email', 'phone_number', 'address')
-
+    list_display = ('admin', 'phone_number', 'address', 'formatted_address', 'validation_error')
+    readonly_fields = ('formatted_address', 'latitude', 'longitude', 'validation_error')
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):

@@ -31,10 +31,10 @@ class Location(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    email = models.EmailField(max_length=150)
+    #email = models.EmailField(max_length=150)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    #first_name = models.CharField(max_length=100)
+    #last_name = models.CharField(max_length=100)
     delivery_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
@@ -132,27 +132,6 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    session_key = models.CharField(max_length=40, null=True, blank=True)
-
-    delivery_location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=20)
-    email = models.EmailField(max_length=150)
-
-
-    
-    order_note = models.TextField(blank=True, null=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_reference = models.CharField(max_length=100, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    paid = models.BooleanField(default=False)
-
-    service_code = models.CharField(max_length=100, null=True, blank=True)  # Made nullable
-    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Made nullable
-    tracking_number = models.CharField(max_length=100, null=True, blank=True)  # Changed to CharField
-        
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('processing', 'Processing'),
@@ -160,14 +139,37 @@ class Order(models.Model):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
     ]
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    delivery_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    order_note = models.TextField(blank=True, null=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_reference = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    paid = models.BooleanField(default=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    courier_id = models.CharField(max_length=255, null=True, unique=False)
-    request_token = models.CharField(max_length=255, null=True, unique=False)
     order_category = models.CharField(max_length=255, null=True, unique=False)
 
+    class Meta:
+        ordering = ['-created_at']
 
-    # Shipment information from shipbubble
-    shipment_order_id = models.CharField(max_length=50, blank=True, null=True)
+    def __str__(self):
+        return f"Order {self.id} by {self.user.get_full_name()}"
+
+    def get_total_cost(self):
+        return sum(item.get_cost() for item in self.items.all())
+
+
+
+
+class ShippingInfo(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='shipping_info')
+
+    shipment_id = models.CharField(max_length=50, blank=True, null=True)
+    service_code = models.CharField(max_length=100, null=True, blank=True)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    tracking_number = models.CharField(max_length=100, null=True, blank=True)
+    courier_id = models.CharField(max_length=255, null=True)
     courier_name = models.CharField(max_length=100, blank=True, null=True)
     courier_email = models.EmailField(blank=True, null=True)
     courier_phone = models.CharField(max_length=20, blank=True, null=True)
@@ -177,22 +179,8 @@ class Order(models.Model):
     tracking_url = models.URLField(blank=True, null=True)
     shipment_date = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
-        ordering = ['-created_at']
-
     def __str__(self):
-        return f"Order {self.id} by {self.name}"
-
-    def get_total_cost(self):
-        return sum(item.get_cost() for item in self.items.all())
-
-    def get_formatted_delivery_address(self):
-        if self.delivery_location:
-            return self.delivery_location.formatted_address
-        return "No delivery address set"
-
-    def get_total_with_shipping(self):
-        return self.total_amount + (self.shipping_cost or Decimal('0.00'))
+        return f"Shipping Info for Order {self.order.id}"
 
 
 
@@ -243,7 +231,7 @@ class SearchedProduct(models.Model):
         return self.name
 
 
-
+"""
 import requests
 class SenderAddress(models.Model):
     admin = models.OneToOneField(User, on_delete=models.CASCADE, related_name='sender_address')
@@ -319,48 +307,105 @@ class SenderAddress(models.Model):
         except requests.RequestException as e:
             logger.error(f"Request to ShipBubble API failed: {str(e)}")
             return {'status': 'error', 'message': "Could not connect to validation service. Please try again later."}
-
-
 """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.conf import settings
+import requests
+import logging
+
+logger = logging.getLogger(__name__)
+
 class SenderAddress(models.Model):
-    admin = models.OneToOneField(User, on_delete=models.CASCADE, related_name='sender_address')
-    email = models.EmailField(max_length=150)
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender_addresses', limit_choices_to={'is_staff': True})
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    street_no = models.CharField(max_length=10)
-    street = models.CharField(max_length=255)
-    country = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
+    address = models.CharField(max_length=255, blank=True)
+    
     formatted_address = models.CharField(max_length=255, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    
+    validation_error = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Sender Addresses"
 
-    def __str__(self):
-        return self.formatted_address
-
-    def get_formatted_address(self):
-        components = []
-        if self.street_no:
-            components.append(self.street_no)
-        if self.street:
-            components.append(self.street)
-        if self.city:
-            components.append(self.city)
-        if self.state:
-            components.append(self.state)
-        if self.postal_code:
-            components.append(self.postal_code)
-        if self.country:
-            components.append(self.country)
-        
-        return ", ".join(filter(None, components))
-
     def save(self, *args, **kwargs):
-        self.formatted_address = self.get_formatted_address()
-        super().save(*args, **kwargs)
+        validation_result = self.get_delivery_address()
+        if validation_result.get('status') == 'error':
+            self.validation_error = validation_result.get('message', 'Error validating address.')
+        else:
+            self.validation_error = None
+        super(SenderAddress, self).save(*args, **kwargs)
+    
+    def get_delivery_address(self):
+        if not self.address:
+            return {'status': 'error', 'message': 'No address provided'}
 
-"""
+        url = "https://api.shipbubble.com/v1/shipping/address/validate"
+        data = {
+            "phone": self.phone_number,
+            "email": self.admin.email,
+            "name": f"{self.admin.first_name} {self.admin.last_name}",
+            "address": self.address
+        }
 
+        headers = {
+            "Authorization": f"Bearer {settings.SHIPBUBBLE_API_KEY}",
+            "Content-Type": "application/json",
+        }
 
+        try:
+            print(data)
+            response = requests.post(url, headers=headers, json=data)
+            response.raise_for_status()
+            response_data = response.json()
+            print(f"..................{response_data}")
+
+            if response_data.get('status') == 'success' and 'data' in response_data:
+                address_data = response_data['data']
+                if 'address_code' in address_data:
+                    self.formatted_address = address_data.get('formatted_address', '')
+                    self.latitude = address_data.get('latitude')
+                    self.longitude = address_data.get('longitude')
+                    return {'status': 'success', 'address': self.formatted_address}
+                else:
+                    logger.warning(f"Unexpected success response structure: {response_data}")
+                    return {'status': 'error', 'message': 'Unexpected response structure'}
+
+            elif response_data.get('status') == 'error':
+                error_message = "Error validating address. Please contact support."
+                if '422' in response_data.get("message", ""):
+                    error_message = "Error validating sender's details. Please contact support."
+                elif '400' in response_data.get("message", ""):
+                    error_message = "Error validating sender's address. Please contact support."
+
+                logger.error(f"ShipBubble API error: {response_data}")
+                return {'status': 'error', 'message': error_message}
+
+            else:
+                logger.error(f"Unexpected response from ShipBubble API: {response_data}")
+                return {'status': 'error', 'message': "Unexpected error. Please try again later."}
+
+        except requests.RequestException as e:
+            logger.error(f"Request to ShipBubble API failed: {str(e)}")
+            return {'status': 'error', 'message': "Could not connect to validation service. Please try again later."}
