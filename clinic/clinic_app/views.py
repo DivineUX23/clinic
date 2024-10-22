@@ -592,7 +592,7 @@ def make_payment(request, order_id):
             shipping_info.service_code = chosen_rate_data['service_code']
             shipping_info.courier_id = chosen_rate_data['courier_id']
             shipping_info.shipping_cost = Decimal(chosen_rate_data['total'])
-            shipping_info.request_token = chosen_rate_data['request_token']
+            shipping_info.request_token = request_token
             shipping_info.save()
             """
             else:
