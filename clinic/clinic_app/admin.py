@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem, CartItem, Cart, FAQ, SearchedProduct
+from .models import Category, Product, Order, OrderItem, CartItem, Cart, FAQ, SearchedProduct, PackageDimension
 from .models import PaymentSettings
 from ckeditor.widgets import CKEditorWidget
 from django import forms
@@ -59,16 +59,34 @@ class SenderAddressAdmin(admin.ModelAdmin):
     list_display = ('admin', 'phone_number', 'address', 'formatted_address', 'validation_error')
     readonly_fields = ('formatted_address', 'latitude', 'longitude', 'validation_error')
 
+
+
+@admin.register(PackageDimension)
+class PackageDimensionAdmin(admin.ModelAdmin):
+    list_display = ('length', 'width', 'height', 'unit_weight')
+
+
+class PackageDimensionInline(admin.StackedInline):
+    model = PackageDimension
+    can_delete = False
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'price', 'stock', 'section', 'available', 'add_to_cart_count', 'created_at', 'updated_at']
     list_filter = ['available', 'category', 'section', 'created_at', 'updated_at']
     list_editable = ['price', 'stock', 'available', 'section']
+    inlines = [PackageDimensionInline]
 
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
     filter_horizontal = ('category',)
     readonly_fields = ('add_to_cart_count',)
+
+
+    def save_model(self, request, obj, form, change):
+        if not hasattr(obj, 'package_dimension'):
+            PackageDimension.objects.create(product=obj)
+        super().save_model(request, obj, form, change)
 
     def get_ordering(self, request):
         return ['-created_at']  # Default ordering by creation date, newest first

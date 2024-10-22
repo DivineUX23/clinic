@@ -18,10 +18,6 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import SignUpForm, OrderForm
 
-
-
-
-
 import json
 import logging
 
@@ -41,7 +37,7 @@ from .helpers import (get_or_create_guest_cart, get_cart_item_count,
                      create_authenticated_order, create_session_order, update_authenticated_order,
                      update_session_order, verify_payment, calculate_total, get_shipping_rates, 
                      create_shipment, get_categories, make_paystack_request, handle_payment_error,
-                    clear_cart, get_or_create_cart )
+                    clear_cart, get_or_create_cart, send_admin_notification, send_user_notification)
 
 
 logger = logging.getLogger(__name__)
@@ -278,11 +274,12 @@ def cart_view(request):
             ).order_by('-created_at')[:5]
 
         else:
-    
-            recent_orders = request.session['order'].objects.filter(
-                session_key=request.session.session_key,
+            order_id = request.session.get('order_id')
+            recent_orders = Order.objects.filter(
+                id=order_id, 
+                user__isnull=True,
                 status__in=['processing', 'failed']
-            ).order_by('-created_at')[:5]
+                ).order_by('-created_at')[:5]
 
     except Exception as e:
         print(f"Error fetching recent orders: {e}")
@@ -438,7 +435,6 @@ def search_products(request):
 from datetime import datetime
 # User Auth
 from .models import Location
-from cities_light.models import Country, Region, City
 import json
 
 
@@ -511,7 +507,7 @@ def signin_view(request):
 
 
 
-
+#update_authenticated_order
 def initialize_payment(request):
     if request.method == 'POST':
         form = OrderForm(request.POST)
@@ -568,7 +564,7 @@ def initialize_payment(request):
 
 
 
-# PAYMENT:
+# PAYMENT: order.paid
 
 def make_payment(request, order_id):
     if request.method == 'POST':
@@ -591,28 +587,31 @@ def make_payment(request, order_id):
         try:
             chosen_rate_data = json.loads(chosen_rate)
 
-            if request.user.is_authenticated:
-                shipping_info, created = ShippingInfo.objects.get_or_create(order=order)
-                shipping_info.service_code = chosen_rate_data['service_code']
-                shipping_info.courier_id = chosen_rate_data['courier_id']
-                shipping_info.shipping_cost = Decimal(chosen_rate_data['total'])
-                shipping_info.save()
+            #if request.user.is_authenticated:
+            shipping_info, created = ShippingInfo.objects.get_or_create(order=order)
+            shipping_info.service_code = chosen_rate_data['service_code']
+            shipping_info.courier_id = chosen_rate_data['courier_id']
+            shipping_info.shipping_cost = Decimal(chosen_rate_data['total'])
+            shipping_info.request_token = chosen_rate_data['request_token']
+            shipping_info.save()
+            """
             else:
-                order['shipping_info'] = {
+                guest_info['shipping_info'] = {
                     'service_code': chosen_rate_data['service_code'],
                     'courier_id': chosen_rate_data['courier_id'],
                     'shipping_cost': str(chosen_rate_data['total'])
                 }
-                request.session.modified = True
+                request.session.modified = Truerequest_token
+            """
+            amount_in_kobo = int((order.total_amount + shipping_info.shipping_cost) * 100)
+            guest_info = order.request.session.get('guest_user', {}) if hasattr(order, 'request') else {}
 
-            amount_in_kobo = int((order.total_amount + order.shipping_cost) * 100)
-            
             # Update the paystack_data creation:
             paystack_data = {
                 "amount": amount_in_kobo,
-                "email": request.user.email if request.user.is_authenticated else order['email'],
+                "email": request.user.email if request.user.is_authenticated else guest_info['email'],
                 "callback_url": request.build_absolute_uri(reverse('payment_callback')),
-                "reference": order.payment_reference if request.user.is_authenticated else order['payment_reference'],
+                "reference": order.payment_reference if request.user.is_authenticated else guest_info['payment_reference'],
             }
             
             print(paystack_data)
@@ -644,25 +643,37 @@ def payment_callback(request):
             order = get_object_or_404(Order, payment_reference=reference)
         else:
             order = request.session.get('order')
-            if not order or order['payment_reference'] != reference:
+            if not order or order.payment_reference != reference:
                 messages.error(request, "Invalid order reference.")
                 return redirect('cart')
 
         # Create shipment
         shipment_created = create_shipment(order)
-
         clear_cart(request)
 
         if shipment_created and shipment_created.get('status') == 'success':
             shipment_data = shipment_created['data']
             
-            if request.user.is_authenticated:
-                update_authenticated_order(order, shipment_data)
-            else:
-                update_session_order(request, order, shipment_data)
+            #if request.user.is_authenticated:
+                #update_authenticated_order(order, shipment_data)
+            #else:
+                #update_session_order(request, order, shipment_data)user_orders
+            update_authenticated_order(order, shipment_data)
+
+            send_admin_notification(order, shipment_success=True)
+            send_user_notification(order, success=True)
+
             messages.success(request, "Payment successful! Your shipment is on its way.")
-            return redirect('home')
+            return redirect("user_orders")
+            #return redirect(shipment_data['tracking_url'])
+            #return redirect('home')
         else:
+            order.paid = True
+            order.status = 'confirmed'
+            order.save()
+            send_admin_notification(order, shipment_success=False)
+            send_user_notification(order, success=False)
+
             messages.error(request, "Payment successful, but shipment creation failed. Please contact support.")
     else:
         messages.error(request, "Payment verification failed.")
@@ -712,9 +723,10 @@ def shipbubble_webhook(request):
 
         if order_id and status_code:
             try:
-                order = Order.objects.get(shipment_order_id=order_id)
-                order.status = status_code
-                order.save()
+                shipment = ShippingInfo.objects.get(shipment_id=order_id)
+                shipment.shipment_status = status_code
+                shipment.order.status = status_code
+                shipment.save()
             except Order.DoesNotExist:
                 pass
 

@@ -7,7 +7,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cities_light', '0011_alter_city_country_alter_city_region_and_more'),
         ('clinic_app', '0021_location_alter_profile_delivery_location'),
     ]
 

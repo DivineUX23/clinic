@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'ckeditor',
     'ckeditor_uploader',
-    'cities_light',
+    #'cities_light',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -229,11 +229,25 @@ CKEDITOR_UPLOAD_PATH = "product_images/"
 
 
 # Cities Light configuration
-CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
-CITIES_LIGHT_INCLUDE_COUNTRIES = ['NG', 'GH']  # Nigeria and Ghana
-CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLR', 'PPLS', 'STLMT',]
+#CITIES_LIGHT_TRANSLATION_LANGUAGES = ['en']
+#CITIES_LIGHT_INCLUDE_COUNTRIES = ['NG', 'GH']  # Nigeria and Ghana
+#CITIES_LIGHT_INCLUDE_CITY_TYPES = ['PPL', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPLC', 'PPLF', 'PPLG', 'PPLL', 'PPLR', 'PPLS', 'STLMT',]
 
+import os
 
+# In settings.py
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+
+# Admin settings
+ADMINS = [('Admin Name', 'admin@example.com')]
+DEFAULT_FROM_EMAIL = 'noreply@jollylifehealth.com'
 
 CACHES = {
     'default': {

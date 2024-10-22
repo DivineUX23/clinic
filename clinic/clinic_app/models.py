@@ -6,7 +6,6 @@ from decimal import Decimal
 from ckeditor.fields import RichTextField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from cities_light.models import Country, Region, City
 from django.conf import settings
 import logging
 
@@ -93,6 +92,17 @@ class Category(models.Model):
         return self.name
 
 
+class PackageDimension(models.Model):
+
+    product = models.OneToOneField('Product', on_delete=models.CASCADE, related_name='package_dimension')    
+    length = models.DecimalField(max_digits=5, decimal_places=2, default=10)
+    width = models.DecimalField(max_digits=5, decimal_places=2, default=10)
+    height = models.DecimalField(max_digits=5, decimal_places=2, default=10)
+    unit_weight = models.DecimalField(max_digits=5, decimal_places=2, default=1),
+
+    def __str__(self):
+        return f"{self.length} x {self.width} x {self.height}"
+    
 
 class Product(models.Model):
     
@@ -113,17 +123,29 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
-
-
     add_to_cart_count = models.PositiveIntegerField(default=0, db_index=True)
-
-
+    #package_dimension = models.OneToOneField(PackageDimension, on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
 
+
+    def save(self, *args, **kwargs):
+        creating = not self.pk  # Check if this is a new product
+        super().save(*args, **kwargs)
+        
+        if creating:
+            PackageDimension.objects.get_or_create(
+                product=self,
+                defaults={
+                    'length': 10,
+                    'width': 10,
+                    'height': 10,
+                    'unit_weight': 1
+                }
+            )
 
     def increment_add_count(self):
         self.add_to_cart_count += 1
@@ -133,13 +155,14 @@ class Product(models.Model):
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('processing', 'Processing'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-        ('cancelled', 'Cancelled'),
-    ]
+        ('pending', 'pending'),
+        ('confirmed', 'confirmed'),
+        ('picked_up', 'picked_up'),
+        ('in_transit', 'in_transit'),
+        ('completed', 'completed'),
+        ('cancelled', 'cancelled'),
 
+    ]
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     delivery_location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     order_note = models.TextField(blank=True, null=True)
@@ -161,12 +184,12 @@ class Order(models.Model):
 
 
 
-
 class ShippingInfo(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='shipping_info')
 
     shipment_id = models.CharField(max_length=50, blank=True, null=True)
     service_code = models.CharField(max_length=100, null=True, blank=True)
+    request_token = models.CharField(max_length=100, null=True, blank=True)
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     tracking_number = models.CharField(max_length=100, null=True, blank=True)
     courier_id = models.CharField(max_length=255, null=True)
@@ -202,7 +225,7 @@ class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    session_key = models.CharField(max_length=40, unique=True, null=True, blank=True)
+    #session_key = models.CharField(max_length=40, unique=True, null=True, blank=True)
     def __str__(self):
         return f"Cart {self.id}"
 
